@@ -1,0 +1,28 @@
+---
+interface Props {
+  name: 'arrow' | 'check' | 'pin' | 'spark' | 'plus' | 'down' | 'mail';
+  size?: number;
+}
+const { name, size = 20 } = Astro.props;
+const paths = {
+  arrow: 'M5 12h14m-6-6 6 6-6 6',
+  check: 'm5 12 4 4L19 6',
+  pin: 'M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z M15 10a3 3 0 1 1-6 0 3 3 0 0 1 6 0',
+  spark: 'm12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5L12 3Z',
+  plus: 'M12 5v14M5 12h14',
+  down: 'M12 5v14m-6-6 6 6 6-6',
+  mail: 'M3 5h18v14H3V5Zm0 0 9 8 9-8',
+};
+---
+
+<svg
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.6"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"><path d={paths[name]}></path></svg
+>

@@ -1,0 +1,576 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Icon from '../components/Icon.astro';
+import { site, services, questions } from '../data/site';
+---
+
+<Layout>
+  <a class="skip-link" href="#indhold">Spring til indhold</a>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="#" aria-label="Lys og Logik – forside">
+        <img
+          src="/images/logo-v11.png"
+          alt="Lys & Logik · El og automation"
+          width="1536"
+          height="1024"
+        />
+      </a>
+      <button
+        class="menu-toggle"
+        aria-expanded="false"
+        aria-controls="navigation"
+        aria-label="Åbn menu"><span></span><span></span></button
+      >
+      <nav id="navigation" aria-label="Hovedmenu">
+        <a href="#ydelser">Det hjælper vi med</a>
+        <a href="#pilot">Pilotprojektet <span class="nav-dot"></span></a>
+        <a href="#om-os">Om os</a>
+        <a class="button button-small" href="#kontakt"
+          >Beskriv din opgave <Icon name="arrow" size={17} /></a
+        >
+      </nav>
+    </div>
+  </header>
+
+  <main id="indhold">
+    <section class="hero" aria-labelledby="hero-heading">
+      <picture class="hero-image"
+        ><source
+          srcset="/images/hero-960.webp 960w, /images/hero.webp 1536w"
+          type="image/webp"
+        /><img
+          src="/images/hero.webp"
+          alt="Varmt lys ved et moderne hjem i skumringen. Inspirationsbillede."
+          width="1536"
+          height="1024"
+          fetchpriority="high"
+        /></picture
+      >
+      <div class="container hero-content">
+        <div class="hero-copy">
+          <p class="eyebrow">
+            <span class="light-dot"></span> EL & AUTOMATION · {site.area}
+          </p>
+          <h1 id="hero-heading">
+            Godt lys.<br />Gennemtænkte<br /><span>løsninger.</span>
+          </h1>
+          <p class="hero-description">
+            Vi hjælper med lys og smarte løsninger i hjemmet. Med faglig omtanke
+            og en aftale, du kan forstå.
+          </p>
+          <div class="hero-actions">
+            <a class="button" href="#pilot"
+              >Bliv et af vores pilotprojekter <Icon name="arrow" /></a
+            ><a class="text-link light-link" href="#ydelser"
+              >Se, hvad vi kan hjælpe med <Icon name="down" size={17} /></a>
+          </div>
+        </div>
+        <a class="hero-note" href="#pilot"
+          ><span class="note-icon"><Icon name="spark" size={26} /></span><span
+            ><strong>Dit projekt. Vores begyndelse.</strong><span
+              >Vi søger {site.pilotPlaces} hjem med en god idé.</span
+            ></span
+          ><Icon name="arrow" /></a
+        >
+      </div>
+      <span class="image-credit">Inspirationsbillede</span>
+    </section>
+
+    <div class="promise-strip">
+      <div class="container promises">
+        <span><Icon name="check" /> Tydelige aftaler fra start</span><span
+          ><Icon name="spark" /> Håndværk møder teknologi</span
+        ><span><Icon name="pin" /> Lokalt i {site.area}</span>
+      </div>
+    </div>
+
+    <section id="ydelser" class="section services-section">
+      <div class="container">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">SMÅ FORANDRINGER. STOR FORSKEL.</p><h2>
+              Et hjem, der fungerer.<br />Og føles rigtigt.
+            </h2>
+          </div><p>
+            Fra den gode belysning til de små smarte detaljer. Vi finder en
+            løsning, der giver mening for dig.
+          </p>
+        </div>
+        <div class="service-grid">
+          {
+            services.map((service) => (
+              <article class="service-card">
+                <>
+                  <a
+                    class="service-image"
+                    href="#kontakt"
+                    data-service={service.id}
+                    aria-label={`Beskriv din opgave: ${service.label}`}
+                  >
+                    <>
+                      <img
+                        src={`/images/${service.image}-960.webp`}
+                        alt={service.alt}
+                        width="960"
+                        height="640"
+                        loading="lazy"
+                      />
+                      <span class="image-tag">{service.label}</span>
+                      <span class="circle-arrow">
+                        <Icon name="arrow" />
+                      </span>
+                    </>
+                  </a>
+                  <div class="service-title">
+                    <>
+                      <span>{service.number}</span>
+                      <h3>{service.title}</h3>
+                    </>
+                  </div>
+                  <p>{service.text}</p>
+                </>
+              </article>
+            ))
+          }
+        </div>
+        <p class="section-footnote">
+          Billederne er inspiration. Alle opgaver vurderes efter virksomhedens
+          aktuelle rammer.
+        </p>
+      </div>
+    </section>
+
+    <section id="pilot" class="section pilot-section">
+      <div class="container pilot-grid">
+        <div class="pilot-copy">
+          <p class="eyebrow">
+            <span class="light-dot"></span> VI SØGER VORES FØRSTE {
+              site.pilotPlaces
+            } PROJEKTER
+          </p><h2>Din idé kan blive<br />vores første kapitel.</h2><p>
+            Vi er ved at starte Lys & Logik. Derfor søger vi tre mindre
+            projekter, hvor vi kan vise, hvad godt håndværk og gennemtænkte
+            løsninger kan gøre.
+          </p><p>
+            Du får hjælp til din opgave. Vi får en god historie at fortælle — og
+            billeder af arbejdet, efter aftale med dig.
+          </p><a class="button" href="#kontakt"
+            >Fortæl os om dit projekt <Icon name="arrow" /></a>
+        </div>
+        <div class="pilot-offer">
+          <span class="offer-tag">PILOTPROJEKTET</span><div class="price">
+            0<span>kr.</span>
+          </div><h3>
+            i arbejdsløn.<br />Op til {site.pilotHours} timers arbejde.
+          </h3><div class="offer-divider"></div><ul>
+            <li>
+              <Icon name="check" /> Du betaler materialer og evt. lejeudstyr
+            </li><li>
+              <Icon name="check" /> Vi aftaler opgaven og omfanget på forhånd
+            </li><li>
+              <Icon name="check" /> Vi dokumenterer projektet efter aftale
+            </li>
+          </ul><p>
+            En ansøgning er uforpligtende. Vi udvælger tre egnede opgaver.
+          </p><span class="offer-corner" aria-hidden="true">L&L</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section process-section">
+      <div class="container">
+        <p class="eyebrow">FRA DEN FØRSTE IDÉ TIL DEN SIDSTE DETALJE</p><h2>
+          Det starter med en samtale.
+        </h2><div class="process-grid">
+          <article>
+            <span class="step-number">01</span><h3>Du fortæller</h3><p>
+              Beskriv kort din opgave og dine ønsker. Du behøver ikke kende den
+              tekniske løsning.
+            </p>
+          </article><article>
+            <span class="step-number">02</span><h3>Vi finder mulighederne</h3><p
+            >
+              Vi tager en snak om omfang, materialer og om opgaven passer som
+              pilotprojekt.
+            </p>
+          </article><article>
+            <span class="step-number">03</span><h3>Vi aftaler resten</h3><p>
+              Du ved, hvad der skal laves, og hvad du betaler, før vi går i
+              gang.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="om-os" class="about-section">
+      <div class="container about-grid">
+        <div>
+          <p class="eyebrow">MENNESKER BAG LØSNINGERNE</p><h2>
+           Én fælles ambition.
+          </h2><p>
+            At gøre det lettere at få gode, gennemtænkte løsninger i hjemmet.
+            Lys & Logik er vores møde mellem praktisk håndværk og interessen for
+            det, teknologi kan gøre bedre.
+          </p><p>
+            Vi starter småt, gør os umage og tror på, at tillid bliver bygget én
+            opgave ad gangen.
+          </p><span class="about-signature"
+            >Lys & Logik <span>Håndværk. Omtanke. Muligheder.</span></span>
+        </div><div class="about-values">
+          <article>
+            <span>LYS</span><h3>Håndværket skal være i orden.</h3><p>
+              Respekt for dit hjem, sans for detaljen og en løsning, vi kan stå
+              inde for.
+            </p>
+          </article><article>
+            <span>LOGIK</span><h3>Teknikken skal give mening.</h3><p>
+              Det smarte er først smart, når det gør hverdagen nemmere for dig.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section faq-section">
+      <div class="container faq-grid">
+        <div>
+          <p class="eyebrow">GODT AT VIDE</p><h2>Måske tænker du …</h2><p>
+            Her er svar på det vigtigste<br />om vores pilotprojekter.
+          </p>
+        </div><div class="faq-list">
+          {
+            questions.map((item) => (
+              <details>
+                <>
+                  <summary>
+                    {item.question}
+                    <span class="faq-plus">
+                      <Icon name="plus" />
+                    </span>
+                  </summary>
+                  <p>{item.answer}</p>
+                </>
+              </details>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <section id="kontakt" class="section contact-section">
+      <div class="container contact-grid">
+        <div class="contact-intro">
+          <p class="eyebrow">
+            <span class="light-dot"></span> LAD OS HØRE DIN IDÉ
+          </p><h2>Hvad kan vi<br />hjælpe dig med?</h2><p>
+            En lampe, der mangler. En idé til smartere lys. Eller en opgave, du
+            længe har tænkt på. Fortæl os lidt om den.
+          </p><div class="contact-detail">
+            <Icon name="pin" /><span
+              >{site.area} og omegn<small>Foreløbigt arbejdsområde</small
+              ></span>
+          </div><div class="contact-detail">
+            <Icon name="mail" /><span
+              >{site.email}<small>Placeholder – kontaktoplysninger følger</small
+              ></span>
+          </div><div class="establishment-note">
+            <strong>Vi er under etablering.</strong><p>
+              Vi vurderer hver opgave fagligt og påtager os kun arbejde, der
+              passer til virksomhedens aktuelle rammer.
+            </p>
+          </div>
+        </div>
+        <div class="form-card">
+          <form id="pilot-form" novalidate>
+            <fieldset id="form-fields" disabled>
+              <legend class="sr-only">Ansøg om et pilotprojekt</legend>
+              <div class="form-heading">
+                <h3>Fortæl om dit projekt</h3><span>Ca. 2 minutter</span>
+              </div>
+              <p class="form-demo">
+                Demoversion · Oplysninger bliver ikke sendt eller gemt.
+              </p>
+              <div
+                id="form-error-summary"
+                class="error-summary"
+                role="alert"
+                hidden
+              >
+              </div>
+              <div class="form-row">
+                <div class="field">
+                  <label for="name">Dit navn</label><input
+                    id="name"
+                    name="name"
+                    autocomplete="name"
+                    placeholder="Fornavn og efternavn"
+                    maxlength="100"
+                    required
+                    aria-describedby="name-error"
+                  /><span class="field-error" id="name-error"></span>
+                </div><div class="field">
+                  <label for="postalCode">Postnummer</label><input
+                    id="postalCode"
+                    name="postalCode"
+                    autocomplete="postal-code"
+                    inputmode="numeric"
+                    placeholder="Fx 2800"
+                    maxlength="4"
+                    required
+                    aria-describedby="postalCode-error"
+                  /><span class="field-error" id="postalCode-error"></span>
+                </div>
+              </div>
+              <div class="field">
+                <label for="contact">Telefon eller e-mail</label><input
+                  id="contact"
+                  name="contact"
+                  placeholder="Så vi kan tage en snak"
+                  maxlength="254"
+                  required
+                  aria-describedby="contact-error"
+                /><span class="field-error" id="contact-error"></span>
+              </div>
+              <div class="field">
+                <label for="service">Hvad drejer det sig om?</label><select
+                  id="service"
+                  name="service"
+                  required
+                  aria-describedby="service-error"
+                  ><option value="">Vælg en opgavetype</option>{
+                    services.map((service) => (
+                      <option value={service.id}>{service.label}</option>
+                    ))
+                  }<option value="andet">Noget andet</option></select
+                ><span class="field-error" id="service-error"></span>
+              </div>
+              <div class="field">
+                <label for="description">Fortæl lidt om din idé</label><textarea
+                  id="description"
+                  name="description"
+                  rows="4"
+                  placeholder="Hvad vil du gerne have hjælp til?"
+                  minlength="10"
+                  maxlength="1500"
+                  required
+                  aria-describedby="description-error"></textarea><span
+                  class="field-error"
+                  id="description-error"></span>
+              </div>
+              <div class="checkbox-field">
+                <input
+                  type="checkbox"
+                  id="terms"
+                  name="terms"
+                  required
+                  aria-describedby="terms-error"
+                /><label for="terms"
+                  >Jeg har læst om pilotprojektet og ved, at materialer og evt.
+                  lejeudstyr betales særskilt.</label>
+              </div><span class="field-error" id="terms-error"></span>
+              <button class="button form-submit" type="submit"
+                >Prøv din ansøgning <Icon name="arrow" /></button
+              >
+              <p class="form-bottom-note">
+                Uforpligtende · Vi udvælger {site.pilotPlaces} projekter
+              </p>
+            </fieldset>
+            <noscript
+              ><p>
+                Aktivér JavaScript for at prøve formularen. Denne lokale
+                prototype sender ingen oplysninger.
+              </p></noscript
+            >
+          </form>
+          <div
+            id="form-success"
+            class="form-success"
+            tabindex="-1"
+            role="status"
+            hidden
+          >
+            <span class="success-icon"><Icon name="check" size={34} /></span><p
+              class="eyebrow"
+            >
+              TAK FOR DIN IDÉ
+            </p><h3>Din demoansøgning<br />er klar.</h3><p>
+              På den færdige hjemmeside vil vi her bekræfte, at vi har modtaget
+              din ansøgning.
+            </p><p>
+              <strong>Dette er en demo. Intet er sendt eller gemt.</strong>
+            </p><button id="form-reset" class="button" type="button"
+              >Prøv igen <Icon name="arrow" /></button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer">
+    <div class="container footer-main">
+      <a
+        class="brand footer-brand"
+        href="#"
+        aria-label="Lys og Logik – tilbage til toppen"
+        ><img
+          src="/images/logo-v11.png"
+          alt="Lys & Logik"
+          width="1536"
+          height="1024"
+          loading="lazy"
+        /></a
+      ><p>El og automation,<br /><strong>gjort enkelt.</strong></p><a
+        class="text-link light-link"
+        href="#kontakt">Lad os tale om din idé <Icon name="arrow" /></a>
+    </div><div class="container footer-bottom">
+      <span
+        >© {new Date().getFullYear()} Lys & Logik · {site.companyStatus}</span
+      ><span>Lokal prototype · Virksomhedsoplysninger er placeholders</span
+      ><button id="privacy-open" type="button">Privatliv & prototype</button>
+    </div>
+  </footer>
+  <div class="mobile-cta">
+    <a href="#kontakt">Beskriv din opgave <Icon name="arrow" /></a>
+  </div>
+  <dialog id="privacy-dialog" aria-labelledby="privacy-title">
+    <button
+      class="dialog-close"
+      id="privacy-close"
+      aria-label="Luk information"
+      type="button">×</button
+    ><p class="eyebrow">OM DENNE VERSION</p><h2 id="privacy-title">
+      En lokal prototype.
+    </h2><p>
+      Hjemmesiden viser et forslag til Lys & Logiks fremtidige website.
+      Kontaktoplysninger og arbejdsområde er foreløbige.
+    </p><p>
+      Formularen validerer kun oplysningerne i din browser. Den sender og gemmer
+      dem ikke. Siden bruger ingen analyseværktøjer eller cookies.
+    </p><p>
+      Boligbillederne er AI-genererede inspirationsbilleder og viser ikke
+      udførte kundeprojekter. Logoet er jeres logo_v11.
+    </p><p>
+      Før offentlig lancering skal de korrekte virksomhedsoplysninger,
+      pilotvilkår, formularmodtagelse og privatlivsinformation være på plads.
+    </p>
+  </dialog>
+  <script>
+    import { validateLead, type LeadField, type LeadInput } from '../lib/lead';
+    const toggle = document.querySelector<HTMLButtonElement>('.menu-toggle')!;
+    const nav = document.querySelector<HTMLElement>('#navigation')!;
+    const closeMenu = () => {
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.setAttribute('aria-label', 'Åbn menu');
+      nav.classList.remove('is-open');
+    };
+    toggle.addEventListener('click', () => {
+      const open = toggle.getAttribute('aria-expanded') !== 'true';
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.setAttribute('aria-label', open ? 'Luk menu' : 'Åbn menu');
+      nav.classList.toggle('is-open', open);
+    });
+    nav
+      .querySelectorAll('a')
+      .forEach((link) => link.addEventListener('click', closeMenu));
+    document.addEventListener('keydown', (event) => {
+      if (
+        event.key === 'Escape' &&
+        toggle.getAttribute('aria-expanded') === 'true'
+      ) {
+        closeMenu();
+        toggle.focus();
+      }
+    });
+    matchMedia('(min-width: 861px)').addEventListener('change', (event) => {
+      if (event.matches) closeMenu();
+    });
+
+    const form = document.querySelector<HTMLFormElement>('#pilot-form')!;
+    const fields = document.querySelector<HTMLFieldSetElement>('#form-fields')!;
+    const success = document.querySelector<HTMLDivElement>('#form-success')!;
+    const summary = document.querySelector<HTMLDivElement>(
+      '#form-error-summary',
+    )!;
+    const names: LeadField[] = [
+      'name',
+      'contact',
+      'postalCode',
+      'service',
+      'description',
+      'terms',
+    ];
+    function clearErrors() {
+      names.forEach((name) => {
+        document.getElementById(name)!.removeAttribute('aria-invalid');
+        document.getElementById(`${name}-error`)!.textContent = '';
+      });
+      summary.hidden = true;
+      summary.textContent = '';
+    }
+    document
+      .querySelectorAll<HTMLAnchorElement>('[data-service]')
+      .forEach((link) =>
+        link.addEventListener('click', () => {
+          (form.elements.namedItem('service') as HTMLSelectElement).value =
+            link.dataset.service!;
+        }),
+      );
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      clearErrors();
+      const data = new FormData(form);
+      const input: LeadInput = {
+        name: String(data.get('name') ?? ''),
+        contact: String(data.get('contact') ?? ''),
+        postalCode: String(data.get('postalCode') ?? ''),
+        service: String(data.get('service') ?? ''),
+        description: String(data.get('description') ?? ''),
+        terms: data.get('terms') === 'on',
+      };
+      const errors = validateLead(input);
+      const invalidFields = names.filter((name) => errors[name]);
+      if (invalidFields.length) {
+        summary.hidden = false;
+        summary.textContent = 'Tjek de markerede felter, så er vi klar.';
+        invalidFields.forEach((name) => {
+          document.getElementById(name)!.setAttribute('aria-invalid', 'true');
+          document.getElementById(`${name}-error`)!.textContent = errors[name]!;
+        });
+        document.getElementById(invalidFields[0])!.focus();
+        return;
+      }
+      form.reset();
+      form.hidden = true;
+      success.hidden = false;
+      success.focus();
+    });
+    fields.disabled = false;
+    document.querySelector('#form-reset')!.addEventListener('click', () => {
+      success.hidden = true;
+      form.hidden = false;
+      clearErrors();
+      document.getElementById('name')!.focus();
+    });
+    const dialog =
+      document.querySelector<HTMLDialogElement>('#privacy-dialog')!;
+    document
+      .querySelector('#privacy-open')!
+      .addEventListener('click', () => dialog.showModal());
+    document
+      .querySelector('#privacy-close')!
+      .addEventListener('click', () => dialog.close());
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) {
+        const rect = dialog.getBoundingClientRect();
+        if (
+          event.clientX < rect.left ||
+          event.clientX > rect.right ||
+          event.clientY < rect.top ||
+          event.clientY > rect.bottom
+        )
+          dialog.close();
+      }
+    });
+  </script>
+</Layout>
