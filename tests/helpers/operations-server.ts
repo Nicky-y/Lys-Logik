@@ -33,7 +33,12 @@ let queue = Promise.resolve();
 const server = createServer((req, res) => {
   queue = queue
     .then(async () => {
-      res.setHeader('Access-Control-Allow-Origin', 'http://127.0.0.1:5175');
+      const origin = req.headers.origin;
+      if (
+        origin === 'http://127.0.0.1:5175' ||
+        origin === 'http://127.0.0.1:5176'
+      )
+        res.setHeader('Access-Control-Allow-Origin', origin);
       res.setHeader(
         'Access-Control-Allow-Headers',
         'authorization,apikey,content-type,x-client-info,range,prefer,accept,range-unit,x-supabase-api-version,accept-profile,content-profile,x-retry-count',

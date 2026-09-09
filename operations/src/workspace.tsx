@@ -50,6 +50,7 @@ import {
 } from './gateway';
 import { CalendarView, AppointmentPanel, AppointmentHistory } from './calendar';
 import { copenhagenLocal } from './calendar-time';
+import { InstallApp } from './pwa';
 
 const dateTime = (value: string) =>
   new Intl.DateTimeFormat('da-DK', {
@@ -234,6 +235,7 @@ export function Workspace({
             }).format(new Date())}
           </span>
           <span className="mobile-brand">Lys & Logik</span>
+          <InstallApp />
         </header>
         {demo && (
           <div className="demo-banner">

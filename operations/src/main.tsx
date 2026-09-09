@@ -11,6 +11,7 @@ import {
 } from '../../supabase/functions/_shared/contracts/operations.ts';
 import { createOperationsGateway, type OperationsGateway } from './gateway';
 import { Workspace } from './workspace';
+import { InstallApp, PwaProvider } from './pwa';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -170,6 +171,7 @@ function SignIn({
             Adgang gives personligt. Har du ikke en konto endnu, skal du
             inviteres af administratoren.
           </p>
+          <InstallApp />
         </div>
       </section>
     </main>
@@ -305,7 +307,9 @@ function Application() {
 createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <Application />
+      <PwaProvider>
+        <Application />
+      </PwaProvider>
     </QueryClientProvider>
   </React.StrictMode>,
 );

@@ -10,3 +10,4 @@ playwright-report/
 *.log
 .npm-cache/
 supabase/.temp/
+.wrangler/

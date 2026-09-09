@@ -4,6 +4,7 @@ Lead-modtagelse er implementeret: formular → servervalidering → atomisk lagr
 
 ## Status 9. september 2026
 
+- Den interne PWA er udgivet på [lys-og-logik-app.mnbrom.workers.dev](https://lys-og-logik-app.mnbrom.workers.dev/). Supabase Auth `site_url` peger nu på denne adresse; øvrige redirectindstillinger er bevaret. Anonym læsning af sager, aftaler og medarbejdere er verificeret afvist. Se [installation og udgivelsesstatus](../operations/README.md#installation-på-android-og-hosting).
 - Migration `20260908093333_lead_intake.sql` er lagt på projektet `elydnshkxcwlmbdmtpys`. Den lokale version matcher Supabases migrationshistorik.
 - Migration `20260908160000_operations.sql` er også registreret på projektet. Brugeren har selv gennemført migrationen og loginopsætningen. Niclas er verificeret som aktiv `backoffice`; der er ikke sendt endnu en invitation.
 - Migration `20260909034350_calendar.sql` er lagt på projektet og verificeret i migrationshistorikken. Den tilføjer private medarbejderdata i `appointments` samt kommandoerne `create_lead_appointment`, `reschedule_lead_appointment` og `cancel_lead_appointment`. Aftale, sagsstatus, kvittering og historik gemmes atomisk. Se [kalenderens regler og brugerflow](../operations/README.md#kalender).
