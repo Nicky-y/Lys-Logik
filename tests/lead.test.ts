@@ -1,38 +1,48 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { validateLead, type LeadInput } from '../src/lib/lead.ts';
+import {
+  LeadSchema,
+  SubmissionKeySchema,
+} from '../supabase/functions/_shared/contracts/lead.ts';
 
 const valid: LeadInput = {
   name: 'Anna Jensen',
-  contact: 'anna@example.com',
+  email: 'anna@example.com',
+  phone: '',
   postalCode: '2800',
   service: 'belysning',
   description: 'Jeg vil gerne have hjælp til lys over mit spisebord.',
   terms: true,
 };
 
-test('accepts a complete pilot enquiry with email', () =>
-  assert.deepEqual(validateLead(valid), {}));
+test('email is required; phone is optional', () => {
+  assert.deepEqual(validateLead(valid), {});
+  assert.ok(validateLead({ ...valid, email: '', phone: '12345678' }).email);
+});
 test('accepts Danish phone numbers with spaces and country prefix', () => {
-  for (const contact of [
+  for (const phone of [
     '12345678',
     '12 34 56 78',
     '+45 12 34 56 78',
     '12-34-56-78',
-  ])
-    assert.deepEqual(validateLead({ ...valid, contact }), {});
+  ]) {
+    assert.deepEqual(validateLead({ ...valid, phone }), {});
+  }
 });
 test('rejects malformed contact details', () => {
-  for (const contact of [
+  for (const email of [
     'anna',
     'a@b',
-    '1234567',
-    '+46 12345678',
-    'text12345678',
+    '12345678',
     'a @example.com',
     'a'.repeat(255) + '@example.com',
-  ])
-    assert.ok(validateLead({ ...valid, contact }).contact);
+  ]) {
+    assert.ok(validateLead({ ...valid, email }).email);
+  }
+  for (const phone of ['1234567', '+46 12345678', 'text12345678']) {
+    assert.ok(validateLead({ ...valid, phone }).phone);
+  }
 });
 test('requires four postcode digits and preserves leading zeroes', () => {
   assert.deepEqual(validateLead({ ...valid, postalCode: '0800' }), {});
@@ -44,8 +54,9 @@ test('accepts each available service and rejects unknown values', () => {
     assert.deepEqual(validateLead({ ...valid, service }), {});
   assert.ok(validateLead({ ...valid, service: 'unexpected' }).service);
 });
-test('requires explicit pilot terms acknowledgement', () =>
-  assert.ok(validateLead({ ...valid, terms: false }).terms));
+test('requires explicit pilot terms acknowledgement', () => {
+  assert.ok(validateLead({ ...valid, terms: false }).terms);
+});
 test('enforces name and description boundaries after trimming', () => {
   assert.ok(validateLead({ ...valid, name: ' A ' }).name);
   assert.ok(validateLead({ ...valid, name: 'a'.repeat(101) }).name);
@@ -66,22 +77,35 @@ test('enforces name and description boundaries after trimming', () => {
     {},
   );
 });
-test('reports all missing inputs together without mutating input', () => {
+test('reports missing inputs together without mutating the input', () => {
   const input = Object.freeze({
     name: '',
-    contact: '',
+    email: '',
+    phone: '',
     postalCode: '',
     service: '',
     description: '',
     terms: false,
   });
   assert.deepEqual(Object.keys(validateLead(input)).sort(), [
-    'contact',
     'description',
+    'email',
     'name',
     'postalCode',
     'service',
     'terms',
   ]);
   assert.equal(input.name, '');
+});
+test('rejects injected status and requires guarded submission identities', () => {
+  assert.equal(
+    LeadSchema.safeParse({ ...valid, status: 'paid' }).success,
+    false,
+  );
+  assert.equal(SubmissionKeySchema.safeParse('123').success, false);
+  assert.equal(
+    SubmissionKeySchema.safeParse('82b2db71-774d-47f7-bfe3-b386992320ce')
+      .success,
+    true,
+  );
 });

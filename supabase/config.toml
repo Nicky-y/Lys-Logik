@@ -1,0 +1,7 @@
+project_id = "lys-og-logik"
+
+[functions.create-lead]
+# Public form; handler enforces Turnstile, payload validation and durable limits.
+verify_jwt = false
+entrypoint = "./functions/create-lead/index.ts"
+import_map = "./functions/deno.json"

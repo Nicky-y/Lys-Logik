@@ -6,16 +6,19 @@ export default defineConfig({
   workers: 2,
   reporter: 'list',
   use: {
-    baseURL: 'http://127.0.0.1:4321',
+    baseURL: 'http://127.0.0.1:4331',
     trace: 'retain-on-failure',
     reducedMotion: 'reduce',
   },
   webServer: {
-    command:
-      'node node_modules/astro/bin/astro.mjs dev --host 127.0.0.1 --port 4321',
-    url: 'http://127.0.0.1:4321',
-    reuseExistingServer: true,
-    env: { ASTRO_TELEMETRY_DISABLED: '1' },
+    command: 'node tests/helpers/astro-server.ts 4331',
+    url: 'http://127.0.0.1:4331',
+    reuseExistingServer: false,
+    env: {
+      ASTRO_TELEMETRY_DISABLED: '1',
+      PUBLIC_LEAD_ENDPOINT: '',
+      PUBLIC_TURNSTILE_SITE_KEY: '',
+    },
   },
   projects: [
     {

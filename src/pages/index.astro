@@ -3,6 +3,28 @@ import Layout from '../layouts/Layout.astro';
 import Icon from '../components/Icon.astro';
 import { site, services, questions } from '../data/site';
 
+const leadEndpoint = import.meta.env.PUBLIC_LEAD_ENDPOINT?.trim() ?? '';
+const turnstileSiteKey =
+  import.meta.env.PUBLIC_TURNSTILE_SITE_KEY?.trim() ?? '';
+if (Boolean(leadEndpoint) !== Boolean(turnstileSiteKey)) {
+  throw new Error(
+    'Configure both PUBLIC_LEAD_ENDPOINT and PUBLIC_TURNSTILE_SITE_KEY, or leave both empty for demo mode.',
+  );
+}
+const liveForm = Boolean(leadEndpoint && turnstileSiteKey);
+if (liveForm) {
+  const endpointUrl = new URL(leadEndpoint);
+  if (
+    endpointUrl.protocol !== 'https:' &&
+    !(
+      import.meta.env.DEV &&
+      ['localhost', '127.0.0.1'].includes(endpointUrl.hostname)
+    )
+  ) {
+    throw new Error('The lead endpoint must use HTTPS.');
+  }
+}
+
 const assetBase = import.meta.env.BASE_URL.endsWith('/')
   ? import.meta.env.BASE_URL
   : `${import.meta.env.BASE_URL}/`;
@@ -67,7 +89,8 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
             <a class="button" href="#pilot"
               >Bliv et af vores pilotprojekter <Icon name="arrow" /></a
             ><a class="text-link light-link" href="#ydelser"
-              >Se, hvad vi kan hjælpe med <Icon name="down" size={17} /></a>
+              >Se, hvad vi kan hjælpe med <Icon name="down" size={17} /></a
+            >
           </div>
         </div>
         <a class="hero-note" href="#pilot"
@@ -160,7 +183,8 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
             Du får hjælp til din opgave. Vi får en god historie at fortælle — og
             billeder af arbejdet, efter aftale med dig.
           </p><a class="button" href="#kontakt"
-            >Fortæl os om dit projekt <Icon name="arrow" /></a>
+            >Fortæl os om dit projekt <Icon name="arrow" /></a
+          >
         </div>
         <div class="pilot-offer">
           <span class="offer-tag">PILOTPROJEKTET</span><div class="price">
@@ -212,7 +236,7 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
       <div class="container about-grid">
         <div>
           <p class="eyebrow">MENNESKER BAG LØSNINGERNE</p><h2>
-           Én fælles ambition.
+            Én fælles ambition.
           </h2><p>
             At gøre det lettere at få gode, gennemtænkte løsninger i hjemmet.
             Lys & Logik er vores møde mellem praktisk håndværk og interessen for
@@ -221,7 +245,8 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
             Vi starter småt, gør os umage og tror på, at tillid bliver bygget én
             opgave ad gangen.
           </p><span class="about-signature"
-            >Lys & Logik <span>Håndværk. Omtanke. Muligheder.</span></span>
+            >Lys & Logik <span>Håndværk. Omtanke. Muligheder.</span></span
+          >
         </div><div class="about-values">
           <article>
             <span>LYS</span><h3>Håndværket skal være i orden.</h3><p>
@@ -273,12 +298,13 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
             længe har tænkt på. Fortæl os lidt om den.
           </p><div class="contact-detail">
             <Icon name="pin" /><span
-              >{site.area} og omegn<small>Foreløbigt arbejdsområde</small
-              ></span>
+              >{site.area} og omegn<small>Foreløbigt arbejdsområde</small></span
+            >
           </div><div class="contact-detail">
             <Icon name="mail" /><span
               >{site.email}<small>Placeholder – kontaktoplysninger følger</small
-              ></span>
+              ></span
+            >
           </div><div class="establishment-note">
             <strong>Vi er under etablering.</strong><p>
               Vi vurderer hver opgave fagligt og påtager os kun arbejde, der
@@ -287,14 +313,23 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
           </div>
         </div>
         <div class="form-card">
-          <form id="pilot-form" novalidate>
+          <form
+            id="pilot-form"
+            data-lead-endpoint={leadEndpoint}
+            data-turnstile-site-key={turnstileSiteKey}
+            novalidate
+          >
             <fieldset id="form-fields" disabled>
               <legend class="sr-only">Ansøg om et pilotprojekt</legend>
               <div class="form-heading">
                 <h3>Fortæl om dit projekt</h3><span>Ca. 2 minutter</span>
               </div>
               <p class="form-demo">
-                Demoversion · Oplysninger bliver ikke sendt eller gemt.
+                {
+                  liveForm
+                    ? 'Vi svarer på e-mail. Du kan sende billeder i den efterfølgende dialog.'
+                    : 'Demoversion · Oplysninger bliver ikke sendt eller gemt.'
+                }
               </p>
               <div
                 id="form-error-summary"
@@ -328,14 +363,27 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
                 </div>
               </div>
               <div class="field">
-                <label for="contact">Telefon eller e-mail</label><input
-                  id="contact"
-                  name="contact"
-                  placeholder="Så vi kan tage en snak"
+                <label for="email">Din e-mail</label><input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autocomplete="email"
+                  placeholder="Så vi kan svare på din henvendelse"
                   maxlength="254"
                   required
-                  aria-describedby="contact-error"
-                /><span class="field-error" id="contact-error"></span>
+                  aria-describedby="email-error"
+                /><span class="field-error" id="email-error"></span>
+              </div>
+              <div class="field">
+                <label for="phone">Telefon (valgfrit)</label><input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  autocomplete="tel"
+                  placeholder="Hvis det er nemmere at tage en snak"
+                  maxlength="30"
+                  aria-describedby="phone-error"
+                /><span class="field-error" id="phone-error"></span>
               </div>
               <div class="field">
                 <label for="service">Hvad drejer det sig om?</label><select
@@ -372,20 +420,32 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
                   aria-describedby="terms-error"
                 /><label for="terms"
                   >Jeg har læst om pilotprojektet og ved, at materialer og evt.
-                  lejeudstyr betales særskilt.</label>
+                  lejeudstyr betales særskilt.</label
+                >
               </div><span class="field-error" id="terms-error"></span>
+              {
+                liveForm && (
+                  <div
+                    id="turnstile-widget"
+                    role="group"
+                    aria-label="Sikkerhedskontrol"
+                  />
+                )
+              }
               <button class="button form-submit" type="submit"
-                >Prøv din ansøgning <Icon name="arrow" /></button
+                ><span
+                  >{
+                    liveForm ? 'Send din henvendelse' : 'Prøv din ansøgning'
+                  }</span
+                >
+                <Icon name="arrow" /></button
               >
               <p class="form-bottom-note">
                 Uforpligtende · Vi udvælger {site.pilotPlaces} projekter
               </p>
             </fieldset>
             <noscript
-              ><p>
-                Aktivér JavaScript for at prøve formularen. Denne lokale
-                prototype sender ingen oplysninger.
-              </p></noscript
+              ><p>Aktivér JavaScript for at bruge formularen.</p></noscript
             >
           </form>
           <div
@@ -399,13 +459,32 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
               class="eyebrow"
             >
               TAK FOR DIN IDÉ
-            </p><h3>Din demoansøgning<br />er klar.</h3><p>
-              På den færdige hjemmeside vil vi her bekræfte, at vi har modtaget
-              din ansøgning.
-            </p><p>
-              <strong>Dette er en demo. Intet er sendt eller gemt.</strong>
-            </p><button id="form-reset" class="button" type="button"
-              >Prøv igen <Icon name="arrow" /></button>
+            </p><h3>
+              {
+                liveForm
+                  ? 'Vi har modtaget din henvendelse.'
+                  : 'Din demoansøgning er klar.'
+              }
+            </h3><p>
+              {
+                liveForm
+                  ? 'Din beskrivelse er gemt. Vi gennemgår opgaven og vender tilbage på e-mail. En aftale er først på plads, når vi har aftalt den sammen.'
+                  : 'På den færdige hjemmeside vil vi her bekræfte, at vi har modtaget din ansøgning.'
+              }
+            </p>{
+              liveForm ? (
+                <p>
+                  Din reference: <strong id="lead-reference" />
+                </p>
+              ) : (
+                <p>
+                  <strong>Dette er en demo. Intet er sendt eller gemt.</strong>
+                </p>
+              )
+            }<button id="form-reset" class="button" type="button"
+              >{liveForm ? 'Ny henvendelse' : 'Prøv igen'}
+              <Icon name="arrow" /></button
+            >
           </div>
         </div>
       </div>
@@ -426,7 +505,8 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
         /></a
       ><p>El og automation,<br /><strong>gjort enkelt.</strong></p><a
         class="text-link light-link"
-        href="#kontakt">Lad os tale om din idé <Icon name="arrow" /></a>
+        href="#kontakt">Lad os tale om din idé <Icon name="arrow" /></a
+      >
     </div><div class="container footer-bottom">
       <span
         >© {new Date().getFullYear()} Lys & Logik · {site.companyStatus}</span
@@ -449,8 +529,11 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
       Hjemmesiden viser et forslag til Lys & Logiks fremtidige website.
       Kontaktoplysninger og arbejdsområde er foreløbige.
     </p><p>
-      Formularen validerer kun oplysningerne i din browser. Den sender og gemmer
-      dem ikke. Siden bruger ingen analyseværktøjer eller cookies.
+      {
+        liveForm
+          ? 'Når du sender formularen, gemmes kontaktoplysninger og opgavebeskrivelse i vores Supabase-database, så vi kan behandle din henvendelse. Cloudflare Turnstile bruges til at beskytte formularen mod misbrug.'
+          : 'Formularen validerer kun oplysningerne i din browser. Den sender og gemmer dem ikke. Siden bruger ingen analyseværktøjer eller cookies.'
+      }
     </p><p>
       Boligbillederne er AI-genererede inspirationsbilleder og viser ikke
       udførte kundeprojekter. Logoet er jeres logo_v11.
@@ -460,7 +543,7 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
     </p>
   </dialog>
   <script>
-    import { validateLead, type LeadField, type LeadInput } from '../lib/lead';
+    import { initializeLeadForm } from '../lib/lead-form';
     const toggle = document.querySelector<HTMLButtonElement>('.menu-toggle')!;
     const nav = document.querySelector<HTMLElement>('#navigation')!;
     const closeMenu = () => {
@@ -490,72 +573,7 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
       if (event.matches) closeMenu();
     });
 
-    const form = document.querySelector<HTMLFormElement>('#pilot-form')!;
-    const fields = document.querySelector<HTMLFieldSetElement>('#form-fields')!;
-    const success = document.querySelector<HTMLDivElement>('#form-success')!;
-    const summary = document.querySelector<HTMLDivElement>(
-      '#form-error-summary',
-    )!;
-    const names: LeadField[] = [
-      'name',
-      'contact',
-      'postalCode',
-      'service',
-      'description',
-      'terms',
-    ];
-    function clearErrors() {
-      names.forEach((name) => {
-        document.getElementById(name)!.removeAttribute('aria-invalid');
-        document.getElementById(`${name}-error`)!.textContent = '';
-      });
-      summary.hidden = true;
-      summary.textContent = '';
-    }
-    document
-      .querySelectorAll<HTMLAnchorElement>('[data-service]')
-      .forEach((link) =>
-        link.addEventListener('click', () => {
-          (form.elements.namedItem('service') as HTMLSelectElement).value =
-            link.dataset.service!;
-        }),
-      );
-    form.addEventListener('submit', (event) => {
-      event.preventDefault();
-      clearErrors();
-      const data = new FormData(form);
-      const input: LeadInput = {
-        name: String(data.get('name') ?? ''),
-        contact: String(data.get('contact') ?? ''),
-        postalCode: String(data.get('postalCode') ?? ''),
-        service: String(data.get('service') ?? ''),
-        description: String(data.get('description') ?? ''),
-        terms: data.get('terms') === 'on',
-      };
-      const errors = validateLead(input);
-      const invalidFields = names.filter((name) => errors[name]);
-      if (invalidFields.length) {
-        summary.hidden = false;
-        summary.textContent = 'Tjek de markerede felter, så er vi klar.';
-        invalidFields.forEach((name) => {
-          document.getElementById(name)!.setAttribute('aria-invalid', 'true');
-          document.getElementById(`${name}-error`)!.textContent = errors[name]!;
-        });
-        document.getElementById(invalidFields[0])!.focus();
-        return;
-      }
-      form.reset();
-      form.hidden = true;
-      success.hidden = false;
-      success.focus();
-    });
-    fields.disabled = false;
-    document.querySelector('#form-reset')!.addEventListener('click', () => {
-      success.hidden = true;
-      form.hidden = false;
-      clearErrors();
-      document.getElementById('name')!.focus();
-    });
+    initializeLeadForm();
     const dialog =
       document.querySelector<HTMLDialogElement>('#privacy-dialog')!;
     document

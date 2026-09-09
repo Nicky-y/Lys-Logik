@@ -1,6 +1,10 @@
 # Lys & Logik — lokal websiteprototype
 
-En lille Astro-hjemmeside med TypeScript og almindelig CSS. Formålet er at vise designet og pilotforløbet, før virksomheden lanceres.
+Astro-hjemmeside med TypeScript og almindelig CSS samt et separat React-arbejdsrum i `operations/`. Lead-modtagelse og første del af intern sagsbehandling bruger Supabase. Se [backendens status og opsætning](supabase/README.md) og [appens vejledning](operations/README.md).
+
+## Åbn arbejdsrummet
+
+Dobbeltklik `START-APP.cmd` og åbn http://127.0.0.1:5173/ for rigtige data efter medarbejderlogin. `START-APP-DEMO.cmd` åbner en særskilt prøvevisning med fiktive sager på http://127.0.0.1:5174/. Hold terminalen åben. Begge startfiler ligger i denne mappe.
 
 ## Åbn hjemmesiden
 
@@ -20,19 +24,21 @@ Kræver Node.js i en version, som den installerede Astro-version understøtter. 
 - `src/data/site.ts`: virksomhedsoplysninger, opgavekategorier og FAQ.
 - `src/pages/index.astro`: sidens indhold og små interaktioner.
 - `src/styles/global.css`: layout, farver og mobilvisning.
-- `src/lib/lead.ts`: ren formularvalidering, som ikke sender eller gemmer data.
+- `src/lib/lead.ts`: fælles formularvalidering fra backendens Zod-kontrakt.
+- `src/lib/lead-form.ts` og `src/lib/submit-lead.ts`: demo eller rigtig indsendelse med fejl- og genforsøgshåndtering.
+- `supabase/`: database, Edge Function, adgangskontrol og opsætningsvejledning.
 - `public/images/`: alle billeder, så sitet ikke afhænger af eksterne billedtjenester.
 
 ## Bevidste prototypegrænser
 
 - Kontaktoplysninger og dækningsområde er placeholders. `.example`-mailadressen kan ikke modtage ansøgninger.
-- Formularen kører kun i browseren. Ingen API, mailafsendelse, database eller lagring. Den viser tydeligt en demobekræftelse, og formularen nulstilles bagefter.
+- Formularen er som standard i demotilstand og sender eller gemmer da intet. Rigtig modtagelse aktiveres med både `PUBLIC_LEAD_ENDPOINT` og `PUBLIC_TURNSTILE_SITE_KEY`. E-mail er påkrævet; telefon er valgfrit.
 - Ved deaktiveret JavaScript er formularen deaktiveret, så personoplysninger ikke utilsigtet sendes til serveren.
-- Ingen tracking, cookies eller eksterne skrifttyper. Manrope hostes sammen med siden.
-- `noindex, nofollow` forhindrer normal søgeindeksering, men er ikke adgangskontrol. Prototypen er kun startet lokalt.
-- Ingen offentlig deployment er oprettet.
+- Ingen tracking eller eksterne skrifttyper. Manrope hostes sammen med siden. Turnstile indlæses kun ved aktiveret, rigtig formularmodtagelse.
+- `noindex, nofollow` forhindrer normal søgeindeksering, men er ikke adgangskontrol.
+- Repositoryet har en GitHub Pages-workflow. Den bruger demotilstand uden de to offentlige formularvariable; backend deployes særskilt til Supabase.
 
-Før en rigtig lancering skal firmaets oplysninger, aktuelle ydelser og pilotvilkår bekræftes. Formularen skal forbindes til en rigtig modtager, og privatlivsinformationen skal beskrive den valgte løsning.
+Før en rigtig lancering skal firmaets oplysninger, aktuelle ydelser og pilotvilkår bekræftes. Formularmodtagelse og Turnstile skal afprøves samlet, og privatlivsinformationen skal beskrive den valgte løsning.
 
 ## Billeder
 
@@ -46,8 +52,11 @@ Logoet er en uændret kopi af `../assets/logo/logo_v11.png`, efter brugerens val
 npm.cmd test
 npm.cmd run build
 npm.cmd run test:e2e
+npm.cmd run test:e2e:intake
+npm.cmd run app:build
+npm.cmd run test:e2e:app
 ```
 
-Unit tests dækker formulargrænser og validering. Playwright tester desktop og mobil, formularintegration, ingen afsendelse/lagring, links, billeder, tastatur, menu og automatisk tilgængelighedskontrol. E2E bruger den installerede Microsoft Edge; i andre miljøer kan `channel: 'msedge'` erstattes af en installeret Playwright-browser i konfigurationen.
+Unit- og integrationstests dækker formulargrænser, HTTP, botkontrol, genforsøg, transaktioner og databaseadgang. Playwright tester både den eksisterende demo og rigtig lokal indsendelse, herunder tabt netværkssvar og separate henvendelser fra samme kunde. Browseren er den installerede Microsoft Edge; Android emuleres i det nye intake-testsæt. Den rigtige Cloudflare-tjeneste er ikke en del af de automatiske tests.
 
 Den statiske produktionsversion bygges til `dist/`.

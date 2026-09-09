@@ -8,19 +8,36 @@
     "build": "astro check && astro build",
     "preview": "astro preview --host 127.0.0.1",
     "test": "node --test tests/*.test.ts",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:e2e:intake": "playwright test --config playwright.intake.config.ts",
+    "app:dev": "node operations/dev.mjs",
+    "app:demo": "node operations/dev.mjs --demo",
+    "app:build": "tsc -p operations/tsconfig.json && vite build --config operations/vite.config.ts",
+    "test:e2e:app": "playwright test --config playwright.operations.config.ts"
   },
   "dependencies": {
     "@fontsource-variable/manrope": "^5.3.0",
-    "astro": "^7.3.1"
+    "@supabase/supabase-js": "^2.116.0",
+    "@tanstack/react-query": "^5.102.8",
+    "astro": "^7.3.1",
+    "lucide-react": "^1.43.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "zod": "^4.5.4"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
     "@axe-core/playwright": "^4.13.0",
+    "@electric-sql/pglite": "^0.5.8",
     "@playwright/test": "^1.63.0",
     "@types/node": "^26.5.0",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.7",
+    "@vitejs/plugin-react": "^6.1.1",
     "prettier": "^3.9.6",
     "prettier-plugin-astro": "^0.14.1",
-    "typescript": "^6.0.3"
+    "supabase": "^2.117.0",
+    "typescript": "^6.0.3",
+    "vite": "^8.2.2"
   }
 }

@@ -85,7 +85,7 @@ test('complete demo submits locally and can be reset without storing personal da
   });
   await page.getByLabel('Dit navn').fill('Anna Jensen');
   await page.getByLabel('Postnummer').fill('2800');
-  await page.getByLabel('Telefon eller e-mail').fill('anna@example.com');
+  await page.getByLabel('Din e-mail').fill('anna@example.com');
   await page.getByLabel('Hvad drejer det sig om?').selectOption('belysning');
   await page
     .getByLabel('Fortæl lidt om din idé')
