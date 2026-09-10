@@ -115,3 +115,8 @@ Verificeret 10. september 2026: 79 unit-/integrationstests og 14 PWA-browsertest
 Brug og installér appen fra `https://app.lysoglogik.dk`. Tilmeld notifikationer på denne adresse; en installation og tilladelse fra den tidligere workers.dev-adresse dækker ikke det nye domæne. Supabase Auth `site_url` er opdateret og læst tilbage som den nye appadresse; øvrige redirectindstillinger er bevaret. VAPID-kontaktadressen bruger også det nye appdomæne.
 
 Ved kontrol 10. september 2026 var `https://lysoglogik.dk` stadig bygget i demoformulartilstand. Backend returnerede 403 på CORS-preflight fra det nye domæne. Før den nye hjemmeside kan skabe leads og dermed pushbeskeder, skal formularens offentlige buildværdier, Turnstile-domæner og backendens tilladte origins/hostnames afstemmes og udgives. Den tidligere GitHub Pages-formular er et separat deployment; dens tidligere gennemførte prøve beviser ikke den nye hjemmesides formular. Simply-mail og Resend er separate fra Web Push.
+
+
+### Formularforbindelsen er aktiveret — 10. september 2026
+
+Den tidligere blokering på det nye hoveddomæne er løst. `https://lysoglogik.dk` har en aktiv formular; Turnstile og backendens origins/hostnames er opdateret. Den rigtige prøve oprettede sag `ba5177f3-4cbe-418c-83f5-55387508d1db`, **Teknisk test – produktionsformular**, under Nye leads. Backend viste medarbejder-push som `sent`, og brugeren bekræftede modtagelsen på sin Android. Kundemail er fortsat ikke implementeret. Se website-README for reference og testresultater.

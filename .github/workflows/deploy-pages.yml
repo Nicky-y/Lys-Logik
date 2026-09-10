@@ -37,13 +37,8 @@ jobs:
         run: npm run app:build
 
       - name: Build and verify live enquiry form
-        env:
-          # Public browser configuration; server secrets stay in Supabase.
-          PUBLIC_LEAD_ENDPOINT: https://elydnshkxcwlmbdmtpys.supabase.co/functions/v1/create-lead
-          PUBLIC_TURNSTILE_SITE_KEY: 0x4AAAAAAEslNMfqqO2vHaTk
-        run: |
-          npm run build
-          npm run test:build:pages
+        # Uses config/website.production.json and verifies the finished artifact.
+        run: npm run build
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5

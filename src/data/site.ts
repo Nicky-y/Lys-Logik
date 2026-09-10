@@ -1,8 +1,8 @@
-/** Editable presentation content. All business details are placeholders for this local prototype. */
+/** Editable business content; establishment status and pilot scope remain explicit. */
 export const site = {
   name: 'Lys & Logik',
   area: 'Storkøbenhavn',
-  email: 'hej@lysoglogik.example',
+  email: 'kontakt@lysoglogik.dk',
   phone: '+45 XX XX XX XX',
   companyStatus: 'Under etablering',
   pilotPlaces: 3,

@@ -2,11 +2,11 @@ import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 import { test } from 'node:test';
 
-// Run against the actual Pages artifact before upload, never against dev HTML.
+// Verify the actual production artifact for both Cloudflare and the legacy Pages target.
 const dist = new URL('../../dist/', import.meta.url);
 const html = readFileSync(new URL('index.html', dist), 'utf8');
 
-test('Pages ships the live form with the production endpoint and real widget', () => {
+test('production ships the live form with the production endpoint and real widget', () => {
   assert.match(
     html,
     /data-lead-endpoint="https:\/\/elydnshkxcwlmbdmtpys\.supabase\.co\/functions\/v1\/create-lead"/,
@@ -15,14 +15,18 @@ test('Pages ships the live form with the production endpoint and real widget', (
   assert.ok(html.includes('Send din henvendelse'));
   assert.ok(html.includes('Vi har modtaget din henvendelse.'));
   assert.match(html, /id="lead-reference"/);
-  assert.ok(html.includes('Cloudflare Turnstile'));
-  assert.ok(html.includes('Aktiv formular'));
+  assert.ok(html.includes('Cloudflare'));
+  assert.ok(html.includes('Turnstile-sikkerhedskontrollen'));
+  assert.ok(html.includes('kontakt@lysoglogik.dk'));
+  assert.ok(!html.includes('hej@lysoglogik.example'));
+  assert.ok(!html.includes('Privatliv &amp; prototype'));
   assert.ok(!html.includes('Demoversion'));
   assert.ok(!html.includes('Intet er sendt eller gemt'));
   assert.match(html, /<fieldset\b[^>]*id="form-fields"[^>]*disabled/);
 });
 
-test('Pages JS and CSS resolve within the repository subpath and exist in the artifact', () => {
+test('production JS and CSS resolve within the deployment base and exist in the artifact', () => {
+  const base = process.env.GITHUB_ACTIONS === 'true' ? '/Lys-Logik/' : '/';
   const assets = [
     ...html.matchAll(/(?:src|href)="([^"\s]*\/_astro\/[^"\s]+)"/g),
   ].map((match) => match[1]);
@@ -35,10 +39,7 @@ test('Pages JS and CSS resolve within the repository subpath and exist in the ar
     'styles are emitted',
   );
   for (const path of assets) {
-    assert.ok(path.startsWith('/Lys-Logik/_astro/'), path);
-    assert.ok(
-      existsSync(new URL(path.slice('/Lys-Logik/'.length), dist)),
-      path,
-    );
+    assert.ok(path.startsWith(`${base}_astro/`), path);
+    assert.ok(existsSync(new URL(path.slice(base.length), dist)), path);
   }
 });

@@ -85,3 +85,10 @@ Referencer: [Supabase API-nøgler](https://supabase.com/docs/guides/getting-star
 ### Opdateret driftsstatus 10. september 2026
 
 Den offentlige formular er udgivet via commit `1690928`, og en rigtig indsendelse med fiktive testdata er verificeret: reference `969509b4-65c8-403e-b8e1-bb36989c78f9`, status `new` og én oprettelseshændelse. Web Push-migration, Edge-funktion og cron er efterfølgende aktiveret. De historiske statusafsnit ovenfor beskriver de tidligere trin; fysisk push-test mangler fortsat.
+
+
+### Nyt hoveddomæne i drift — 10. september 2026
+
+`LEAD_ALLOWED_ORIGINS` er nu `https://nicky-y.github.io,https://lysoglogik.dk`, og `TURNSTILE_HOSTNAMES` er `nicky-y.github.io,lysoglogik.dk`. Ingen localhost-værter er tilladt i produktionsbackend. Kun disse to konfigurationsværdier blev opdateret; eksisterende secret, serverkey og database er bevaret. Preflight er 204 for begge godkendte origins og 403 for en fremmed origin.
+
+Rigtig formularindsendelse fra det nye hoveddomæne gav reference `3b3a9124-aa35-4190-83a0-07285e8255d3`, status `new`, én oprettelseshændelse og medarbejder-push accepteret af leverandøren. Brugeren bekræftede fysisk Android-modtagelse. Customer-outbox er fortsat pending uden mailafsendelse.

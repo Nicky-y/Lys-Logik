@@ -2,28 +2,16 @@
 import Layout from '../layouts/Layout.astro';
 import Icon from '../components/Icon.astro';
 import { site, services, questions } from '../data/site';
-
-const leadEndpoint = import.meta.env.PUBLIC_LEAD_ENDPOINT?.trim() ?? '';
-const turnstileSiteKey =
-  import.meta.env.PUBLIC_TURNSTILE_SITE_KEY?.trim() ?? '';
-if (Boolean(leadEndpoint) !== Boolean(turnstileSiteKey)) {
-  throw new Error(
-    'Configure both PUBLIC_LEAD_ENDPOINT and PUBLIC_TURNSTILE_SITE_KEY, or leave both empty for demo mode.',
-  );
-}
-const liveForm = Boolean(leadEndpoint && turnstileSiteKey);
-if (liveForm) {
-  const endpointUrl = new URL(leadEndpoint);
-  if (
-    endpointUrl.protocol !== 'https:' &&
-    !(
-      import.meta.env.DEV &&
-      ['localhost', '127.0.0.1'].includes(endpointUrl.hostname)
-    )
-  ) {
-    throw new Error('The lead endpoint must use HTTPS.');
-  }
-}
+import { resolveLeadFormConfig } from '../lib/lead-form-config';
+const {
+  endpoint: leadEndpoint,
+  siteKey: turnstileSiteKey,
+  live: liveForm,
+} = resolveLeadFormConfig({
+  development: import.meta.env.DEV,
+  endpoint: import.meta.env.PUBLIC_LEAD_ENDPOINT,
+  siteKey: import.meta.env.PUBLIC_TURNSTILE_SITE_KEY,
+});
 
 const assetBase = import.meta.env.BASE_URL.endsWith('/')
   ? import.meta.env.BASE_URL
@@ -302,7 +290,8 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
             >
           </div><div class="contact-detail">
             <Icon name="mail" /><span
-              >{site.email}<small>Placeholder – kontaktoplysninger følger</small
+              ><a href={`mailto:${site.email}`}>{site.email}</a><small
+                >Skriv til os om din opgave</small
               ></span
             >
           </div><div class="establishment-note">
@@ -327,7 +316,7 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
               <p class="form-demo">
                 {
                   liveForm
-                    ? 'Vi svarer på e-mail. Du kan sende billeder i den efterfølgende dialog.'
+                    ? 'Vi gennemgår din henvendelse og kontakter dig. Du kan sende billeder i den efterfølgende dialog.'
                     : 'Demoversion · Oplysninger bliver ikke sendt eller gemt.'
                 }
               </p>
@@ -443,6 +432,15 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
               <p class="form-bottom-note">
                 Uforpligtende · Vi udvælger {site.pilotPlaces} projekter
               </p>
+              {
+                liveForm && (
+                  <p class="form-bottom-note">
+                    Vi bruger dine oplysninger til at behandle henvendelsen og
+                    kontakte dig. Undlad CPR-nummer og andre følsomme
+                    oplysninger. Læs mere under Privatliv nederst på siden.
+                  </p>
+                )
+              }
             </fieldset>
             <noscript
               ><p>Aktivér JavaScript for at bruge formularen.</p></noscript
@@ -513,10 +511,12 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
       ><span
         >{
           liveForm
-            ? 'Aktiv formular · Virksomhedsoplysninger er foreløbige'
+            ? 'Kontakt os på kontakt@lysoglogik.dk'
             : 'Lokal prototype · Virksomhedsoplysninger er placeholders'
         }</span
-      ><button id="privacy-open" type="button">Privatliv & prototype</button>
+      ><button id="privacy-open" type="button"
+        >{liveForm ? 'Privatliv' : 'Privatliv & prototype'}</button
+      >
     </div>
   </footer>
   <div class="mobile-cta">
@@ -528,23 +528,33 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
       id="privacy-close"
       aria-label="Luk information"
       type="button">×</button
-    ><p class="eyebrow">OM DENNE VERSION</p><h2 id="privacy-title">
+    ><p class="eyebrow">
+      {liveForm ? 'DINE OPLYSNINGER' : 'OM DENNE VERSION'}
+    </p><h2 id="privacy-title">
       {liveForm ? 'Om formularen og dine oplysninger.' : 'En lokal prototype.'}
     </h2><p>
-      Hjemmesiden viser et forslag til Lys & Logiks fremtidige website.
-      Kontaktoplysninger og arbejdsområde er foreløbige.
+      {
+        liveForm
+          ? 'Lys & Logik bruger navn, e-mail, eventuelt telefonnummer, postnummer og opgavebeskrivelse til at vurdere opgaven og kontakte dig. Henvendelsen er uforpligtende.'
+          : 'Dette er en lokal prøvevisning af hjemmesiden.'
+      }
     </p><p>
       {
         liveForm
-          ? 'Når du sender formularen, gemmes kontaktoplysninger og opgavebeskrivelse i vores Supabase-database, så vi kan behandle din henvendelse. Cloudflare Turnstile bruges til at beskytte formularen mod misbrug.'
+          ? 'Oplysningerne gemmes hos vores databaseleverandør Supabase og er kun tilgængelige for medarbejdere med adgang til vores arbejdsrum. Cloudflare leverer hjemmesiden og Turnstile-sikkerhedskontrollen, som beskytter mod misbrug. Vi sender ikke dine oplysninger til markedsføring.'
           : 'Formularen validerer kun oplysningerne i din browser. Den sender og gemmer dem ikke. Siden bruger ingen analyseværktøjer eller cookies.'
       }
     </p><p>
       Boligbillederne er AI-genererede inspirationsbilleder og viser ikke
-      udførte kundeprojekter. Logoet er jeres logo_v11.
+      udførte kundeprojekter.
     </p><p>
-      Før offentlig lancering skal de korrekte virksomhedsoplysninger,
-      pilotvilkår, formularmodtagelse og privatlivsinformation være på plads.
+      {liveForm ? 'Skriv til ' : 'Spørgsmål om hjemmesiden? Skriv til '}<a
+        href={`mailto:${site.email}`}>{site.email}</a
+      >{
+        liveForm
+          ? ', hvis du vil spørge til, rette eller bede om at få slettet oplysninger om din henvendelse.'
+          : '.'
+      }
     </p>
   </dialog>
   <script>

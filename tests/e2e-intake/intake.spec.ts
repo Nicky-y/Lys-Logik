@@ -111,3 +111,42 @@ test('live form remains accessible and displays field errors', async ({
     .analyze();
   expect(result.violations).toEqual([]);
 });
+
+test('a blocked security script preserves the form and cannot report success', async ({
+  page,
+  request,
+}) => {
+  await page.route(
+    'https://challenges.cloudflare.com/turnstile/v0/api.js*',
+    (route) => route.abort(),
+  );
+  await page.reload();
+  await expect(page.getByRole('alert')).toContainText(
+    'Sikkerhedskontrollen kunne ikke indlæses',
+  );
+  await fillEnquiry(page);
+  await page.getByRole('button', { name: 'Send din henvendelse' }).click();
+  await expect(page.getByRole('alert')).toContainText(
+    'Vent på sikkerhedskontrollen',
+  );
+  await expect(page.getByLabel('Din e-mail')).toHaveValue('anna@example.com');
+  await expect(page.locator('#form-success')).toBeHidden();
+  expect(
+    await (await request.get('http://127.0.0.1:54325/_test/state')).json(),
+  ).toEqual({ leads: 0, newLeads: 0, events: 0, deliveries: 0 });
+});
+
+test('live privacy information names the actual contact and explains submitted data', async ({
+  page,
+}) => {
+  await page.getByRole('button', { name: 'Privatliv', exact: true }).click();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog).toContainText('Supabase');
+  await expect(dialog).toContainText('Turnstile');
+  await expect(
+    dialog.getByRole('link', { name: 'kontakt@lysoglogik.dk' }),
+  ).toHaveAttribute('href', 'mailto:kontakt@lysoglogik.dk');
+  await expect(dialog).not.toContainText('lokal prøvevisning');
+  await page.keyboard.press('Escape');
+  await expect(dialog).toBeHidden();
+});
