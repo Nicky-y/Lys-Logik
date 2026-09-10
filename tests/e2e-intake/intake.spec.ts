@@ -42,7 +42,7 @@ test('sends form through the real local endpoint and stores one enquiry with its
   await expect(page.locator('#lead-reference')).toHaveText(/[0-9a-f-]{36}/);
   expect(
     await (await request.get('http://127.0.0.1:54325/_test/state')).json(),
-  ).toEqual({ leads: 1, events: 1, deliveries: 2 });
+  ).toEqual({ leads: 1, newLeads: 1, events: 1, deliveries: 2 });
   expect(
     await page.evaluate(() => ({
       local: localStorage.length,
@@ -82,7 +82,7 @@ test('lost response preserves fields and retry confirms the same database enquir
   expect(keys[1]).toBe(keys[0]);
   expect(
     await (await request.get('http://127.0.0.1:54325/_test/state')).json(),
-  ).toEqual({ leads: 1, events: 1, deliveries: 2 });
+  ).toEqual({ leads: 1, newLeads: 1, events: 1, deliveries: 2 });
 });
 
 test('two confirmed enquiries from the same customer are separate cases', async ({
@@ -98,7 +98,7 @@ test('two confirmed enquiries from the same customer are separate cases', async 
   await expect(page.locator('#form-success')).toBeVisible();
   expect(
     await (await request.get('http://127.0.0.1:54325/_test/state')).json(),
-  ).toEqual({ leads: 2, events: 2, deliveries: 4 });
+  ).toEqual({ leads: 2, newLeads: 2, events: 2, deliveries: 4 });
 });
 
 test('live form remains accessible and displays field errors', async ({

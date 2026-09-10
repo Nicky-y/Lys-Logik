@@ -10,6 +10,7 @@
     "test": "node --test tests/*.test.ts",
     "test:e2e": "playwright test",
     "test:e2e:intake": "playwright test --config playwright.intake.config.ts",
+    "test:build:pages": "node --test tests/build/pages.test.ts",
     "app:dev": "node operations/dev.mjs",
     "app:demo": "node operations/dev.mjs --demo",
     "app:build": "tsc -p operations/tsconfig.json && vite build --config operations/vite.config.ts",

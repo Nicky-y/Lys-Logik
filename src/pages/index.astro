@@ -510,7 +510,12 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
     </div><div class="container footer-bottom">
       <span
         >© {new Date().getFullYear()} Lys & Logik · {site.companyStatus}</span
-      ><span>Lokal prototype · Virksomhedsoplysninger er placeholders</span
+      ><span
+        >{
+          liveForm
+            ? 'Aktiv formular · Virksomhedsoplysninger er foreløbige'
+            : 'Lokal prototype · Virksomhedsoplysninger er placeholders'
+        }</span
       ><button id="privacy-open" type="button">Privatliv & prototype</button>
     </div>
   </footer>
@@ -524,7 +529,7 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
       aria-label="Luk information"
       type="button">×</button
     ><p class="eyebrow">OM DENNE VERSION</p><h2 id="privacy-title">
-      En lokal prototype.
+      {liveForm ? 'Om formularen og dine oplysninger.' : 'En lokal prototype.'}
     </h2><p>
       Hjemmesiden viser et forslag til Lys & Logiks fremtidige website.
       Kontaktoplysninger og arbejdsområde er foreløbige.

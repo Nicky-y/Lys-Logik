@@ -1,0 +1,44 @@
+import assert from 'node:assert/strict';
+import { readFileSync, existsSync } from 'node:fs';
+import { test } from 'node:test';
+
+// Run against the actual Pages artifact before upload, never against dev HTML.
+const dist = new URL('../../dist/', import.meta.url);
+const html = readFileSync(new URL('index.html', dist), 'utf8');
+
+test('Pages ships the live form with the production endpoint and real widget', () => {
+  assert.match(
+    html,
+    /data-lead-endpoint="https:\/\/elydnshkxcwlmbdmtpys\.supabase\.co\/functions\/v1\/create-lead"/,
+  );
+  assert.match(html, /data-turnstile-site-key="0x4AAAAAAEslNMfqqO2vHaTk"/);
+  assert.ok(html.includes('Send din henvendelse'));
+  assert.ok(html.includes('Vi har modtaget din henvendelse.'));
+  assert.match(html, /id="lead-reference"/);
+  assert.ok(html.includes('Cloudflare Turnstile'));
+  assert.ok(html.includes('Aktiv formular'));
+  assert.ok(!html.includes('Demoversion'));
+  assert.ok(!html.includes('Intet er sendt eller gemt'));
+  assert.match(html, /<fieldset\b[^>]*id="form-fields"[^>]*disabled/);
+});
+
+test('Pages JS and CSS resolve within the repository subpath and exist in the artifact', () => {
+  const assets = [
+    ...html.matchAll(/(?:src|href)="([^"\s]*\/_astro\/[^"\s]+)"/g),
+  ].map((match) => match[1]);
+  assert.ok(
+    assets.some((path) => path.endsWith('.js')),
+    'form JavaScript is emitted',
+  );
+  assert.ok(
+    assets.some((path) => path.endsWith('.css')),
+    'styles are emitted',
+  );
+  for (const path of assets) {
+    assert.ok(path.startsWith('/Lys-Logik/_astro/'), path);
+    assert.ok(
+      existsSync(new URL(path.slice('/Lys-Logik/'.length), dist)),
+      path,
+    );
+  }
+});

@@ -43,6 +43,8 @@ Requestgrænsen er fælles for endpointet: 20 requestforsøg pr. minut og 200 pr
 
 ## Aktivering af rigtig formular
 
+**10. september 2026:** Pages-workflowen er lokalt ændret til at indbygge de to offentlige produktionsværdier og verificere den færdige formular før upload. Den offentlige side er stadig verificeret i demo; commit/push, en vellykket Pages-udgivelse og en indsendelse på den offentlige adresse udestår. Backendens preflight er genkontrolleret: 204 for `https://nicky-y.github.io`, 403 for en ikke-godkendt origin. Ingen backendkonfiguration eller database er ændret i dette trin.
+
 1. Widgetten ovenfor er oprettet og valideret. Dens offentlige nøgle er gemt som `TURNSTILE_SITE_KEY` i den ignorerede `.env.local`; det aktiverer ikke formularen i sig selv.
 2. `TURNSTILE_SECRET_KEY`, `LEAD_ALLOWED_ORIGINS`, `TURNSTILE_HOSTNAMES` og `LEAD_SERVER_KEY_NAME` er sat i Supabase-projektets Edge Function secrets. Ved senere ændringer uploades kun de nødvendige værdier; upload aldrig hele `.env.local` med administrationsnøgler.
 3. Origins indeholder scheme og hostname, fx `https://nicky-y.github.io`, uden path eller afsluttende skråstreg. `TURNSTILE_HOSTNAMES` indeholder præcise, kommaseparerede værtsnavne fra Siteverify. Produktionsopsætningen accepterer kun produktionsværtsnavne; lokal afprøvning bruger sin egen konfiguration.

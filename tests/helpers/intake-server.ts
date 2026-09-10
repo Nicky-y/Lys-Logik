@@ -31,6 +31,7 @@ const server = createServer(async (incoming, outgoing) => {
     if (incoming.url === '/_test/state') {
       const { rows } =
         await db.query(`select (select count(*)::int from public.leads) as leads,
+        (select count(*)::int from public.leads where status = 'new') as "newLeads",
         (select count(*)::int from public.lead_events) as events,
         (select count(*)::int from lys_private.notification_outbox) as deliveries`);
       outgoing.setHeader('Content-Type', 'application/json');

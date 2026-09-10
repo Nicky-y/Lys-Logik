@@ -36,7 +36,7 @@ Kræver Node.js i en version, som den installerede Astro-version understøtter. 
 - Ved deaktiveret JavaScript er formularen deaktiveret, så personoplysninger ikke utilsigtet sendes til serveren.
 - Ingen tracking eller eksterne skrifttyper. Manrope hostes sammen med siden. Turnstile indlæses kun ved aktiveret, rigtig formularmodtagelse.
 - `noindex, nofollow` forhindrer normal søgeindeksering, men er ikke adgangskontrol.
-- Repositoryet har en GitHub Pages-workflow. Den bruger demotilstand uden de to offentlige formularvariable; backend deployes særskilt til Supabase.
+- GitHub Pages-workflowen bygger med den offentlige Supabase-endpoint og Turnstile site key. Den kontrollerer den færdige HTML og filer under `/Lys-Logik/` før upload, så en demoversion ikke udgives ved en fejl. Almindelig lokal udvikling er stadig demo uden de to formularvariable. Backend deployes særskilt til Supabase.
 
 Før en rigtig lancering skal firmaets oplysninger, aktuelle ydelser og pilotvilkår bekræftes. Formularmodtagelse og Turnstile skal afprøves samlet, og privatlivsinformationen skal beskrive den valgte løsning.
 
@@ -60,3 +60,11 @@ npm.cmd run test:e2e:app
 Unit- og integrationstests dækker formulargrænser, HTTP, botkontrol, genforsøg, transaktioner og databaseadgang. Playwright tester både den eksisterende demo og rigtig lokal indsendelse, herunder tabt netværkssvar og separate henvendelser fra samme kunde. Browseren er den installerede Microsoft Edge; Android emuleres i det nye intake-testsæt. Den rigtige Cloudflare-tjeneste er ikke en del af de automatiske tests.
 
 Den statiske produktionsversion bygges til `dist/`.
+
+## Formularaktivering — 10. september 2026
+
+Aktiveringen er forberedt i `.github/workflows/deploy-pages.yml`. Den offentlige side er ved kontrollen stadig i demotilstand; ændringen skal først committes, pushes og gennemføre Pages-workflowen. Produktionsbackend accepterer allerede origin `https://nicky-y.github.io` (preflight 204) og afviser uvedkommende origin (403).
+
+Den nye `npm.cmd run test:build:pages` køres efter et Pages-build med begge produktionsvariable. Den verificerer rigtig formularopsætning, kvittering, information om datalagring, deaktiveret formular uden JavaScript og at JS/CSS findes under det rigtige repository-basepath. Den normale `npm.cmd run build` uden formularvariable må fortsat bygge en lokal demo.
+
+Efter udgivelse skal én tydeligt markeret testhenvendelse sendes fra den offentlige side med rigtig Turnstile. Kontrollér kvitteringen og den tilsvarende sag under **Nye leads** i appen. Mail og push sendes endnu ikke; følg foreløbig nye sager ved at åbne appen.
