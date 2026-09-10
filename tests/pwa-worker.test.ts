@@ -85,13 +85,13 @@ test('offline cache contains only public fallback and icon, never API or auth re
   await sw.lifecycle('install');
   assert.deepEqual([...sw.stores.values()][0].keys().toArray(), [
     '/offline.html',
-    '/icons/app-192.png',
+    '/icons/app-v12-192.png',
   ]);
   for (const url of [
     'https://database.example/auth/v1/token',
     'https://database.example/rest/v1/leads',
     'https://app.example/api/leads',
-    'https://app.example/icons/app-192.png?token=secret',
+    'https://app.example/icons/app-v12-192.png?token=secret',
   ]) {
     assert.equal(await sw.fetch(url), undefined);
   }
@@ -150,5 +150,15 @@ test('manifest has a stable identity, standalone launch and required icon sizes'
     );
     assert.equal(png.readUInt32BE(16), size);
     assert.equal(png.readUInt32BE(20), size);
+  }
+  const maskable = manifest.icons.find((entry: any) => entry.purpose === 'maskable');
+  assert.ok(maskable);
+  const png = readFileSync(new URL(`../operations/public${maskable.src}`, import.meta.url));
+  assert.equal(png.readUInt32BE(16), 512);
+  assert.equal(png.readUInt32BE(20), 512);
+  assert.equal(png[25], 2, 'Android maskable icon has an opaque RGB background');
+  for (const file of ['index.html', 'public/offline.html', 'src/pwa.tsx', 'service-worker.js']) {
+    const source = readFileSync(new URL(`../operations/${file}`, import.meta.url), 'utf8');
+    assert.ok(source.includes(manifest.icons[0].src), `${file} uses the current app icon`);
   }
 });

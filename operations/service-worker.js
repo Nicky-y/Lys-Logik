@@ -1,7 +1,63 @@
 // Only public offline assets enter Cache Storage. API requests and application
 // navigation always use the network; no customer records or auth responses are cached.
 const CACHE = 'lys-logik-offline-__BUILD_ID__';
-const OFFLINE_ASSETS = ['/offline.html', '/icons/app-192.png'];
+const OFFLINE_ASSETS = ['/offline.html', '/icons/app-v12-192.png'];
+self.addEventListener('message', (event) => {
+  if (event.data?.type === 'PUSH_CAPABILITY')
+    event.ports[0]?.postMessage({ push: true });
+});
+self.addEventListener('push', (event) => {
+  let payload = {};
+  try {
+    payload = event.data?.json() ?? {};
+  } catch {
+    /* Generic notification if payload is invalid. */
+  }
+  const uuid =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  const leadId =
+    typeof payload.leadId === 'string' && uuid.test(payload.leadId)
+      ? payload.leadId
+      : null;
+  const deliveryId =
+    typeof payload.deliveryId === 'string' && uuid.test(payload.deliveryId)
+      ? payload.deliveryId
+      : 'new-lead';
+  event.waitUntil(
+    self.registration.showNotification('Ny henvendelse · Lys & Logik', {
+      body: 'Der er kommet en ny henvendelse. Åbn appen for at se sagen.',
+      icon: '/icons/app-v12-192.png',
+      badge: '/icons/app-v12-192.png',
+      tag: deliveryId,
+      renotify: false,
+      data: { leadId },
+    }),
+  );
+});
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const id = event.notification.data?.leadId;
+  const valid =
+    typeof id === 'string' &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+  const target =
+    self.location.origin + (valid ? '/#/leads/' + id : '/#/pipeline');
+  event.waitUntil(
+    (async () => {
+      const windows = await self.clients.matchAll({
+        type: 'window',
+        includeUncontrolled: true,
+      });
+      const app = windows.find(
+        (client) => new URL(client.url).origin === self.location.origin,
+      );
+      if (app) {
+        await app.navigate(target);
+        await app.focus();
+      } else await self.clients.openWindow(target);
+    })(),
+  );
+});
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE).then((cache) => cache.addAll(OFFLINE_ASSETS)),

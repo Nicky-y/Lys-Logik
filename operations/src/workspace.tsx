@@ -51,6 +51,8 @@ import {
 import { CalendarView, AppointmentPanel, AppointmentHistory } from './calendar';
 import { copenhagenLocal } from './calendar-time';
 import { InstallApp } from './pwa';
+import { PushSettings } from './push';
+import type { PushController } from './push-controller';
 
 const dateTime = (value: string) =>
   new Intl.DateTimeFormat('da-DK', {
@@ -107,11 +109,13 @@ function Empty({ children }: { children: ReactNode }) {
 }
 export function Workspace({
   gateway,
+  push,
   staff,
   demo,
   onSignOut,
 }: {
   gateway: OperationsGateway;
+  push?: PushController;
   staff: Staff;
   demo: boolean;
   onSignOut: () => void;
@@ -236,6 +240,7 @@ export function Workspace({
           </span>
           <span className="mobile-brand">Lys & Logik</span>
           <InstallApp />
+          {push && <PushSettings controller={push} />}
         </header>
         {demo && (
           <div className="demo-banner">

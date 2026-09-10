@@ -5,3 +5,9 @@ project_id = "lys-og-logik"
 verify_jwt = false
 entrypoint = "./functions/create-lead/index.ts"
 import_map = "./functions/deno.json"
+
+[functions.dispatch-push]
+# Cron only: the handler verifies a separate secret before accessing any data.
+verify_jwt = false
+entrypoint = "./functions/dispatch-push/index.ts"
+import_map = "./functions/deno.json"

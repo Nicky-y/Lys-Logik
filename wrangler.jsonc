@@ -1,0 +1,8 @@
+{
+  "name": "lys-og-logik-website",
+  "compatibility_date": "2026-09-10",
+  "workers_dev": false,
+  "assets": {
+    "directory": "./dist"
+  }
+}

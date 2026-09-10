@@ -39,7 +39,7 @@ Det private schema `lys_private` indeholder indsendelsesnøgler, outbox, request
 
 Requestgrænsen er fælles for endpointet: 20 requestforsøg pr. minut og 200 pr. time. Grænserne konfigureres administrativt i `lys_private.lead_request_limit`. Der stoles ikke på klientoplyste IP-adresser. HTTP-body begrænses til 16 KiB via både angivet længde og faktisk læste bytes.
 
-**Outbox lagrer foreløbig kun leveringsopgaver.** Der er endnu ingen worker, som sender mail eller push. `pending` betyder derfor ikke, at kunden eller medarbejderen har fået en notifikation.
+**Medarbejder-push er implementeret 10. september 2026.** `dispatch-push` behandler medarbejderopgaver pr. tilmeldt enhed; kundemail afventer stadig. `pending` er ikke leveret, `skipped` betyder ingen tilmeldte modtagere, og `sent` betyder leverandøraccept. Se [mobilnotifikationer](../operations/README.md#mobilnotifikationer--10-september-2026).
 
 ## Aktivering af rigtig formular
 
@@ -81,3 +81,7 @@ Cloudflares 14 officielle skills er installeret i `C:/Users/mnbro/.codex/skills/
 Efter kalenderdelen består 63 unit-/integrationstests og 16 app-browsertests på desktop og emuleret Android. Website- og appbuild består. Appens JavaScript-bundle er ca. 164 kB gzip. Den tidligere kørte website-/intake-browserkontrol omfattede 25 beståede tests og én mobiltest, der blev sprunget over på desktop.
 
 Referencer: [Supabase API-nøgler](https://supabase.com/docs/guides/getting-started/api-keys), [Cloudflare Siteverify](https://developers.cloudflare.com/turnstile/get-started/server-side-validation/) og [Cloudflare Agent Setup](https://developers.cloudflare.com/agent-setup/prompt.md).
+
+### Opdateret driftsstatus 10. september 2026
+
+Den offentlige formular er udgivet via commit `1690928`, og en rigtig indsendelse med fiktive testdata er verificeret: reference `969509b4-65c8-403e-b8e1-bb36989c78f9`, status `new` og én oprettelseshændelse. Web Push-migration, Edge-funktion og cron er efterfølgende aktiveret. De historiske statusafsnit ovenfor beskriver de tidligere trin; fysisk push-test mangler fortsat.

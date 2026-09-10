@@ -98,7 +98,7 @@ test('login survives reopening, offline launch reveals no customer data and logo
         paths.push(new URL(request.url).pathname);
     return paths.sort();
   });
-  expect(paths).toEqual(['/icons/app-192.png', '/offline.html']);
+  expect(paths).toEqual(['/icons/app-v12-192.png', '/offline.html']);
   await context.setOffline(true);
   await page.reload();
   await expect(

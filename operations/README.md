@@ -4,7 +4,7 @@ Mobilvenlig intern app med Supabase-login, pipeline, søgning, sagsvisning, fagl
 
 ## Åbn appen
 
-**Installerbar app:** [lys-og-logik-app.mnbrom.workers.dev](https://lys-og-logik-app.mnbrom.workers.dev/). Åbn adressen i Chrome på Android, vælg **Installér app**, og følg vejledningen. Brug din eksisterende medarbejderkonto. Appen ligger hos Cloudflare og kræver ikke, at udviklingscomputeren er tændt.
+**Installerbar app:** [app.lysoglogik.dk](https://app.lysoglogik.dk/). Åbn adressen i Chrome på Android, vælg **Installér app**, og følg vejledningen. Brug din eksisterende medarbejderkonto. Appen ligger hos Cloudflare og kræver ikke, at udviklingscomputeren er tændt.
 
 Kør fra `website/`, eller dobbeltklik den tilsvarende startfil:
 
@@ -56,11 +56,11 @@ React Query holder hentede kundedata i hukommelsen, som ryddes ved logout. Supab
 
 ## Installation på Android og hosting
 
-PWA'en har manifest med stabil appidentitet, standalone-visning, logo_v11 i 192/512 px og et maskable-ikon. **Installér app** vises ved login og i arbejdsrummet; demoen tilbyder ikke installation. Knappen bruger browserens installationsdialog, når den er tilgængelig, og viser ellers vejledning til Chrome på Android: menu → Føj til startskærm → Installér. Knappen skjules i standalone-visning.
+PWA'en har manifest med stabil appidentitet, standalone-visning, logo_v12 uden tekst i 192/512 px og et maskable-ikon med lys baggrund og plads til Androids beskæring. Ikonernes versionsnavne sikrer nye cacheadresser; appidentiteten er uændret. **Installér app** vises ved login og i arbejdsrummet; demoen tilbyder ikke installation. Knappen bruger browserens installationsdialog, når den er tilgængelig, og viser ellers vejledning til Chrome på Android: menu → Føj til startskærm → Installér. Knappen skjules i standalone-visning.
 
-Service workeren registreres kun i produktionsbuildet og på en sikker origin. Navigation og alle database-/loginkald bruger netværket. Åbning uden net viser en særskilt offlinebesked uden kundedata. Allerede åbne sager har fortsat netværksindikator og blokerede gem-handlinger offline. Der er ingen baggrundssynkronisering eller push i dette trin. Opdatering bruger hverken `skipWaiting` eller automatisk reload, så en åben indtastning ikke afbrydes; luk appens vinduer/faner og åbn den igen for at aktivere en ventende service worker.
+Service workeren registreres kun i produktionsbuildet og på en sikker origin. Navigation og alle database-/loginkald bruger netværket. Åbning uden net viser en særskilt offlinebesked uden kundedata. Allerede åbne sager har fortsat netværksindikator og blokerede gem-handlinger offline. Der er ingen offlinekø. Web Push leveres nu af det separate baggrundsjob beskrevet nedenfor. Opdatering bruger hverken `skipWaiting` eller automatisk reload, så en åben indtastning ikke afbrydes; luk appens vinduer/faner og åbn den igen for at aktivere en ventende service worker.
 
-**Udgivet 9. september 2026:** [https://lys-og-logik-app.mnbrom.workers.dev](https://lys-og-logik-app.mnbrom.workers.dev/). Cloudflare Workers Static Assets kører som `lys-og-logik-app` på konto `af5e7237c7fd2ab66d71c3ce2c02b70a`, under kontoens eksisterende `mnbrom.workers.dev`. Konfigurationen ligger i `wrangler.jsonc`. Verificeret deploymentversion: `58cc83b7-4f21-4190-9927-0873ff8d299b`.
+**Udgivet 10. september 2026:** [app.lysoglogik.dk](https://app.lysoglogik.dk/). Cloudflare Workers Static Assets kører som `lys-og-logik-app` på konto `af5e7237c7fd2ab66d71c3ce2c02b70a`. Custom domain administreres hos Cloudflare; `workers_dev` er slået fra i `wrangler.jsonc`. Seneste appversion med notifikationer: `8d4a44e0-6ede-4e24-a199-90656b9c3d17`. Hoveddomænet er tilknyttet den separate website-Worker.
 
 OAuth er godkendt med **Workers Scripts Write** (`workers_scripts:write`), `account:read` og `user:read`. Scope `workers:write` alene er utilstrækkeligt. Brug det projektspecifikke login-script ved behov for ny adgang; `--device` giver fem minutter til godkendelse uden en lokal callbackserver. De tidligere API-nøgler i website-miljøfilen anvendes ikke til appudgivelse.
 
@@ -96,4 +96,22 @@ Efter PWA-delen består 67 unit-/integrationstests, 16 app-browsertests og 8 PWA
 
 ## Resterende V0
 
-P2 mangler kundemail frem og tilbage, billedskabelon/vedhæftninger, push og fysisk afprøvning af PWA'en. Kalenderdelen af P3 er implementeret; markering af udført, faktureret og betalt samt samlet afprøvning på begge Android-telefoner mangler. De resterende pipelinekolonner er synlige, men overgangene åbnes først med de nødvendige funktioner. Outbox fra lead-modtagelsen sender endnu ikke mail eller push.
+P2 mangler kundemail frem og tilbage, billedskabelon/vedhæftninger og fysisk afprøvning af PWA'en. Kalenderdelen af P3 er implementeret; markering af udført, faktureret og betalt samt samlet afprøvning på begge Android-telefoner mangler. De resterende pipelinekolonner er synlige, men overgangene åbnes først med de nødvendige funktioner. Outbox sender nu medarbejder-push. Kundemail er fortsat afventende.
+
+## Mobilnotifikationer — 10. september 2026
+
+Efter login vælges **Notifikationer → Slå notifikationer til** på hver enhed. Browserens tilladelse gives kun ved eget tryk. Slå fra afmelder den aktuelle enhed; logout afmelder også lokalt, selv hvis backend ikke kan kontaktes. Ved en gammel service worker beder appen om at lukke alle appvinduer/faner og åbne igen, før tilmelding kan gennemføres. Ingen kundeoplysninger vises på låseskærmen: notifikationen siger kun, at en ny henvendelse er kommet. Tryk åbner `#/leads/<id>`; login og medarbejderadgang gælder stadig.
+
+Migration `20260910063714_web_push.sql` er lagt på Supabase. Private tilmeldinger ejes af den aktive medarbejder, maksimalt 10 aktive enheder. Endpoints er begrænset til kendte Web Push-udbydere; ukendte værter, custom ports og redirects afvises. Ingen ny tilmelding modtager historiske henvendelser.
+
+`dispatch-push` er udgivet med særskilt adgangskode. `lys-logik-web-push` kører hvert minut via pg_cron/pg_net; adgangskoden hentes fra Vault. Kun de tre push-værdier fra den ignorerede `.env.push.local` er uploadet til Edge secrets. Kun `VITE_WEB_PUSH_PUBLIC_KEY` tilføjes appens build. Aktivering af cron kan gentages med `supabase/operations/enable-push-cron.sql`, efter Vault-secret og Edge-funktion er klar.
+
+Hver medarbejder-outboxpost fordeles til kvalificerede enheder og får selvstændige leveringsrækker. Ingen modtagere giver `skipped`. Der reserveres højst 20 leveringer med to minutters lånetid og højst fire samtidige kald. Fejl genforsøges højst fem gange med stigende ventetid; 404/410 deaktiverer udløbne tilmeldinger. Fuldførelse kræver det aktuelle forsøgs lease-id. En allerede leveret søskende sendes ikke igen. Ved tabt svar efter leverandøraccept kan leveringen gentages; samme notification-tag samler gentagelsen, men der loves ikke præcis én visning. `sent` betyder accept hos push-leverandøren, ikke at medarbejderen har set beskeden. Kundemail-outbox behandles ikke.
+
+Verificeret 10. september 2026: 79 unit-/integrationstests og 14 PWA-browsertests består. Både `npm run build` (inklusive Astro check: 0 fejl) og `npm run app:build` består. Hosted dispatch afviser anonymt kald med 401 og accepterer korrekt adgang med 200. Cron er aktiv; de seneste tre automatiske HTTP-kald returnerede 200 uden timeout. Den nye appadresse er verificeret med matchende manifest/SW/ikonfiler, browserens installationskontrol, offlinevisning og genåbning uden JavaScript-fejl. Rigtig levering på en fysisk Android afventer tilmelding; der var 0 aktive produktionsenheder ved kontrollen.
+
+### Domæneflytning og resterende forbindelse til formularen
+
+Brug og installér appen fra `https://app.lysoglogik.dk`. Tilmeld notifikationer på denne adresse; en installation og tilladelse fra den tidligere workers.dev-adresse dækker ikke det nye domæne. Supabase Auth `site_url` er opdateret og læst tilbage som den nye appadresse; øvrige redirectindstillinger er bevaret. VAPID-kontaktadressen bruger også det nye appdomæne.
+
+Ved kontrol 10. september 2026 var `https://lysoglogik.dk` stadig bygget i demoformulartilstand. Backend returnerede 403 på CORS-preflight fra det nye domæne. Før den nye hjemmeside kan skabe leads og dermed pushbeskeder, skal formularens offentlige buildværdier, Turnstile-domæner og backendens tilladte origins/hostnames afstemmes og udgives. Den tidligere GitHub Pages-formular er et separat deployment; dens tidligere gennemførte prøve beviser ikke den nye hjemmesides formular. Simply-mail og Resend er separate fra Web Push.

@@ -12,6 +12,7 @@ import {
 import { createOperationsGateway, type OperationsGateway } from './gateway';
 import { Workspace } from './workspace';
 import { InstallApp, PwaProvider } from './pwa';
+import { browserPushController } from './push';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -43,6 +44,10 @@ const client =
       })
     : null;
 const liveGateway = client ? createOperationsGateway(client) : null;
+const pushController =
+  client && import.meta.env.VITE_WEB_PUSH_PUBLIC_KEY
+    ? browserPushController(client, import.meta.env.VITE_WEB_PUSH_PUBLIC_KEY)
+    : undefined;
 
 function SignIn({
   onDone,
@@ -257,6 +262,7 @@ function Application() {
     };
   }, [session?.user.id]);
   async function signOut() {
+    await pushController?.disable().catch(() => {});
     await client?.auth.signOut({ scope: 'local' });
     queryClient.clear();
     setSession(null);
@@ -298,6 +304,7 @@ function Application() {
   return (
     <Workspace
       gateway={liveGateway!}
+      push={pushController}
       staff={staff}
       demo={false}
       onSignOut={() => void signOut()}

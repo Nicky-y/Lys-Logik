@@ -109,7 +109,7 @@ export function InstallApp() {
         >
           <X size={20} />
         </button>
-        <img className="install-icon" src="/icons/app-192.png" alt="" />
+        <img className="install-icon" src="/icons/app-v12-192.png" alt="" />
         <p className="eyebrow">LYS & LOGIK PÅ TELEFONEN</p>
         <h2 id="install-title">Et tryk til arbejdsrummet.</h2>
         <p>
@@ -147,8 +147,8 @@ export function InstallApp() {
         )}
         {message && <p role="status">{message}</p>}
         <p className="install-footnote">
-          Sager og aftaler kræver internet. Mobilnotifikationer kommer i et
-          senere trin.
+          Sager og aftaler kræver internet. Efter login kan du slå
+          mobilnotifikationer til under Notifikationer.
         </p>
       </dialog>
     </>

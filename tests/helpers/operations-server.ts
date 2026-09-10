@@ -166,6 +166,25 @@ const server = createServer((req, res) => {
         await db.exec(user ? 'set role authenticated' : 'set role anon');
         if (url.pathname.startsWith('/rest/v1/rpc/')) {
           const name = url.pathname.split('/').at(-1);
+          if (
+            name === 'register_push_subscription' ||
+            name === 'disable_push_subscription' ||
+            name === 'push_subscription_active'
+          ) {
+            const value =
+              name === 'register_push_subscription'
+                ? JSON.stringify(body.p_subscription)
+                : body.p_endpoint;
+            reply(
+              (
+                await db.query<{ receipt: unknown }>(
+                  `select public.${name}($1) as receipt`,
+                  [value],
+                )
+              ).rows[0].receipt,
+            );
+            return;
+          }
           const args = [
             body.p_lead_id,
             body.p_expected_version,

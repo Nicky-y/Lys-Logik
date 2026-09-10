@@ -5,6 +5,7 @@ import { resolve, extname } from 'node:path';
 process.env.VITE_SUPABASE_URL = 'http://127.0.0.1:54327';
 process.env.VITE_SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_local_fixture';
 process.env.VITE_OPERATIONS_MODE = 'live';
+process.env.VITE_WEB_PUSH_PUBLIC_KEY = 'B'.repeat(87);
 const root = resolve('.npm-cache/pwa-dist');
 await build({
   configFile: 'operations/vite.config.ts',
@@ -42,7 +43,15 @@ const server = createServer(async (req, res) => {
     res.end();
     return;
   }
-  const file = resolve(root, '.' + (path === '/' ? '/index.html' : path === '/offline' ? '/offline.html' : path));
+  const file = resolve(
+    root,
+    '.' +
+      (path === '/'
+        ? '/index.html'
+        : path === '/offline'
+          ? '/offline.html'
+          : path),
+  );
   if (
     !file.startsWith(
       root + '/'.replace('/', process.platform === 'win32' ? '\\' : '/'),
