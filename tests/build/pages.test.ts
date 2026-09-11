@@ -27,6 +27,8 @@ test('production ships the live form with the production endpoint and real widge
 
 test('production JS and CSS resolve within the deployment base and exist in the artifact', () => {
   const base = process.env.GITHUB_ACTIONS === 'true' ? '/Lys-Logik/' : '/';
+  assert.ok(html.includes(`href="${base}images/favicon-v19.png"`));
+  assert.ok(existsSync(new URL('images/favicon-v19.png', dist)));
   const assets = [
     ...html.matchAll(/(?:src|href)="([^"\s]*\/_astro\/[^"\s]+)"/g),
   ].map((match) => match[1]);
