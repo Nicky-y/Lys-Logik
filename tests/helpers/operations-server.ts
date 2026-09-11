@@ -27,6 +27,7 @@ async function reset() {
     submissionKey,
     JSON.stringify(validLead),
   ]);
+  await db.exec('update lys_private.mail_settings set enabled=true');
 }
 await reset();
 let queue = Promise.resolve();
@@ -166,6 +167,27 @@ const server = createServer((req, res) => {
         await db.exec(user ? 'set role authenticated' : 'set role anon');
         if (url.pathname.startsWith('/rest/v1/rpc/')) {
           const name = url.pathname.split('/').at(-1);
+          if (name === 'customer_mail_enabled') {
+            reply(
+              (
+                await db.query<{ enabled: boolean }>(
+                  'select public.customer_mail_enabled() enabled',
+                )
+              ).rows[0].enabled,
+            );
+            return;
+          }
+          if (name === 'queue_customer_message') {
+            reply(
+              (
+                await db.query<{ id: string }>(
+                  'select public.queue_customer_message($1,$2,$3,$4) id',
+                  [body.p_id, body.p_lead_id, body.p_subject, body.p_body],
+                )
+              ).rows[0].id,
+            );
+            return;
+          }
           if (
             name === 'register_push_subscription' ||
             name === 'disable_push_subscription' ||
@@ -284,6 +306,16 @@ const server = createServer((req, res) => {
                   ],
                 )
               ).rows;
+        } else if (url.pathname === '/rest/v1/lead_messages') {
+          rows = (
+            await db.query(
+              'select * from public.lead_messages where lead_id=$1 order by created_at desc,id desc limit 50 offset $2',
+              [
+                url.searchParams.get('lead_id')?.replace(/^eq\./, ''),
+                Number(url.searchParams.get('offset') ?? 0),
+              ],
+            )
+          ).rows;
         } else if (url.pathname === '/rest/v1/lead_events')
           rows = (
             await db.query(

@@ -2,6 +2,8 @@
   "imports": {
     "@supabase/supabase-js": "npm:@supabase/supabase-js@2",
     "zod": "npm:zod@4",
-    "web-push": "npm:web-push@3.6.7"
+    "web-push": "npm:web-push@3.6.7",
+    "svix": "npm:svix@2.4.0",
+    "html-to-text": "npm:html-to-text@10.0.1"
   }
 }

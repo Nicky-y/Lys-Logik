@@ -1,3 +1,4 @@
+import { LeadConversation } from './conversation';
 import { randomId } from './random-id';
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import {
@@ -689,6 +690,14 @@ function LeadContent({
         <p className="preserve">{lead.description}</p>
         <small className="muted">Modtaget {dateTime(lead.created_at)}</small>
       </section>
+      {gateway.mail && (
+        <LeadConversation
+          key={lead.id}
+          lead={lead}
+          gateway={gateway.mail}
+          online={online}
+        />
+      )}
       {stale && (
         <div role="alert" className="warning-box">
           <strong>Der er nyt på sagen.</strong>

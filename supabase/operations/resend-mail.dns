@@ -1,0 +1,5 @@
+resend._domainkey.mail.lysoglogik.dk. 300 IN TXT "p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCk5QgYO48iYDmIFx771XOYa0gs3tlU1jfzEx6ubUtabaJzomxfP6HyamQGhgcqCyRhPF/ubJL48cos5kOmn09yc60E3bxgSNrLnPMQuaFdDFgo3YysPen597UjIlPFFZGFHplvGCCL+8lOMZ5+KwRLA6fIq8ODagyCZkmoqi8P9QIDAQAB"
+send.mail.lysoglogik.dk. 300 IN MX 10 feedback-smtp.eu-west-1.amazonses.com.
+send.mail.lysoglogik.dk. 300 IN TXT "v=spf1 include:amazonses.com ~all"
+rsend.mail.lysoglogik.dk. 300 IN CNAME send.forge.rmta.net.
+mail.lysoglogik.dk. 300 IN MX 10 inbound-smtp.eu-west-1.amazonaws.com.

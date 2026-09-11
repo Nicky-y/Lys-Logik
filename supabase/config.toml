@@ -11,3 +11,18 @@ import_map = "./functions/deno.json"
 verify_jwt = false
 entrypoint = "./functions/dispatch-push/index.ts"
 import_map = "./functions/deno.json"
+
+[functions.dispatch-mail]
+verify_jwt = false
+entrypoint = "./functions/dispatch-mail/index.ts"
+import_map = "./functions/deno.json"
+
+[functions.mail-webhook]
+verify_jwt = false
+entrypoint = "./functions/mail-webhook/index.ts"
+import_map = "./functions/deno.json"
+
+[functions.customer-attachment]
+verify_jwt = false
+entrypoint = "./functions/customer-attachment/index.ts"
+import_map = "./functions/deno.json"

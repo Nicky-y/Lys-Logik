@@ -24,8 +24,8 @@ self.addEventListener('push', (event) => {
       ? payload.deliveryId
       : 'new-lead';
   event.waitUntil(
-    self.registration.showNotification('Ny henvendelse · Lys & Logik', {
-      body: 'Der er kommet en ny henvendelse. Åbn appen for at se sagen.',
+    self.registration.showNotification('Nyt i arbejdsrummet · Lys & Logik', {
+      body: 'Der er en ny henvendelse eller et svar på en sag. Åbn appen for at se mere.',
       icon: '/icons/app-v12-192.png',
       badge: '/icons/app-v12-192.png',
       tag: deliveryId,
@@ -43,19 +43,9 @@ self.addEventListener('notificationclick', (event) => {
   const target =
     self.location.origin + (valid ? '/#/leads/' + id : '/#/pipeline');
   event.waitUntil(
-    (async () => {
-      const windows = await self.clients.matchAll({
-        type: 'window',
-        includeUncontrolled: true,
-      });
-      const app = windows.find(
-        (client) => new URL(client.url).origin === self.location.origin,
-      );
-      if (app) {
-        await app.navigate(target);
-        await app.focus();
-      } else await self.clients.openWindow(target);
-    })(),
+    // Let Android reopen the installed app, even if an old WindowClient is
+    // suspended. Start during the click event, before any other async work.
+    self.clients.openWindow(target).then((app) => app?.focus()),
   );
 });
 self.addEventListener('install', (event) => {

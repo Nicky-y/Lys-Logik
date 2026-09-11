@@ -6,6 +6,7 @@ test('push displays fixed private text, groups retries and opens only the matchi
   const handlers: Record<string, (event: any) => void> = {};
   const shown: any[] = [];
   const opened: string[] = [];
+  let focused = 0;
   runInNewContext(
     readFileSync(
       new URL('../operations/service-worker.js', import.meta.url),
@@ -24,9 +25,18 @@ test('push displays fixed private text, groups retries and opens only the matchi
           },
         },
         clients: {
-          matchAll: async () => [],
+          matchAll: async () => {
+            throw new Error('Stale suspended app must not block opening');
+          },
           openWindow: async (url: string) => {
             opened.push(url);
+            return opened.length === 1
+              ? {
+                  focus: async () => {
+                    focused++;
+                  },
+                }
+              : null;
           },
         },
       },
@@ -51,7 +61,7 @@ test('push displays fixed private text, groups retries and opens only the matchi
     waitUntil,
   });
   await completion;
-  assert.equal(shown[0].title, 'Ny henvendelse · Lys & Logik');
+  assert.equal(shown[0].title, 'Nyt i arbejdsrummet · Lys & Logik');
   assert.equal(shown[0].tag, deliveryId);
   assert.equal(shown[0].renotify, false);
   assert.ok(!JSON.stringify(shown).includes('Private'));
@@ -59,7 +69,10 @@ test('push displays fixed private text, groups retries and opens only the matchi
     notification: { data: shown[0].data, close() {} },
     waitUntil,
   });
+  // Opening begins in the click handler, without first waiting for old clients.
+  assert.deepEqual(opened, ['https://app.example/#/leads/' + leadId]);
   await completion;
+  assert.equal(focused, 1);
   assert.deepEqual(opened, ['https://app.example/#/leads/' + leadId]);
   handlers.notificationclick({
     notification: { data: { leadId: 'https://evil.example' }, close() {} },

@@ -1,4 +1,8 @@
 import { randomId } from './random-id';
+import {
+  createCustomerMailGateway,
+  type CustomerMailGateway,
+} from './customer-mail';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { z } from 'zod';
 import {
@@ -16,6 +20,7 @@ import {
 } from '../../supabase/functions/_shared/contracts/operations.ts';
 
 export interface OperationsGateway {
+  mail?: CustomerMailGateway;
   list(offset: number): Promise<{ items: OperationsLead[]; hasMore: boolean }>;
   lead(id: LeadId): Promise<OperationsLead>;
   history(id: LeadId): Promise<LeadEvent[]>;
@@ -80,6 +85,7 @@ export function createOperationsGateway(
   client: SupabaseClient,
 ): OperationsGateway {
   return {
+    mail: createCustomerMailGateway(client),
     async list(offset) {
       const { data, error } = await client
         .from('leads')
