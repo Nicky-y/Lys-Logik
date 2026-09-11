@@ -154,7 +154,7 @@ test('mobile menu opens, closes on navigation, and responds to Escape', async ({
   await menu.click();
   await expect(menu).toHaveAttribute('aria-expanded', 'true');
   await page
-    .getByRole('navigation')
+    .getByRole('navigation', { name: 'Hovedmenu' })
     .getByRole('link', { name: 'Om os', exact: true })
     .click();
   await expect(menu).toHaveAttribute('aria-expanded', 'false');

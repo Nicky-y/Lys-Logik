@@ -1,0 +1,311 @@
+---
+import Icon from './Icon.astro';
+import BrandIcon from './BrandIcon.astro';
+import { site, socialProfiles, trustpilotUrl } from '../data/site';
+
+interface Props {
+  liveForm: boolean;
+}
+
+const { liveForm } = Astro.props;
+const assetBase = import.meta.env.BASE_URL.endsWith('/')
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
+---
+
+<footer id="sidefod" class="site-footer">
+  <div class="container">
+    <div class="footer-intro">
+      <p>Har du en opgave i tankerne?</p>
+      <a class="text-link" href="#kontakt">
+        Beskriv din opgave <Icon name="arrow" size={18} />
+      </a>
+    </div>
+
+    <div class="footer-columns">
+      <div class="footer-company">
+        <a
+          class="footer-brand"
+          href="#"
+          aria-label="Lys og Logik – tilbage til toppen"
+        >
+          <img
+            src={`${assetBase}images/logo-v11.png`}
+            alt="Lys & Logik"
+            width="1536"
+            height="1024"
+            loading="lazy"
+          />
+        </a>
+        <p class="footer-vision">{site.vision}</p>
+        <div class="footer-company-details">
+          <p class="company-name">{site.legalName}</p>
+          <p>{site.area}</p>
+          <p class="company-cvr">CVR {site.cvr}</p>
+        </div>
+      </div>
+
+      <section class="footer-contact" aria-labelledby="footer-contact-title">
+        <h2 id="footer-contact-title">Kontakt</h2>
+        <ul>
+          <li>
+            <a class="footer-phone" href={site.phoneHref}>{site.phone}</a>
+          </li>
+          <li><a href={`mailto:${site.email}`}>{site.email}</a></li>
+        </ul>
+        <p>Fortæl os om din opgave.<br />Så tager vi den derfra.</p>
+      </section>
+
+      <nav class="footer-navigation" aria-labelledby="footer-navigation-title">
+        <h2 id="footer-navigation-title">Genveje</h2>
+        <ul>
+          <li><a href="#ydelser">Det hjælper vi med</a></li>
+          <li><a href="#pilot">Pilotprojektet</a></li>
+          <li><a href="#om-os">Om os</a></li>
+          <li><a href="#kontakt">Beskriv din opgave</a></li>
+        </ul>
+      </nav>
+
+      <nav class="footer-social" aria-labelledby="footer-social-title">
+        <h2 id="footer-social-title">Følg med</h2>
+        <ul>
+          {
+            socialProfiles.map((profile) => (
+              <li>
+                <a href={profile.url}>
+                  <BrandIcon name={profile.icon} />
+                  <span>{profile.name}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+        <a class="footer-trustpilot" href={trustpilotUrl}>
+          <BrandIcon name="trustpilot" />
+          <span>Find os på Trustpilot</span>
+        </a>
+      </nav>
+    </div>
+
+    <div class="footer-bottom">
+      <span>© {new Date().getFullYear()} {site.legalName}</span>
+      <button
+        id="privacy-open"
+        type="button"
+        aria-haspopup="dialog"
+        aria-controls="privacy-dialog"
+      >
+        {liveForm ? 'Privatliv' : 'Privatliv & prototype'}
+      </button>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    background: #0b1115;
+    color: #bec8ce;
+  }
+
+  .footer-intro {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px 32px;
+    padding-block: 34px;
+    border-bottom: 1px solid #2b353b;
+  }
+
+  .footer-intro p {
+    color: #fff;
+    font-size: clamp(1.25rem, 2.2vw, 1.625rem);
+    line-height: 1.4;
+    letter-spacing: -0.025em;
+  }
+
+  .footer-intro a {
+    color: var(--yellow);
+    font-size: 0.875rem;
+    min-height: 44px;
+  }
+
+  .footer-columns {
+    display: grid;
+    grid-template-columns: 1.7fr 1.25fr 1fr 1.1fr;
+    gap: 32px;
+    padding-block: 44px;
+    font-size: 0.875rem;
+    line-height: 1.7;
+  }
+
+  .footer-columns > * {
+    min-width: 0;
+  }
+
+  .footer-brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 150px;
+    max-width: 100%;
+    aspect-ratio: 3 / 2;
+    background: #fff;
+    border-radius: 4px;
+    margin-bottom: 20px;
+  }
+
+  .company-name {
+    color: #fff;
+    font-weight: 650;
+    margin-bottom: 6px;
+  }
+
+  .footer-vision {
+    max-width: 42ch;
+    margin-bottom: 24px;
+    text-wrap: pretty;
+  }
+
+  .company-cvr {
+    margin-top: 12px;
+  }
+
+  h2 {
+    color: #fff;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    letter-spacing: 0;
+    margin-bottom: 12px;
+  }
+
+  ul {
+    margin: 0;
+  }
+
+  li a,
+  .footer-trustpilot {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  .footer-phone {
+    color: #fff;
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: 0.015em;
+  }
+
+  .footer-contact p {
+    margin-top: 16px;
+  }
+
+  .footer-trustpilot {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #2b353b;
+  }
+
+  .footer-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+    border-top: 1px solid #2b353b;
+    padding-block: 14px;
+    font-size: 0.75rem;
+  }
+
+  .footer-bottom button {
+    min-height: 44px;
+    border: 0;
+    padding: 8px 0;
+    background: none;
+    color: inherit;
+    font-size: inherit;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  a:hover,
+  button:hover {
+    color: var(--yellow);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  a:focus-visible,
+  button:focus-visible {
+    outline-color: var(--yellow);
+  }
+
+  @media (max-width: 1000px) {
+    .footer-columns {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 40px 32px;
+    }
+
+    .footer-company {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: 150px minmax(0, 1.7fr) minmax(150px, 0.8fr);
+      align-items: start;
+      gap: 32px;
+      padding-bottom: 40px;
+      border-bottom: 1px solid #2b353b;
+    }
+
+    .footer-brand,
+    .footer-vision {
+      margin-bottom: 0;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .footer-intro {
+      padding-block: 28px;
+      gap: 8px;
+    }
+
+    .footer-columns {
+      grid-template-columns: 1fr;
+      gap: 0;
+      padding-block: 32px;
+    }
+
+    .footer-company {
+      grid-column: 1 / -1;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      padding-bottom: 32px;
+    }
+
+    .footer-brand {
+      width: 150px;
+    }
+
+    .footer-contact,
+    .footer-navigation,
+    .footer-social {
+      grid-column: 1 / -1;
+      padding-block: 28px;
+      border-bottom: 1px solid #2b353b;
+    }
+
+    .footer-social {
+      border-bottom: 0;
+    }
+
+  }
+
+  @media (max-width: 600px) {
+    .footer-bottom {
+      padding-bottom: calc(88px + env(safe-area-inset-bottom));
+    }
+  }
+</style>

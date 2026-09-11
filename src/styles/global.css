@@ -927,59 +927,6 @@ fieldset {
 .form-success > .button {
   margin-top: 30px;
 }
-.site-footer {
-  background: #0b1115;
-  color: #c9d0d3;
-  padding: 28px 0 0;
-}
-.footer-main {
-  display: flex;
-  align-items: center;
-  gap: 70px;
-  padding-bottom: 25px;
-}
-.footer-brand {
-  width: 170px;
-  height: 110px;
-}
-.footer-brand img {
-  width: 174px;
-  height: 116px;
-  transform: none;
-}
-.footer-main > p {
-  font-size: 1.125rem;
-  line-height: 1.5;
-  color: #dfe3e5;
-  letter-spacing: -0.015em;
-}
-.footer-main > p strong {
-  font-weight: 500;
-  color: #8f9ba3;
-}
-.footer-main > .text-link {
-  margin-left: auto;
-  font-size: 0.8125rem;
-}
-.footer-bottom {
-  border-top: 1px solid #283237;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  min-height: 65px;
-  font-size: 0.75rem;
-  color: #a2adb3;
-}
-.footer-bottom button {
-  font-size: 0.75rem;
-  border: 0;
-  background: none;
-  color: #bdc7cc;
-  padding: 15px 0;
-  text-decoration: underline;
-  text-underline-offset: 4px;
-}
 .mobile-cta {
   display: none;
 }
@@ -1064,9 +1011,6 @@ dialog p:not(.eyebrow) {
   }
   .faq-grid {
     gap: 40px;
-  }
-  .footer-bottom {
-    font-size: 0.75rem;
   }
   .hero-copy {
     min-width: 490px;
@@ -1305,21 +1249,6 @@ dialog p:not(.eyebrow) {
   }
   .form-row {
     grid-template-columns: 1fr;
-  }
-  .footer-main {
-    gap: 35px;
-  }
-  .footer-main > .text-link {
-    font-size: 0.75rem;
-  }
-  .footer-bottom {
-    flex-wrap: wrap;
-    padding-block: 20px;
-    gap: 12px;
-  }
-  .footer-bottom > span:nth-child(2) {
-    order: 3;
-    width: 100%;
   }
 }
 @media (max-width: 600px) {
@@ -1592,39 +1521,6 @@ dialog p:not(.eyebrow) {
   .contact-section {
     padding-bottom: 58px;
   }
-  .footer-main {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px 28px;
-    padding-bottom: 28px;
-  }
-  .footer-brand {
-    height: 96px;
-  }
-  .footer-brand img {
-    transform: none;
-  }
-  .footer-main > p {
-    font-size: 1rem;
-  }
-  .footer-main > .text-link {
-    grid-column: 1/-1;
-    margin-left: 0;
-    margin-top: 9px;
-    font-size: 0.8125rem;
-  }
-  .footer-bottom {
-    font-size: 0.75rem;
-    padding-bottom: 99px;
-    gap: 9px;
-  }
-  .footer-bottom > span:first-child {
-    max-width: 220px;
-    line-height: 1.8;
-  }
-  .footer-bottom button {
-    font-size: 0.75rem;
-  }
   .mobile-cta {
     display: block;
     position: fixed;
@@ -1687,14 +1583,6 @@ dialog p:not(.eyebrow) {
 }
 .menu-toggle span {
   background: var(--ink);
-}
-.footer-brand {
-  background: #fff;
-  border-radius: 4px;
-  height: 105px;
-}
-.footer-brand img {
-  transform: translateY(-5px);
 }
 .section-heading > p,
 .service-card > p,

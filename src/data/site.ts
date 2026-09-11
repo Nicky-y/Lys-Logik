@@ -1,13 +1,42 @@
-/** Editable business content; establishment status and pilot scope remain explicit. */
+/** Shared business details and editable website content. */
 export const site = {
   name: 'Lys & Logik',
+  legalName: 'Lys & Logik I/S',
+  cvr: '45 82 71 27',
   area: 'Storkøbenhavn',
+  vision:
+    'Vi bygger Lys & Logik med godt elhåndværk som fundament og teknologi som en del af driften. Vi udvikler egne softwareværktøjer og nye arbejdsgange, der skal forbedre planlægning, logistik og dokumentation. Målet er at kunne vokse uden at miste overblik, kvalitet eller nærhed til kunden – og med tiden måle os med de bedste i Norden.',
   email: 'kontakt@lysoglogik.dk',
-  phone: '+45 XX XX XX XX',
-  companyStatus: 'Under etablering',
+  phone: '71 41 84 81',
+  phoneHref: 'tel:+4571418481',
   pilotPlaces: 3,
   pilotHours: 8,
 } as const;
+
+export const socialProfiles = [
+  {
+    name: 'Instagram',
+    icon: 'instagram',
+    url: 'https://www.instagram.com/lysoglogik/',
+  },
+  {
+    name: 'Facebook',
+    icon: 'facebook',
+    url: 'https://www.facebook.com/profile.php?id=61594299360677',
+  },
+  {
+    name: 'TikTok',
+    icon: 'tiktok',
+    url: 'https://www.tiktok.com/@lys_og_logik',
+  },
+  {
+    name: 'YouTube',
+    icon: 'youtube',
+    url: 'https://www.youtube.com/@LysogLogik',
+  },
+] as const;
+
+export const trustpilotUrl = 'https://www.trustpilot.com/review/lysoglogik.dk';
 
 export const services = [
   {

@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Icon from '../components/Icon.astro';
+import SiteFooter from '../components/SiteFooter.astro';
 import { site, services, questions } from '../data/site';
 import { resolveLeadFormConfig } from '../lib/lead-form-config';
 const {
@@ -488,37 +489,7 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
       </div>
     </section>
   </main>
-  <footer class="site-footer">
-    <div class="container footer-main">
-      <a
-        class="brand footer-brand"
-        href="#"
-        aria-label="Lys og Logik – tilbage til toppen"
-        ><img
-          src={`${assetBase}images/logo-v11.png`}
-          alt="Lys & Logik"
-          width="1536"
-          height="1024"
-          loading="lazy"
-        /></a
-      ><p>El og automation,<br /><strong>gjort enkelt.</strong></p><a
-        class="text-link light-link"
-        href="#kontakt">Lad os tale om din idé <Icon name="arrow" /></a
-      >
-    </div><div class="container footer-bottom">
-      <span
-        >© {new Date().getFullYear()} Lys & Logik · {site.companyStatus}</span
-      ><span
-        >{
-          liveForm
-            ? 'Kontakt os på kontakt@lysoglogik.dk'
-            : 'Lokal prototype · Virksomhedsoplysninger er placeholders'
-        }</span
-      ><button id="privacy-open" type="button"
-        >{liveForm ? 'Privatliv' : 'Privatliv & prototype'}</button
-      >
-    </div>
-  </footer>
+  <SiteFooter liveForm={liveForm} />
   <div class="mobile-cta">
     <a href="#kontakt">Beskriv din opgave <Icon name="arrow" /></a>
   </div>
