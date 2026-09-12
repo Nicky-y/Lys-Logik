@@ -30,15 +30,26 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
             class="catalogue-item"
             aria-labelledby={`service-${service.id}`}
           >
-            <img
-              class="catalogue-image"
-              src={`${assetBase}images/${service.image}`}
-              alt={service.imageAlt}
-              width="960"
-              height="640"
-              loading="lazy"
-              decoding="async"
-            />
+            <a
+              class="catalogue-image-link"
+              href={
+                service.page
+                  ? `${assetBase}services/${service.page}/`
+                  : '#kontakt'
+              }
+              data-service={service.page ? undefined : service.id}
+              aria-label={`${service.page ? 'Læs om' : 'Kontakt os om'} ${service.label}`}
+            >
+              <img
+                class="catalogue-image"
+                src={`${assetBase}images/${service.image}`}
+                alt={service.imageAlt}
+                width="960"
+                height="640"
+                loading="lazy"
+                decoding="async"
+              />
+            </a>
             <div class="catalogue-content">
               <div class="catalogue-name">
                 <span class="catalogue-number" aria-hidden="true">
@@ -103,6 +114,14 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
     aspect-ratio: 3 / 2;
     object-fit: cover;
     border-radius: 4px;
+  }
+  .catalogue-image-link {
+    display: block;
+    border-radius: 4px;
+  }
+  .catalogue-image-link:hover {
+    outline: 2px solid #895b00;
+    outline-offset: 3px;
   }
   .catalogue-content {
     flex: 1;

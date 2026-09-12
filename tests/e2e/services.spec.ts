@@ -1,6 +1,44 @@
 import { expect, test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
+test('catalogue images follow their card destination with keyboard and pointer', async ({
+  page,
+}) => {
+  for (const service of [
+    'lampeopsaetning',
+    'stikkontakter',
+    'smart-home',
+    'lysstyring-sensorer',
+    'hvidevarer',
+  ]) {
+    await page.goto('/#ydelser');
+    const card = page
+      .locator('article')
+      .filter({ has: page.locator(`#service-${service}`) });
+    const imageLink = card.locator('.catalogue-image-link');
+    await expect(imageLink).toHaveAccessibleName(/Læs om|Kontakt os om/);
+    await expect(imageLink).toHaveAttribute(
+      'href',
+      (await card.locator('.catalogue-link').getAttribute('href'))!,
+    );
+    if (service === 'lampeopsaetning') {
+      await imageLink.focus();
+      await page.keyboard.press('Enter');
+    } else {
+      await imageLink.getByRole('img').click();
+    }
+    if (['lampeopsaetning', 'stikkontakter'].includes(service)) {
+      await expect(page).toHaveURL(new RegExp(`/services/${service}/?$`));
+      await expect(page.locator('main h1')).toBeVisible();
+    } else {
+      await expect(page).toHaveURL(/#kontakt$/);
+      await expect(page.getByLabel('Hvad drejer det sig om?')).toHaveValue(
+        service,
+      );
+    }
+  }
+});
+
 test('all five service descriptions select the matching enquiry type', async ({
   page,
 }, testInfo) => {
@@ -37,11 +75,11 @@ test('all five service descriptions select the matching enquiry type', async ({
     await expect(
       catalogue.getByRole('heading', { name, exact: true }),
     ).toBeVisible();
-    if (value === 'lampeopsaetning') {
+    if (['lampeopsaetning', 'stikkontakter'].includes(value)) {
       await article
         .getByRole('link', { name: `Udforsk service: ${name}` })
         .click();
-      await expect(page).toHaveURL(/\/services\/lampeopsaetning\/?$/);
+      await expect(page).toHaveURL(new RegExp(`/services/${value}/?$`));
       await page
         .locator('main')
         .getByRole('link', { name: 'Beskriv din opgave', exact: true })
@@ -65,71 +103,95 @@ test('all five service descriptions select the matching enquiry type', async ({
   await catalogue.screenshot({ path: testInfo.outputPath('catalogue.png') });
 });
 
-test('lamp page has metadata, working navigation, FAQ and accessible responsive layout', async ({
-  page,
-}, testInfo) => {
-  const errors: string[] = [];
-  page.on('pageerror', (error) => errors.push(error.message));
-  await page.goto('/services/lampeopsaetning/');
-  await expect(page).toHaveTitle(
-    'Lampeopsætning i Storkøbenhavn | Lys & Logik',
-  );
-  await expect(page.locator('meta[name="description"]')).toHaveAttribute(
-    'content',
-    /ophængning/,
-  );
-  await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
-  await expect(page.locator('main')).not.toContainText('425');
-  await expect(page.locator('main')).toContainText(
-    'Op til 4 timers gratis arbejde',
-  );
-  const faq = page.getByText('Kan I lave et nyt lampeudtag?', { exact: true });
-  await faq.focus();
-  await page.keyboard.press('Enter');
-  await expect(page.locator('details[open]')).toContainText('Nye udtag');
-  await page
-    .getByRole('button', { name: 'Privatliv & prototype', exact: true })
-    .click();
-  await expect(page.getByRole('dialog')).toBeVisible();
-  await page.keyboard.press('Escape');
-  if (testInfo.project.name === 'mobile') {
-    await page.locator('.menu-toggle').click();
-    await expect(page.locator('#navigation')).toHaveClass(/is-open/);
+for (const serviceCase of [
+  {
+    slug: 'lampeopsaetning',
+    title: 'Lampeopsætning i Storkøbenhavn | Lys & Logik',
+    description: /ophængning/,
+    question: 'Kan I lave et nyt lampeudtag?',
+    answer: 'Nye udtag',
+  },
+  {
+    slug: 'stikkontakter',
+    title: 'Udskiftning af stikkontakter i Storkøbenhavn | Lys & Logik',
+    description: /eksisterende indendørs/,
+    question: 'Kan I etablere eller flytte en stikkontakt?',
+    answer: 'Nye stikkontakter, flytning og udvidelse',
+  },
+]) {
+  test(`${serviceCase.slug} page has metadata, working navigation, FAQ and accessible responsive layout`, async ({
+    page,
+  }, testInfo) => {
+    const errors: string[] = [];
+    page.on('pageerror', (error) => errors.push(error.message));
+    await page.goto(`/services/${serviceCase.slug}/`);
+    await expect(page).toHaveTitle(serviceCase.title);
+    await expect(page.locator('meta[name="description"]')).toHaveAttribute(
+      'content',
+      serviceCase.description,
+    );
+    await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
+    await expect(page.locator('main')).not.toContainText('425');
+    await expect(page.locator('main')).toContainText(
+      'Op til 4 timers gratis arbejde',
+    );
+    const faq = page.getByText(serviceCase.question, { exact: true });
+    await faq.focus();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('details[open]')).toContainText(
+      serviceCase.answer,
+    );
+    if (serviceCase.slug === 'stikkontakter') {
+      await expect(page.locator('main')).not.toContainText(
+        /lampen|lamperne|lampeudtag/i,
+      );
+      await expect(page.locator('main')).toContainText('30 mA');
+      await expect(page.locator('main')).toContainText('IP20');
+    }
+    await page
+      .getByRole('button', { name: 'Privatliv & prototype', exact: true })
+      .click();
+    await expect(page.getByRole('dialog')).toBeVisible();
     await page.keyboard.press('Escape');
-    await expect(page.locator('.menu-toggle')).toBeFocused();
-  }
-  const result = await new AxeBuilder({ page })
-    .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
-    .analyze();
-  expect(result.violations).toEqual([]);
-  for (const width of [320, 390, 768, 1440]) {
-    await page.setViewportSize({ width, height: 900 });
+    if (testInfo.project.name === 'mobile') {
+      await page.locator('.menu-toggle').click();
+      await expect(page.locator('#navigation')).toHaveClass(/is-open/);
+      await page.keyboard.press('Escape');
+      await expect(page.locator('.menu-toggle')).toBeFocused();
+    }
+    const result = await new AxeBuilder({ page })
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
+      .analyze();
+    expect(result.violations).toEqual([]);
+    for (const width of [320, 390, 768, 1440]) {
+      await page.setViewportSize({ width, height: 900 });
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+      ).toBe(true);
+    }
+    await page.setViewportSize({ width: 720, height: 900 });
+    await page.addStyleTag({ content: 'html { font-size: 200%; }' });
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,
       ),
     ).toBe(true);
-  }
-  await page.setViewportSize({ width: 720, height: 900 });
-  await page.addStyleTag({ content: 'html { font-size: 200%; }' });
-  expect(
-    await page.evaluate(
-      () => document.documentElement.scrollWidth <= innerWidth,
-    ),
-  ).toBe(true);
-  await page.reload();
-  await page.setViewportSize(testInfo.project.use.viewport!);
-  await page.screenshot({
-    path: testInfo.outputPath('lamp-page.png'),
-    fullPage: true,
+    await page.reload();
+    await page.setViewportSize(testInfo.project.use.viewport!);
+    await page.screenshot({
+      path: testInfo.outputPath(`${serviceCase.slug}-page.png`),
+      fullPage: true,
+    });
+    await page
+      .locator('.footer-navigation')
+      .getByRole('link', { name: 'Det hjælper vi med' })
+      .click();
+    await expect(page).toHaveURL(/\/#ydelser$/);
+    expect(errors).toEqual([]);
   });
-  await page
-    .locator('.footer-navigation')
-    .getByRole('link', { name: 'Det hjælper vi med' })
-    .click();
-  await expect(page).toHaveURL(/\/#ydelser$/);
-  expect(errors).toEqual([]);
-});
+}
 
 test('service query accepts a visible choice and ignores unknown input', async ({
   page,

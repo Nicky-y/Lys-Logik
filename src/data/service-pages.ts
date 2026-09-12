@@ -14,6 +14,9 @@ export interface ServicePageContent {
   tasks: string[];
   situations: string[];
   preparation: string;
+  scopeDetails: string;
+  processIntro: string;
+  completionHeading: string;
   questions: { question: string; answer: string }[];
 }
 
@@ -44,6 +47,11 @@ export const lampPage: ServicePageContent = {
   ],
   preparation:
     'Fortæl os, hvor mange lamper det drejer sig om, hvor de skal hænge, og om der allerede er lampeudtag. Oplys gerne, hvis loftet er højt, lampen er tung, eller underlaget kræver særlig opmærksomhed.',
+  scopeDetails:
+    'Vi vurderer lampen, underlaget og de eksisterende forhold, før vi laver en aftale. Vi udfører kun arbejde, der ikke kræver autorisation.',
+  processIntro:
+    'Beskriv lamperne, placeringen og det, du gerne vil have hjælp til.',
+  completionHeading: 'Vi får lampen på plads',
   questions: [
     {
       question: 'Skal jeg selv have købt lampen?',
@@ -64,6 +72,66 @@ export const lampPage: ServicePageContent = {
       question: 'Hvad koster lampeopsætning?',
       answer:
         'Vi aftaler pris og omfang med dig, før arbejdet starter. Du kan også søge om at blive et af vores udvalgte pilotprojekter. En henvendelse er uforpligtende.',
+    },
+  ],
+};
+
+export const socketPage: ServicePageContent = {
+  service: services[1],
+  title: 'Udskiftning af stikkontakter i Storkøbenhavn | Lys & Logik',
+  description:
+    'Få hjælp til udskiftning af eksisterende indendørs stikkontakter i Storkøbenhavn, hvor arbejdet må udføres uden autorisation. Beskriv din opgave.',
+  heading: 'Få de gamle stikkontakter skiftet.',
+  helpHeading: 'En opdatering på den samme plads.',
+  scopeHeading: 'Eksisterende kontakter. Tydelige rammer.',
+  faqHeading: 'Spørgsmål om stikkontakter.',
+  contactHeading: 'Hvilke stikkontakter vil du have skiftet?',
+  intro:
+    'Er stikkontakterne gulnede, eller passer de ikke længere til rummet? Vi hjælper med at udskifte eksisterende indendørs stikkontakter, når installationen og placeringen tillader arbejde uden autorisation.',
+  tasks: [
+    'Udskiftning på den eksisterende placering',
+    'En eller flere stikkontakter ved samme besøg',
+    'Afklaring af en kompatibel model og ramme',
+    'Et mere ensartet udtryk i rummet',
+  ],
+  situations: [
+    'Stikkontakterne er gulnede og trænger til et nyt udtryk.',
+    'Væggene er malet, men de gamle stikkontakter skiller sig ud.',
+    'I vil gerne have et mere ensartet udtryk i boligen.',
+  ],
+  preparation:
+    'Fortæl os, hvor mange stikkontakter du vil have skiftet, og i hvilke rum de sidder. Beskriv gerne den nuværende model og det udtryk, du ønsker. Du behøver ikke kende de tekniske betegnelser eller åbne stikkontakterne.',
+  scopeDetails:
+    'Ydelsen gælder almindelige indendørs stikkontakter i tørre rum. Vi afklarer placering, model og fejlstrømsbeskyttelse, før vi laver en aftale. Flytning, nye ledninger, udendørs stikkontakter og arbejde med særlige tæthedskrav er ikke omfattet.',
+  processIntro:
+    'Beskriv antallet af stikkontakter, rummene og det, du gerne vil have ændret.',
+  completionHeading: 'Vi skifter de aftalte kontakter',
+  questions: [
+    {
+      question: 'Kan I etablere eller flytte en stikkontakt?',
+      answer:
+        'Nej. Vi udskifter eksisterende stikkontakter på deres nuværende placering. Nye stikkontakter, flytning og udvidelse af installationen er ikke en del af denne ydelse.',
+    },
+    {
+      question:
+        'Kan alle eksisterende stikkontakter udskiftes uden autorisation?',
+      answer:
+        'Nej. Reglerne omfatter stikkontakter til højst 250 V på steder, hvor der ikke kræves højere tæthed end IP20, og installationen skal være beskyttet af en fejlstrømsafbryder på 30 mA (HFI eller HPFI). Vi vurderer de konkrete forhold. Opgaver uden for de tilladte rammer skal håndteres af en autoriseret virksomhed.',
+    },
+    {
+      question: 'Skal jeg købe stikkontakterne først?',
+      answer:
+        'Vent gerne, til vi har afklaret opgaven. Den nye stikkontakt skal passe til den eksisterende installation og dåse. Vi aftaler model, materialer og omkostninger på forhånd.',
+    },
+    {
+      question: 'Kan I ændre en stikkontakt uden jord til en med jord?',
+      answer:
+        'Det er ikke en opgradering, vi tilbyder som en del af denne ydelse. Jordforbindelsen og den eksisterende installation kræver en konkret vurdering. Vi etablerer ikke en ny jordleder.',
+    },
+    {
+      question: 'Hvad koster udskiftningen?',
+      answer:
+        'Prisen afhænger blandt andet af antal stikkontakter, materialer og de eksisterende forhold. Vi aftaler pris og omfang, før arbejdet starter. Du kan også søge om at blive et af vores udvalgte pilotprojekter.',
     },
   ],
 };

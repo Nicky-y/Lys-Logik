@@ -85,10 +85,7 @@ const { live: liveForm } = resolveLeadFormConfig({
         </h2>
       </div>
       <div class="scope-copy">
-        <p>{service.scope}</p><p>
-          Vi vurderer lampen, underlaget og de eksisterende forhold, før vi
-          laver en aftale. Vi udfører kun arbejde, der ikke kræver autorisation.
-        </p>
+        <p>{service.scope}</p><p>{content.scopeDetails}</p>
       </div>
     </section>
     <section class="section process-section" aria-labelledby="process-title">
@@ -99,7 +96,7 @@ const { live: liveForm } = resolveLeadFormConfig({
         <ol class="process-list">
           <li>
             <span>01</span><h3>Fortæl om opgaven</h3><p>
-              Beskriv lamperne, placeringen og det, du gerne vil have hjælp til.
+              {content.processIntro}
             </p>
           </li>
           <li>
@@ -109,7 +106,7 @@ const { live: liveForm } = resolveLeadFormConfig({
             </p>
           </li>
           <li>
-            <span>03</span><h3>Vi får lampen på plads</h3><p>
+            <span>03</span><h3>{content.completionHeading}</h3><p>
               Vi udfører det aftalte arbejde og gennemgår resultatet sammen med
               dig.
             </p>
@@ -184,6 +181,9 @@ const { live: liveForm } = resolveLeadFormConfig({
   </div>
 </Layout>
 <style>
+  .service-page {
+    overflow-wrap: anywhere;
+  }
   .service-hero {
     padding-block: 28px 76px;
   }

@@ -60,7 +60,7 @@ export const services = [
   {
     id: 'stikkontakter',
     number: '02',
-    page: null,
+    page: 'stikkontakter',
     teaser:
       'Udskiftning af eksisterende indendørs stikkontakter inden for de tilladte rammer.',
     label: serviceLabels.stikkontakter,

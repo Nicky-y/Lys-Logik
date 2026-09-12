@@ -6,6 +6,26 @@ import { test } from 'node:test';
 const dist = new URL('../../dist/', import.meta.url);
 const html = readFileSync(new URL('index.html', dist), 'utf8');
 
+test('socket service page ships with its own scope and the matching contact choice', () => {
+  const base = process.env.GITHUB_ACTIONS === 'true' ? '/Lys-Logik/' : '/';
+  const socket = readFileSync(
+    new URL('services/stikkontakter/index.html', dist),
+    'utf8',
+  );
+  assert.match(socket, /<title>Udskiftning af stikkontakter i Storkøbenhavn/);
+  assert.equal([...socket.matchAll(/<h1\b/g)].length, 1);
+  assert.ok(html.includes(`href="${base}services/stikkontakter/"`));
+  assert.ok(socket.includes(`href="${base}?service=stikkontakter#kontakt"`));
+  assert.ok(
+    socket.includes(`src="${base}images/service-stikkontakter-v1.webp"`),
+  );
+  assert.ok(socket.includes('Op til 4 timers gratis arbejde'));
+  assert.ok(socket.includes('250 V'));
+  assert.ok(socket.includes('IP20'));
+  assert.ok(socket.includes('30 mA'));
+  assert.ok(!socket.includes('425 kr'));
+});
+
 test('lamp service route has its own metadata and base-aware navigation and assets', () => {
   const base = process.env.GITHUB_ACTIONS === 'true' ? '/Lys-Logik/' : '/';
   const lamp = readFileSync(
