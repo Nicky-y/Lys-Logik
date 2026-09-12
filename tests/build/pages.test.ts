@@ -6,6 +6,24 @@ import { test } from 'node:test';
 const dist = new URL('../../dist/', import.meta.url);
 const html = readFileSync(new URL('index.html', dist), 'utf8');
 
+test('smart-home page ships with bounded configuration services and matching contact context', () => {
+  const base = process.env.GITHUB_ACTIONS === 'true' ? '/Lys-Logik/' : '/';
+  const smartHome = readFileSync(
+    new URL('services/smart-home/index.html', dist),
+    'utf8',
+  );
+  assert.match(smartHome, /<title>Smart-home opsætning i Storkøbenhavn/);
+  assert.equal([...smartHome.matchAll(/<h1\b/g)].length, 1);
+  assert.ok(html.includes(`href="${base}services/smart-home/"`));
+  assert.ok(smartHome.includes(`href="${base}?service=smart-home#kontakt"`));
+  assert.ok(
+    smartHome.includes(`src="${base}images/service-smart-home-v1.webp"`),
+  );
+  assert.ok(smartHome.includes('Vi monterer ikke indbyggede relæer'));
+  assert.ok(smartHome.includes('Op til 4 timers gratis arbejde'));
+  assert.ok(!smartHome.includes('425 kr'));
+});
+
 test('socket service page ships with its own scope and the matching contact choice', () => {
   const base = process.env.GITHUB_ACTIONS === 'true' ? '/Lys-Logik/' : '/';
   const socket = readFileSync(

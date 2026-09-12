@@ -68,10 +68,10 @@ test('shows accessible form errors and focuses the first invalid field', async (
 test('service cards preselect the enquiry category', async ({ page }) => {
   await page.goto('/');
   await page
-    .getByRole('link', { name: 'Beskriv din opgave: Smart-home opsætning og konfigurering' })
+    .getByRole('link', { name: 'Beskriv din opgave: Lysstyring og sensorer' })
     .click();
   await expect(page.getByLabel('Hvad drejer det sig om?')).toHaveValue(
-    'smart-home',
+    'lysstyring-sensorer',
   );
 });
 

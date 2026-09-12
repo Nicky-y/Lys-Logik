@@ -27,7 +27,7 @@ test('catalogue images follow their card destination with keyboard and pointer',
     } else {
       await imageLink.getByRole('img').click();
     }
-    if (['lampeopsaetning', 'stikkontakter'].includes(service)) {
+    if (['lampeopsaetning', 'stikkontakter', 'smart-home'].includes(service)) {
       await expect(page).toHaveURL(new RegExp(`/services/${service}/?$`));
       await expect(page.locator('main h1')).toBeVisible();
     } else {
@@ -75,7 +75,7 @@ test('all five service descriptions select the matching enquiry type', async ({
     await expect(
       catalogue.getByRole('heading', { name, exact: true }),
     ).toBeVisible();
-    if (['lampeopsaetning', 'stikkontakter'].includes(value)) {
+    if (['lampeopsaetning', 'stikkontakter', 'smart-home'].includes(value)) {
       await article
         .getByRole('link', { name: `Udforsk service: ${name}` })
         .click();
@@ -104,6 +104,13 @@ test('all five service descriptions select the matching enquiry type', async ({
 });
 
 for (const serviceCase of [
+  {
+    slug: 'smart-home',
+    title: 'Smart-home opsætning i Storkøbenhavn | Lys & Logik',
+    description: /kompatible smart-home-enheder/,
+    question: 'Virker mine enheder sammen?',
+    answer: 'Vi afklarer kompatibiliteten',
+  },
   {
     slug: 'lampeopsaetning',
     title: 'Lampeopsætning i Storkøbenhavn | Lys & Logik',

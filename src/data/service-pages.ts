@@ -135,3 +135,69 @@ export const socketPage: ServicePageContent = {
     },
   ],
 };
+
+export const smartHomePage: ServicePageContent = {
+  service: services[2],
+  title: 'Smart-home opsætning i Storkøbenhavn | Lys & Logik',
+  description:
+    'Få hjælp til opsætning af kompatible smart-home-enheder, apps og scenarier i Storkøbenhavn. Vi afklarer mulighederne i dit hjem før en aftale.',
+  heading: 'Et hjem, der er nemmere at styre.',
+  helpHeading: 'Fra enkelte enheder til fælles funktioner.',
+  scopeHeading: 'Opsætning og konfigurering i dit hjem.',
+  faqHeading: 'Spørgsmål om smart home.',
+  contactHeading: 'Hvad skal dit hjem kunne gøre lettere?',
+  intro:
+    'Sluk lyset samlet, vælg en aftenindstilling, eller lad en tidsplan klare det daglige. Vi hjælper med at sætte kompatible enheder og apps op, så de aftalte funktioner er nemme at bruge.',
+  tasks: [
+    'Tilføjelse af kompatible enheder i en app',
+    'Opsætning af en kompatibel hub eller bridge',
+    'Inddeling af enheder i rum og grupper',
+    'Lysscener til hverdagens forskellige situationer',
+    'Tidsplaner og enkle automatiseringer',
+    'Gennemgang af betjeningen sammen med dig',
+  ],
+  situations: [
+    'I har købt smarte enheder, men mangler at få dem sat op.',
+    'I vil gerne kunne slukke flere lamper med ét tryk.',
+    'De samme indstillinger bliver gentaget hver morgen eller aften.',
+  ],
+  preparation:
+    'Fortæl os, hvilke enheder og apps du allerede bruger, og hvad du gerne vil kunne styre. Mærke og model hjælper os med at afklare mulighederne. Vi aftaler også, hvilke konti, netværksforbindelser og eventuelt ekstra udstyr der skal være klar.',
+  scopeDetails:
+    'Ydelsen omfatter opsætning i apps og konfigurering af kompatible enheder. Vi monterer ikke indbyggede relæer, trækker nye faste ledninger eller ændrer eltavlen som del af denne service. Du får en konkret aftale om enheder og funktioner, inden vi går i gang.',
+  processIntro:
+    'Beskriv dit nuværende udstyr, og hvad du gerne vil gøre nemmere i hverdagen.',
+  completionHeading: 'Vi sætter op og gennemgår',
+  questions: [
+    {
+      question: 'Virker mine enheder sammen?',
+      answer:
+        'Det afhænger af de konkrete modeller og systemer. Send os mærke og model på dit udstyr og navnet på den app, du bruger. Vi afklarer kompatibiliteten, før vi lover en bestemt funktion.',
+    },
+    {
+      question: 'Skal jeg købe udstyr på forhånd?',
+      answer:
+        'Du kan både kontakte os med udstyr, du allerede har, og med en idé til en løsning. Vent gerne med nye køb, til vi har afklaret, hvad der passer sammen, og om der er behov for en hub eller andet ekstra udstyr.',
+    },
+    {
+      question: 'Kan I hjælpe med en opsætning, jeg allerede er begyndt på?',
+      answer:
+        'Ja, beskriv hvor langt du er kommet, og hvad du gerne vil have hjælp til. Vi aftaler, hvilke enheder og indstillinger vi skal arbejde med. Omfanget afhænger af dit udstyr og den eksisterende opsætning.',
+    },
+    {
+      question: 'Skal der ændres noget i elinstallationen?',
+      answer:
+        'Denne ydelse omfatter kun løsninger, der kan opsættes uden ændringer i den faste elinstallation. Hvis din ønskede løsning kræver indbyggede relæer eller nye faste ledninger, er det ikke omfattet af vores smart-home-service.',
+    },
+    {
+      question: 'Kan jeg selv bruge og ændre opsætningen bagefter?',
+      answer:
+        'Vi gennemgår de aftalte funktioner sammen med dig, så du ved, hvordan du betjener løsningen og finder de relevante indstillinger. Fortæl os gerne på forhånd, hvem i hjemmet der skal kunne bruge den.',
+    },
+    {
+      question: 'Hvad koster opsætningen?',
+      answer:
+        'Prisen afhænger af antal enheder, den eksisterende opsætning og de funktioner, vi aftaler. Eventuelt nyt udstyr betales separat. Du kan også søge om at blive et af vores udvalgte pilotprojekter.',
+    },
+  ],
+};

@@ -74,7 +74,7 @@ export const services = [
   {
     id: 'smart-home',
     number: '03',
-    page: null,
+    page: 'smart-home',
     teaser: 'Få kompatible enheder, apps og lysscener til at arbejde sammen.',
     label: serviceLabels['smart-home'],
     image: 'service-smart-home-v1.webp',
