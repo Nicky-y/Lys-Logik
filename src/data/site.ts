@@ -1,3 +1,8 @@
+import {
+  serviceLabels,
+  type Service,
+} from '../../supabase/functions/_shared/contracts/service.ts';
+
 /** Shared business details and editable website content. */
 export const site = {
   name: 'Lys & Logik',
@@ -10,7 +15,7 @@ export const site = {
   phone: '71 41 84 81',
   phoneHref: 'tel:+4571418481',
   pilotPlaces: 3,
-  pilotHours: 8,
+  pilotHours: 4,
 } as const;
 
 export const socialProfiles = [
@@ -40,49 +45,83 @@ export const trustpilotUrl = 'https://www.trustpilot.com/review/lysoglogik.dk';
 
 export const services = [
   {
-    id: 'belysning',
+    id: 'lampeopsaetning',
     number: '01',
-    title: 'Lys, der gør en forskel',
-    image: 'lighting',
-    alt: 'Varme pendellamper over et spisebord i et lyst hjem',
-    text: 'Den rigtige lampe. Det hyggelige hjørne. Vi hjælper med at finde en løsning, der passer til dit hjem.',
-    label: 'Belysning',
+    label: serviceLabels.lampeopsaetning,
+    image: 'lighting-960.webp',
+    imageAlt:
+      'Pendellamper med varmt lys over et spisebord. Inspirationsbillede.',
+    text: 'Få lampen over spisebordet eller ved sengen på plads. Vi hjælper med ophængning og tilslutning af loft- og væglamper.',
+    scope:
+      'Tilslutning sker i eksisterende lampeudtag. Nye udtag og ændringer af den faste installation er ikke omfattet.',
+  },
+  {
+    id: 'stikkontakter',
+    number: '02',
+    label: serviceLabels.stikkontakter,
+    image: 'service-stikkontakter-v1.webp',
+    imageAlt:
+      'Hvid stikkontakt på en lys væg. AI-genereret inspirationsbillede.',
+    text: 'Vi hjælper med at udskifte eksisterende indendørs stikkontakter, når installationen og placeringen tillader arbejde uden autorisation.',
+    scope:
+      'Vi vurderer de eksisterende forhold, herunder fejlstrømsbeskyttelsen, før en aftale. Vi etablerer ikke nye stikkontakter.',
   },
   {
     id: 'smart-home',
-    number: '02',
-    title: 'En lidt smartere hverdag',
-    image: 'smart-home',
-    alt: 'Stue med varmt, dæmpet lys og en enkel vægkontakt',
-    text: 'Lys, der følger din hverdag. Smarte funktioner og enkle scenarier, som gør hjemmet lettere at bruge.',
-    label: 'Smart home',
+    number: '03',
+    label: serviceLabels['smart-home'],
+    image: 'service-smart-home-v1.webp',
+    imageAlt:
+      'Telefon med styring af hjemmets belysning. AI-genereret inspirationsbillede.',
+    text: 'Få dine kompatible enheder til at arbejde sammen. Vi hjælper med opsætning, apps og scenarier, der passer til din hverdag.',
+    scope:
+      'Vi konfigurerer løsninger, der kan bruges uden ændringer i den faste elinstallation. Enhedernes kompatibilitet afklares på forhånd.',
   },
   {
-    id: 'forbedringer',
-    number: '03',
-    title: 'De små forbedringer',
-    image: 'hero',
-    alt: 'Varmt lys ved indgangen til et hus i skumringen',
-    text: 'Har du en mindre opgave i tankerne? Fortæl os om den, så vurderer vi sammen mulighederne.',
-    label: 'Mindre opgaver',
+    id: 'lysstyring-sensorer',
+    number: '04',
+    label: serviceLabels['lysstyring-sensorer'],
+    image: 'smart-home-960.webp',
+    imageAlt:
+      'Lysafbryder ved en stue med dæmpet belysning. Inspirationsbillede.',
+    text: 'Lys, der tænder ved bevægelse eller følger en tidsplan. Vi hjælper med kompatibel lysstyring, sensorer og udskiftning af eksisterende indendørs afbrydere.',
+    scope:
+      'Opsætning og udskiftning sker kun, hvor arbejdet ikke kræver autorisation. Nye ledninger i den faste installation er ikke omfattet.',
   },
-] as const;
+  {
+    id: 'hvidevarer',
+    number: '05',
+    label: serviceLabels.hvidevarer,
+    image: 'service-hvidevarer-v1.webp',
+    imageAlt:
+      'Tørretumbler i et lyst bryggers. AI-genereret inspirationsbillede.',
+    text: 'Vi hjælper med den elektriske tilslutning af kompatible hvidevarer med stikprop, for eksempel et køleskab eller en tørretumbler.',
+    scope:
+      'Stikproppen skal passe til en eksisterende stikkontakt, og tilslutningen skal kunne ske uden værktøj. Fast tilslutning og VVS-arbejde er ikke omfattet.',
+  },
+] as const satisfies readonly {
+  id: Service;
+  number: string;
+  label: string;
+  image: string;
+  imageAlt: string;
+  text: string;
+  scope: string;
+}[];
 
 export const questions = [
   {
     question: 'Hvad er et pilotprojekt?',
-    answer:
-      'Et af vores første tre udvalgte referenceprojekter. Vi tilbyder op til otte timers arbejdsløn uden beregning mod, at vi efter nærmere aftale må dokumentere forløbet med billeder og bruge det som en case.',
+    answer: `Et af vores første tre udvalgte referenceprojekter. Vi tilbyder op til ${site.pilotHours} timers arbejde uden beregning mod, at vi efter nærmere aftale må dokumentere forløbet med billeder og bruge det som en case.`,
   },
   {
     question: 'Hvad skal jeg selv betale?',
-    answer:
-      'Du betaler materialer og eventuelt nødvendigt lejeudstyr. Omfang og udgifter aftales, før vi går i gang. Arbejde ud over de otte timer kræver en særskilt aftale.',
+    answer: `Du betaler materialer og eventuelt nødvendigt lejeudstyr. Omfang og udgifter aftales, før vi går i gang. Arbejde ud over de ${site.pilotHours} timer kræver en særskilt aftale.`,
   },
   {
     question: 'Hvilke opgaver kan komme i betragtning?',
     answer:
-      'Vi leder efter mindre, overskuelige opgaver inden for lys og smart home. Vi er under etablering og vurderer hver opgave fagligt, så vi kun påtager os arbejde inden for virksomhedens aktuelle rammer.',
+      'Mindre opgaver inden for lampeopsætning, stikkontakter, smart home, lysstyring og hvidevarer med stikprop. Vi vurderer hver opgave fagligt og udvælger kun arbejde, der kan udføres uden autorisation og passer til pilotforløbet.',
   },
   {
     question: 'Er jeg bundet, når jeg ansøger?',

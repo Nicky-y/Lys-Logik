@@ -6,6 +6,13 @@ import { test } from 'node:test';
 const dist = new URL('../../dist/', import.meta.url);
 const html = readFileSync(new URL('index.html', dist), 'utf8');
 
+test('pilot offer and payment terms consistently specify four hours', () => {
+  assert.ok(html.includes('Op til 4 timers arbejde.'));
+  assert.ok(html.includes('op til 4 timers arbejde uden beregning'));
+  assert.ok(html.includes('Arbejde ud over de 4 timer kræver en særskilt aftale.'));
+  assert.doesNotMatch(html, /(?:8|otte)\s+timer(?:s)?\b/i);
+});
+
 test('production ships the live form with the production endpoint and real widget', () => {
   assert.match(
     html,
@@ -23,6 +30,22 @@ test('production ships the live form with the production endpoint and real widge
   assert.ok(!html.includes('Demoversion'));
   assert.ok(!html.includes('Intet er sendt eller gemt'));
   assert.match(html, /<fieldset\b[^>]*id="form-fields"[^>]*disabled/);
+});
+
+test('all five catalogue images ship under the deployment base', () => {
+  const base = process.env.GITHUB_ACTIONS === 'true' ? '/Lys-Logik/' : '/';
+  const catalogue = html.match(/<section\b[^>]*id="ydelser"[\s\S]*?<\/section>/)?.[0];
+  assert.ok(catalogue, 'service catalogue is rendered');
+  const images = [...catalogue.matchAll(/<img\b[^>]*src="([^"]+)"[^>]*>/g)];
+  assert.equal(images.length, 5);
+  assert.equal(new Set(images.map((image) => image[1])).size, 5);
+  for (const [tag, path] of images) {
+    assert.ok(path.startsWith(`${base}images/`), path);
+    assert.ok(existsSync(new URL(path.slice(base.length), dist)), path);
+    assert.match(tag, /width="960"/);
+    assert.match(tag, /height="640"/);
+    assert.match(tag, /loading="lazy"/);
+  }
 });
 
 test('production JS and CSS resolve within the deployment base and exist in the artifact', () => {

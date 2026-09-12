@@ -1,4 +1,6 @@
 import { z } from 'zod';
+import { ServiceSchema } from './service.ts';
+export { serviceLabels } from './service.ts';
 
 export const LeadIdSchema = z.uuid().brand<'LeadId'>();
 export const StaffIdSchema = z.uuid().brand<'StaffId'>();
@@ -76,7 +78,7 @@ export const OperationsLeadSchema = z.object({
   email: z.email(),
   phone: z.string(),
   postal_code: z.string().regex(/^\d{4}$/),
-  service: z.enum(['belysning', 'smart-home', 'forbedringer', 'andet']),
+  service: ServiceSchema,
   description: z.string(),
   status: LeadStatusSchema,
   version: LeadVersionSchema,
@@ -201,12 +203,6 @@ export const archiveStatuses: LeadStatus[] = [
   'outside_scope',
   'cancelled',
 ];
-export const serviceLabels = {
-  belysning: 'Belysning',
-  'smart-home': 'Smart home',
-  forbedringer: 'Mindre opgave',
-  andet: 'Anden opgave',
-};
 
 /** UI guidance only. PostgreSQL is authoritative for transitions and review prerequisites. */
 export function availableTransitions(lead: OperationsLead): LeadStatus[] {

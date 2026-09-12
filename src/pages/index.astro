@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import Icon from '../components/Icon.astro';
 import SiteFooter from '../components/SiteFooter.astro';
+import ServiceCatalogue from '../components/ServiceCatalogue.astro';
 import { site, services, questions } from '../data/site';
 import { resolveLeadFormConfig } from '../lib/lead-form-config';
 const {
@@ -101,61 +102,7 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
       </div>
     </div>
 
-    <section id="ydelser" class="section services-section">
-      <div class="container">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">SMÅ FORANDRINGER. STOR FORSKEL.</p><h2>
-              Et hjem, der fungerer.<br />Og føles rigtigt.
-            </h2>
-          </div><p>
-            Fra den gode belysning til de små smarte detaljer. Vi finder en
-            løsning, der giver mening for dig.
-          </p>
-        </div>
-        <div class="service-grid">
-          {
-            services.map((service) => (
-              <article class="service-card">
-                <>
-                  <a
-                    class="service-image"
-                    href="#kontakt"
-                    data-service={service.id}
-                    aria-label={`Beskriv din opgave: ${service.label}`}
-                  >
-                    <>
-                      <img
-                        src={`${assetBase}images/${service.image}-960.webp`}
-                        alt={service.alt}
-                        width="960"
-                        height="640"
-                        loading="lazy"
-                      />
-                      <span class="image-tag">{service.label}</span>
-                      <span class="circle-arrow">
-                        <Icon name="arrow" />
-                      </span>
-                    </>
-                  </a>
-                  <div class="service-title">
-                    <>
-                      <span>{service.number}</span>
-                      <h3>{service.title}</h3>
-                    </>
-                  </div>
-                  <p>{service.text}</p>
-                </>
-              </article>
-            ))
-          }
-        </div>
-        <p class="section-footnote">
-          Billederne er inspiration. Alle opgaver vurderes efter virksomhedens
-          aktuelle rammer.
-        </p>
-      </div>
-    </section>
+    <ServiceCatalogue />
 
     <section id="pilot" class="section pilot-section">
       <div class="container pilot-grid">

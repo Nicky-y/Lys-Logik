@@ -68,7 +68,7 @@ test('shows accessible form errors and focuses the first invalid field', async (
 test('service cards preselect the enquiry category', async ({ page }) => {
   await page.goto('/');
   await page
-    .getByRole('link', { name: 'Beskriv din opgave: Smart home' })
+    .getByRole('link', { name: 'Beskriv din opgave: Smart-home opsætning og konfigurering' })
     .click();
   await expect(page.getByLabel('Hvad drejer det sig om?')).toHaveValue(
     'smart-home',
@@ -86,7 +86,7 @@ test('complete demo submits locally and can be reset without storing personal da
   await page.getByLabel('Dit navn').fill('Anna Jensen');
   await page.getByLabel('Postnummer').fill('2800');
   await page.getByLabel('Din e-mail').fill('anna@example.com');
-  await page.getByLabel('Hvad drejer det sig om?').selectOption('belysning');
+  await page.getByLabel('Hvad drejer det sig om?').selectOption('lampeopsaetning');
   await page
     .getByLabel('Fortæl lidt om din idé')
     .fill('Vi vil gerne have bedre lys over vores spisebord.');

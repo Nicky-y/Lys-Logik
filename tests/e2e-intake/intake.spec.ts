@@ -23,7 +23,7 @@ async function fillEnquiry(page: Page) {
   await page.getByLabel('Din e-mail').fill('anna@example.com');
   await page.getByLabel('Telefon (valgfrit)').fill('12 34 56 78');
   await page.getByLabel('Postnummer').fill('2800');
-  await page.getByLabel('Hvad drejer det sig om?').selectOption('belysning');
+  await page.getByLabel('Hvad drejer det sig om?').selectOption('lampeopsaetning');
   await page
     .getByLabel('Fortæl lidt om din idé')
     .fill('Vi vil gerne have bedre lys over vores spisebord.');

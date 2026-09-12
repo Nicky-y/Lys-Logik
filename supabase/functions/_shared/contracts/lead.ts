@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ServiceSchema } from './service.ts';
 
 export const SubmissionKeySchema = z.uuid().brand<'SubmissionKey'>();
 export type SubmissionKey = z.infer<typeof SubmissionKeySchema>;
@@ -29,9 +30,7 @@ export const LeadSchema = z.strictObject({
     .string()
     .trim()
     .regex(/^[0-9]{4}$/, 'Skriv et postnummer med 4 cifre.'),
-  service: z.enum(['belysning', 'smart-home', 'forbedringer', 'andet'], {
-    error: 'Vælg, hvad du gerne vil have hjælp til.',
-  }),
+  service: ServiceSchema,
   description: z
     .string()
     .trim()

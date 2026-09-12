@@ -399,74 +399,6 @@ p {
   color: var(--muted);
   margin-bottom: 4px;
 }
-.service-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 27px;
-}
-.service-image {
-  display: block;
-  position: relative;
-  overflow: hidden;
-  border-radius: 5px;
-}
-.service-image img {
-  aspect-ratio: 1.28;
-  object-fit: cover;
-  transition: transform 0.5s;
-}
-.service-image:hover img {
-  transform: scale(1.035);
-}
-.image-tag {
-  position: absolute;
-  bottom: 16px;
-  left: 16px;
-  font-size: 0.75rem;
-  background: white;
-  padding: 7px 12px;
-  border-radius: 3px;
-  font-weight: 650;
-}
-.circle-arrow {
-  position: absolute;
-  right: 16px;
-  bottom: 16px;
-  border: 1px solid #ffffff80;
-  border-radius: 50%;
-  height: 34px;
-  width: 34px;
-  display: grid;
-  place-items: center;
-  background: #19232960;
-  color: white;
-  backdrop-filter: blur(5px);
-}
-.service-title {
-  display: flex;
-  gap: 11px;
-  align-items: baseline;
-  margin-top: 22px;
-}
-.service-title > span {
-  color: #895b00;
-  font-size: 0.75rem;
-  font-weight: 650;
-}
-.service-title h3 {
-  font-size: 1.25rem;
-}
-.service-card > p {
-  font-size: 0.875rem;
-  color: var(--muted);
-  line-height: 1.8;
-  margin-top: 12px;
-}
-.section-footnote {
-  font-size: 0.75rem;
-  color: #697074;
-  margin-top: 28px;
-}
 .pilot-section {
   background: var(--soft);
 }
@@ -1003,9 +935,6 @@ dialog p:not(.eyebrow) {
   .hero h1 {
     font-size: 3.75rem;
   }
-  .service-title h3 {
-    font-size: 1.125rem;
-  }
   .pilot-offer {
     padding: 33px;
   }
@@ -1135,36 +1064,6 @@ dialog p:not(.eyebrow) {
   .section-heading > p {
     max-width: 245px;
     font-size: 0.8125rem;
-  }
-  .service-grid {
-    gap: 18px;
-  }
-  .service-title {
-    gap: 7px;
-  }
-  .service-title h3 {
-    font-size: 1.0625rem;
-  }
-  .service-title > span {
-    display: none;
-  }
-  .service-card > p {
-    font-size: 0.8125rem;
-  }
-  .service-image img {
-    aspect-ratio: 0.95;
-  }
-  .image-tag {
-    font-size: 0.75rem;
-    left: 10px;
-    bottom: 10px;
-    padding: 6px 8px;
-  }
-  .circle-arrow {
-    right: 10px;
-    bottom: 10px;
-    width: 28px;
-    height: 28px;
   }
   .circle-arrow svg {
     width: 16px;
@@ -1331,44 +1230,6 @@ dialog p:not(.eyebrow) {
     max-width: 340px;
     font-size: 0.875rem;
     margin-top: 18px;
-  }
-  .service-grid {
-    grid-template-columns: 1fr;
-    gap: 31px;
-  }
-  .service-image img {
-    aspect-ratio: 1.4;
-  }
-  .image-tag {
-    font-size: 0.75rem;
-    left: 15px;
-    bottom: 15px;
-    padding: 7px 12px;
-  }
-  .circle-arrow {
-    width: 35px;
-    height: 35px;
-    bottom: 15px;
-    right: 15px;
-  }
-  .service-title {
-    margin-top: 18px;
-    gap: 10px;
-  }
-  .service-title > span {
-    display: block;
-  }
-  .service-title h3 {
-    font-size: 1.375rem;
-  }
-  .service-card > p {
-    font-size: 0.875rem;
-    max-width: 390px;
-    margin-top: 9px;
-  }
-  .section-footnote {
-    font-size: 0.75rem;
-    margin-top: 26px;
   }
   .pilot-grid {
     grid-template-columns: 1fr;
@@ -1564,9 +1425,6 @@ dialog p:not(.eyebrow) {
   .button:hover {
     transform: none;
   }
-  .service-image:hover img {
-    transform: none;
-  }
 }
 
 /* Readability and the original dark logo on a light surface. */
@@ -1585,7 +1443,6 @@ dialog p:not(.eyebrow) {
   background: var(--ink);
 }
 .section-heading > p,
-.service-card > p,
 .pilot-copy > p:not(.eyebrow),
 .process-grid p,
 .about-grid > div > p:not(.eyebrow),

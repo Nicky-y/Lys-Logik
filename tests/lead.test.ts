@@ -5,6 +5,11 @@ import {
   LeadSchema,
   SubmissionKeySchema,
 } from '../supabase/functions/_shared/contracts/lead.ts';
+import {
+  ServiceSchema,
+  serviceLabels,
+} from '../supabase/functions/_shared/contracts/service.ts';
+import { services } from '../src/data/site.ts';
 
 const valid: LeadInput = {
   name: 'Anna Jensen',
@@ -50,9 +55,26 @@ test('requires four postcode digits and preserves leading zeroes', () => {
     assert.ok(validateLead({ ...valid, postalCode }).postalCode);
 });
 test('accepts each available service and rejects unknown values', () => {
-  for (const service of ['belysning', 'smart-home', 'forbedringer', 'andet'])
+  for (const service of [
+    'lampeopsaetning',
+    'stikkontakter',
+    'smart-home',
+    'lysstyring-sensorer',
+    'hvidevarer',
+    'belysning',
+    'forbedringer',
+    'andet',
+  ])
     assert.deepEqual(validateLead({ ...valid, service }), {});
   assert.ok(validateLead({ ...valid, service: 'unexpected' }).service);
+});
+
+test('each published catalogue choice is accepted by intake and has an operations label', () => {
+  assert.equal(services.length, 5);
+  for (const service of services) {
+    assert.equal(ServiceSchema.parse(service.id), service.id);
+    assert.equal(serviceLabels[service.id], service.label);
+  }
 });
 test('requires explicit pilot terms acknowledgement', () => {
   assert.ok(validateLead({ ...valid, terms: false }).terms);

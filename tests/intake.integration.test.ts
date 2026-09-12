@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { after, before, beforeEach, test } from 'node:test';
 import type { PGlite } from '@electric-sql/pglite';
+import { OperationsLeadSchema } from '../supabase/functions/_shared/contracts/operations.ts';
 import {
   createTestDatabase,
   validLead,
@@ -36,6 +37,55 @@ async function counts() {
     (select count(*)::int from lys_private.lead_submissions) submissions`)
   ).rows[0];
 }
+
+test('catalogue services and historical categories retain their exact intake snapshots', async () => {
+  const services = [
+    'lampeopsaetning',
+    'stikkontakter',
+    'smart-home',
+    'lysstyring-sensorer',
+    'hvidevarer',
+    'belysning',
+    'forbedringer',
+    'andet',
+  ];
+  for (const [index, service] of services.entries()) {
+    const lead = { ...validLead, service };
+    const key = `00000000-0000-4000-8000-${String(index).padStart(12, '0')}`;
+    const receipt = await submit(key, lead);
+    const { rows } = await db.query<{
+      service: string;
+      original_submission: unknown;
+    }>(
+      'select service, original_submission from public.leads where reference=$1::uuid',
+      [receipt.reference],
+    );
+    assert.equal(
+      OperationsLeadSchema.shape.service.parse(rows[0].service),
+      service,
+    );
+    assert.deepEqual(rows[0].original_submission, lead);
+    assert.deepEqual(await submit(key, lead), receipt);
+  }
+  assert.deepEqual(await counts(), {
+    leads: 8,
+    events: 8,
+    deliveries: 16,
+    submissions: 8,
+  });
+  await assert.rejects(
+    submit('00000000-0000-4000-8000-999999999999', {
+      ...validLead,
+      service: 'unknown-service',
+    }),
+  );
+  assert.deepEqual(await counts(), {
+    leads: 8,
+    events: 8,
+    deliveries: 16,
+    submissions: 8,
+  });
+});
 
 test('migration atomically creates snapshot, receipt, event and two pending delivery intents', async () => {
   const receipt = await submit();
