@@ -6,6 +6,28 @@ import { test } from 'node:test';
 const dist = new URL('../../dist/', import.meta.url);
 const html = readFileSync(new URL('index.html', dist), 'utf8');
 
+test('lighting control route preserves the sensor enquiry choice and existing-installation scope', () => {
+  const base = process.env.GITHUB_ACTIONS === 'true' ? '/Lys-Logik/' : '/';
+  const lighting = readFileSync(
+    new URL('services/lysstyring/index.html', dist),
+    'utf8',
+  );
+  assert.match(lighting, /<title>Lysstyring og sensorer i Storkøbenhavn/);
+  assert.equal([...lighting.matchAll(/<h1\b/g)].length, 1);
+  assert.ok(html.includes(`href="${base}services/lysstyring/"`));
+  assert.ok(
+    lighting.includes(`href="${base}?service=lysstyring-sensorer#kontakt"`),
+  );
+  assert.ok(lighting.includes(`src="${base}images/smart-home-960.webp"`));
+  assert.ok(
+    lighting.includes(
+      'Nye afbryderplaceringer og større indgreb er ikke omfattet.',
+    ),
+  );
+  assert.ok(lighting.includes('Op til 4 timers gratis arbejde'));
+  assert.ok(!lighting.includes('425 kr'));
+});
+
 test('smart-home page ships with bounded configuration services and matching contact context', () => {
   const base = process.env.GITHUB_ACTIONS === 'true' ? '/Lys-Logik/' : '/';
   const smartHome = readFileSync(

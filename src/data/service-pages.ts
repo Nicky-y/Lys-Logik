@@ -201,3 +201,69 @@ export const smartHomePage: ServicePageContent = {
     },
   ],
 };
+
+export const lightingControlPage: ServicePageContent = {
+  service: services[3],
+  title: 'Lysstyring og sensorer i Storkøbenhavn | Lys & Logik',
+  description:
+    'Få hjælp til kompatibel lysstyring, sensorer og tidsplaner i Storkøbenhavn. Vi afklarer udstyr og eksisterende installation, før vi aftaler opgaven.',
+  heading: 'Lys, når du har brug for det.',
+  helpHeading: 'Tilpas lyset til rummet og hverdagen.',
+  scopeHeading: 'En løsning, der passer til det eksisterende.',
+  faqHeading: 'Spørgsmål om lysstyring og sensorer.',
+  contactHeading: 'Hvor skal lyset gøre hverdagen lettere?',
+  intro:
+    'Lys i gangen, når du går forbi. En tidsplan til de daglige rutiner. En roligere lysstyrke om aftenen. Vi hjælper med opsætning af kompatibel lysstyring og sensorer med udgangspunkt i dit rum og dit udstyr.',
+  tasks: [
+    'Opsætning af kompatible trådløse bevægelsessensorer',
+    'Tidsplaner for tænding og slukning',
+    'Indstilling af lysstyrke på kompatibelt udstyr',
+    'Tilpasning af sensorens indstillinger og placering',
+    'Udskiftning af eksisterende indendørs afbrydere, hvor det er tilladt',
+    'Afprøvning af de aftalte funktioner i rummet',
+  ],
+  situations: [
+    'Lyset i gangen skal tænde, når nogen går forbi.',
+    'I vil gerne have en lavere lysstyrke om aftenen.',
+    'Lyset skal følge en tidsplan, som passer til jeres hverdag.',
+  ],
+  preparation:
+    'Beskriv rummet, det lys du har i dag, og hvornår det skal tænde, dæmpes eller slukke. Fortæl gerne, hvilke lamper, pærer, afbrydere og eventuelle sensorer du allerede har. Så kan vi afklare, hvad der passer sammen.',
+  scopeDetails:
+    'Vi tager udgangspunkt i løsninger, der kan opsættes og konfigureres uden nye faste ledninger. Udskiftning af en eksisterende indendørs afbryder vurderes særskilt ud fra produktet og installationen. Nye tilslutningssteder, indbyggede relæer og andre autorisationskrævende ændringer er ikke omfattet.',
+  processIntro:
+    'Fortæl, hvilket rum det drejer sig om, og hvordan du ønsker, at lyset skal reagere.',
+  completionHeading: 'Vi indstiller og afprøver lyset',
+  questions: [
+    {
+      question: 'Kan en sensor bruges sammen med mine nuværende lamper?',
+      answer:
+        'Det afhænger af lampen, lyskilden og den valgte styring. Fortæl os, hvilket udstyr du har. Vi afklarer kompatibiliteten, før vi aftaler en løsning eller anbefaler, at du køber nyt.',
+    },
+    {
+      question: 'Skal der trækkes nye ledninger?',
+      answer:
+        'Nye ledninger i den faste installation er ikke en del af denne ydelse. Vi tager udgangspunkt i kompatible trådløse løsninger og eksisterende tilslutninger. Hvis opgaven kræver ændringer uden for vores rammer, aftaler vi ikke at udføre dem.',
+    },
+    {
+      question: 'Kan I udskifte en eksisterende afbryder?',
+      answer:
+        'Vi kan hjælpe med udskiftning af eksisterende indendørs, normaltætte afbrydere til højst 250 V, når de konkrete forhold tillader arbejde uden autorisation. Nye afbryderplaceringer og større indgreb er ikke omfattet. Vi afklarer produkt, belastning og installation på forhånd.',
+    },
+    {
+      question: 'Kan alle pærer og lamper dæmpes?',
+      answer:
+        'Vi lover ikke dæmpning af alt udstyr. Lyskilde og styring skal være kompatible og beregnet til funktionen. Send os gerne mærke og model, så vi kan afklare mulighederne.',
+    },
+    {
+      question: 'Kan jeg ændre tidsplanen eller indstillingerne selv?',
+      answer:
+        'Vi gennemgår de aftalte funktioner sammen med dig og viser, hvor de relevante indstillinger findes. Vi aftaler betjeningen ud fra det udstyr, løsningen bruger.',
+    },
+    {
+      question: 'Hvad koster lysstyring og sensorer?',
+      answer:
+        'Prisen afhænger af udstyret, antallet af rum og de funktioner, vi aftaler. Materialer og eventuelt nyt udstyr betales separat. Du kan også søge om at blive et af vores udvalgte pilotprojekter.',
+    },
+  ],
+};

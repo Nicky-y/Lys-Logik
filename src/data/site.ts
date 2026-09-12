@@ -87,7 +87,7 @@ export const services = [
   {
     id: 'lysstyring-sensorer',
     number: '04',
-    page: null,
+    page: 'lysstyring',
     teaser: 'Lys, der følger din hverdag med sensorer og tidsstyring.',
     label: serviceLabels['lysstyring-sensorer'],
     image: 'smart-home-960.webp',

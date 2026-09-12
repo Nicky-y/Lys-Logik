@@ -1,6 +1,14 @@
 import { expect, test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
+// URL slugs and persisted enquiry choices are deliberately separate.
+const serviceRoutes: Record<string, string> = {
+  lampeopsaetning: 'lampeopsaetning',
+  stikkontakter: 'stikkontakter',
+  'smart-home': 'smart-home',
+  'lysstyring-sensorer': 'lysstyring',
+};
+
 test('catalogue images follow their card destination with keyboard and pointer', async ({
   page,
 }) => {
@@ -27,8 +35,10 @@ test('catalogue images follow their card destination with keyboard and pointer',
     } else {
       await imageLink.getByRole('img').click();
     }
-    if (['lampeopsaetning', 'stikkontakter', 'smart-home'].includes(service)) {
-      await expect(page).toHaveURL(new RegExp(`/services/${service}/?$`));
+    if (serviceRoutes[service]) {
+      await expect(page).toHaveURL(
+        new RegExp(`/services/${serviceRoutes[service]}/?$`),
+      );
       await expect(page.locator('main h1')).toBeVisible();
     } else {
       await expect(page).toHaveURL(/#kontakt$/);
@@ -75,11 +85,13 @@ test('all five service descriptions select the matching enquiry type', async ({
     await expect(
       catalogue.getByRole('heading', { name, exact: true }),
     ).toBeVisible();
-    if (['lampeopsaetning', 'stikkontakter', 'smart-home'].includes(value)) {
+    if (serviceRoutes[value]) {
       await article
         .getByRole('link', { name: `Udforsk service: ${name}` })
         .click();
-      await expect(page).toHaveURL(new RegExp(`/services/${value}/?$`));
+      await expect(page).toHaveURL(
+        new RegExp(`/services/${serviceRoutes[value]}/?$`),
+      );
       await page
         .locator('main')
         .getByRole('link', { name: 'Beskriv din opgave', exact: true })
@@ -104,6 +116,14 @@ test('all five service descriptions select the matching enquiry type', async ({
 });
 
 for (const serviceCase of [
+  {
+    slug: 'lysstyring',
+    title: 'Lysstyring og sensorer i Storkøbenhavn | Lys & Logik',
+    description: /lysstyring, sensorer og tidsplaner/,
+    question: 'Skal der trækkes nye ledninger?',
+    answer:
+      'Nye ledninger i den faste installation er ikke en del af denne ydelse.',
+  },
   {
     slug: 'smart-home',
     title: 'Smart-home opsætning i Storkøbenhavn | Lys & Logik',
