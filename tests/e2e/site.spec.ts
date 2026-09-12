@@ -69,7 +69,7 @@ test('service cards preselect the enquiry category', async ({ page }) => {
   await page.goto('/');
   await page
     .getByRole('link', {
-      name: 'Udforsk service: Tilslutning af hvidevarer med stikprop',
+      name: 'Læs mere: Tilslutning af hvidevarer med stikprop',
     })
     .click();
   await expect(page).toHaveURL(/\/services\/hvidevarer\/$/);

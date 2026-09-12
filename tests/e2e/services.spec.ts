@@ -10,6 +10,39 @@ const serviceRoutes: Record<string, string> = {
   hvidevarer: 'hvidevarer',
 };
 
+test('catalogue image arrows stay fixed during hover zoom and remain clickable', async ({
+  page,
+}, testInfo) => {
+  await page.goto('/#ydelser');
+  await expect(
+    page.getByRole('heading', { name: 'Serviceydelser', exact: true }),
+  ).toBeVisible();
+  await expect(page.locator('.catalogue-image-arrow')).toHaveCount(5);
+  const link = page.locator('.catalogue-image-link').first();
+  const photo = link.locator('img');
+  const arrow = link.locator('.catalogue-image-arrow');
+  await link.scrollIntoViewIfNeeded();
+  if (testInfo.project.name === 'desktop') {
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    const before = await arrow.boundingBox();
+    await link.hover();
+    await expect(photo).toHaveCSS(
+      'transform',
+      'matrix(1.04, 0, 0, 1.04, 0, 0)',
+    );
+    await expect(link).toHaveCSS('outline-style', 'none');
+    await expect(link).toHaveCSS('overflow', 'hidden');
+    expect(await arrow.boundingBox()).toEqual(before);
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await expect(photo).toHaveCSS('transform', 'none');
+    await link.focus();
+    await expect(link).toHaveCSS('outline-style', 'solid');
+  }
+  const box = (await arrow.boundingBox())!;
+  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+  await expect(page).toHaveURL(/\/services\/lampeopsaetning\/$/);
+});
+
 test('catalogue images follow their card destination with keyboard and pointer', async ({
   page,
 }) => {
@@ -71,7 +104,7 @@ test('all five service descriptions select the matching enquiry type', async ({
 }, testInfo) => {
   await page.goto('/#ydelser');
   const catalogue = page.getByRole('region', {
-    name: 'Små opgaver. Godt håndværk.',
+    name: 'Serviceydelser',
   });
   await expect(catalogue.getByRole('article')).toHaveCount(5);
   const choices = [
@@ -104,7 +137,7 @@ test('all five service descriptions select the matching enquiry type', async ({
     ).toBeVisible();
     if (serviceRoutes[value]) {
       await article
-        .getByRole('link', { name: `Udforsk service: ${name}` })
+        .getByRole('link', { name: `Læs mere: ${name}` })
         .click();
       await expect(page).toHaveURL(
         new RegExp(`/services/${serviceRoutes[value]}/?$`),

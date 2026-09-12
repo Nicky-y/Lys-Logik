@@ -15,11 +15,11 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
     <div class="catalogue-heading">
       <div>
         <p class="eyebrow">DET HJÆLPER VI MED</p>
-        <h2 id="catalogue-title">Små opgaver.<br />Godt håndværk.</h2>
+        <h2 id="catalogue-title">Serviceydelser</h2>
       </div>
       <p>
-        Fra lampen over spisebordet til et smart home, der er nemt at bruge. Vi
-        hjælper med fem konkrete typer opgaver i hjemmet.
+        Fra den gode belysning til de små smarte detaljer. Vi finder en løsning,
+        der giver mening for dig.
       </p>
     </div>
 
@@ -47,6 +47,9 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
               <span class="catalogue-tag" aria-hidden="true">
                 {service.tag}
               </span>
+              <span class="catalogue-image-arrow" aria-hidden="true">
+                <Icon name="arrow" size={18} />
+              </span>
             </a>
             <div class="catalogue-content">
               <div class="catalogue-name">
@@ -59,9 +62,9 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
               <a
                 class="catalogue-link"
                 href={`${assetBase}services/${service.page}/`}
-                aria-label={`Udforsk service: ${service.label}`}
+                aria-label={`Læs mere: ${service.label}`}
               >
-                Udforsk service <Icon name="arrow" size={18} />
+                Læs mere <Icon name="arrow" size={18} />
               </a>
             </div>
           </article>
@@ -76,6 +79,21 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
 </section>
 
 <style>
+  .catalogue-image-arrow {
+    position: absolute;
+    right: 16px;
+    bottom: 16px;
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgb(255 255 255 / 60%);
+    border-radius: 50%;
+    color: #fff;
+    background: rgb(23 37 43 / 35%);
+    pointer-events: none;
+  }
+
   .catalogue-tag {
     position: absolute;
     left: 16px;
@@ -125,11 +143,20 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
   .catalogue-image-link {
     position: relative;
     display: block;
+    overflow: hidden;
     border-radius: 4px;
   }
-  .catalogue-image-link:hover {
+  .catalogue-image-link:focus-visible {
     outline: 2px solid #895b00;
     outline-offset: 3px;
+  }
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .catalogue-image {
+      transition: transform 280ms ease;
+    }
+    .catalogue-image-link:hover .catalogue-image {
+      transform: scale(1.04);
+    }
   }
   .catalogue-content {
     flex: 1;

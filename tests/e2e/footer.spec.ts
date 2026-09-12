@@ -1,5 +1,33 @@
 import { expect, test } from '@playwright/test';
 
+test('header contact opens footer contact details on home and service pages', async ({
+  page,
+}, testInfo) => {
+  for (const path of ['/', '/services/hvidevarer/']) {
+    await page.goto(path);
+    const menu = page.getByRole('navigation', { name: 'Hovedmenu' });
+    await expect(
+      menu.getByRole('link', { name: 'Pilotprojektet', exact: true }),
+    ).toHaveCount(0);
+    if (testInfo.project.name === 'mobile')
+      await page.getByRole('button', { name: 'Åbn menu' }).click();
+    await menu.getByRole('link', { name: 'Kontakt', exact: true }).click();
+    await expect(page).toHaveURL(new RegExp(`${path}#footer-kontakt$`));
+    const contact = page.locator('#footer-kontakt');
+    await expect(
+      contact.getByRole('link', { name: '71 41 84 81', exact: true }),
+    ).toBeInViewport();
+    await expect(
+      contact.getByRole('link', { name: 'kontakt@lysoglogik.dk', exact: true }),
+    ).toBeInViewport();
+    if (testInfo.project.name === 'mobile')
+      await expect(page.locator('.menu-toggle')).toHaveAttribute(
+        'aria-expanded',
+        'false',
+      );
+  }
+});
+
 test('footer provides real business details and working contact destinations', async ({
   page,
 }) => {

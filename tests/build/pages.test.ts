@@ -147,6 +147,15 @@ test('all five catalogue images ship under the deployment base', () => {
     /<section\b[^>]*id="ydelser"[\s\S]*?<\/section>/,
   )?.[0];
   assert.ok(catalogue, 'service catalogue is rendered');
+  assert.ok(
+    catalogue
+      .replace(/\s+/g, ' ')
+      .includes(
+        'Fra den gode belysning til de små smarte detaljer. Vi finder en løsning, der giver mening for dig.',
+      ),
+  );
+  assert.equal([...catalogue.matchAll(/aria-label="Læs mere:/g)].length, 5);
+  assert.ok(!catalogue.includes('Udforsk service'));
   const images = [...catalogue.matchAll(/<img\b[^>]*src="([^"]+)"[^>]*>/g)];
   assert.equal(images.length, 5);
   assert.equal(new Set(images.map((image) => image[1])).size, 5);
