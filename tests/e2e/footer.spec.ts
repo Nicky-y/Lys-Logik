@@ -15,7 +15,7 @@ test('header contact opens footer contact details on home and service pages', as
     await expect(page).toHaveURL(new RegExp(`${path}#footer-kontakt$`));
     const contact = page.locator('#footer-kontakt');
     await expect(
-      contact.getByRole('link', { name: '71 41 84 81', exact: true }),
+      contact.getByRole('link', { name: '+45 71 41 84 81', exact: true }),
     ).toBeInViewport();
     await expect(
       contact.getByRole('link', { name: 'kontakt@lysoglogik.dk', exact: true }),
@@ -33,6 +33,10 @@ test('footer provides real business details and working contact destinations', a
 }) => {
   await page.goto('/');
   const footer = page.getByRole('contentinfo');
+  await expect(footer).not.toContainText('Har du en opgave i tankerne?');
+  await expect(
+    footer.locator('.footer-contact-link svg[aria-hidden="true"]'),
+  ).toHaveCount(2);
   await expect(footer).toContainText('Lys & Logik I/S');
   await expect(footer).toContainText('CVR 45 82 71 27');
   await expect(footer).toContainText('Storkøbenhavn');
@@ -44,7 +48,7 @@ test('footer provides real business details and working contact destinations', a
   );
   await expect(footer).not.toContainText(/placeholder|Under etablering/i);
   await expect(
-    footer.getByRole('link', { name: '71 41 84 81', exact: true }),
+    footer.getByRole('link', { name: '+45 71 41 84 81', exact: true }),
   ).toHaveAttribute('href', 'tel:+4571418481');
   await expect(
     footer.getByRole('link', { name: 'kontakt@lysoglogik.dk', exact: true }),
