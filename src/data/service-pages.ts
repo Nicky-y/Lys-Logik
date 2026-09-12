@@ -20,6 +20,72 @@ export interface ServicePageContent {
   questions: { question: string; answer: string }[];
 }
 
+export const appliancePage: ServicePageContent = {
+  service: services[4],
+  title: 'Tilslutning af hvidevarer med stikprop i Storkøbenhavn | Lys & Logik',
+  description:
+    'Få hjælp til elektrisk tilslutning af kompatible hvidevarer med stikprop i Storkøbenhavn. Vi afklarer apparatet og den eksisterende stikkontakt før besøget.',
+  heading: 'Få din hvidevare sluttet til.',
+  helpHeading: 'Hjælp til den elektriske tilslutning.',
+  scopeHeading: 'Stikprop og eksisterende stikkontakt.',
+  faqHeading: 'Spørgsmål om tilslutning af hvidevarer.',
+  contactHeading: 'Hvilken hvidevare skal sluttes til?',
+  intro:
+    'Et nyt køleskab eller en tørretumbler skal passe til tilslutningen i dit hjem. Vi hjælper med den elektriske tilslutning af kompatible hvidevarer med stikprop og afklarer forholdene, inden vi kommer.',
+  tasks: [
+    'Elektrisk tilslutning af køleskab eller fryser med stikprop',
+    'Elektrisk tilslutning af en kompatibel tørretumbler med stikprop',
+    'Frakobling af et eksisterende apparat med stikprop',
+    'Afklaring af apparatets krav og den eksisterende tilslutning',
+    'Kontrol af, at stikprop og stikkontakt passer sammen',
+    'Aftalt afprøvning efter producentens anvisninger',
+  ],
+  situations: [
+    'Det nye køleskab er leveret, og I vil have hjælp til tilslutningen.',
+    'I er i tvivl om, hvorvidt apparatets stik passer til stikkontakten.',
+    'En hvidevare skal udskiftes på den eksisterende placering.',
+  ],
+  preparation:
+    'Fortæl os, hvilket apparat det drejer sig om, gerne med mærke og model. Beskriv den eksisterende stikkontakt, placeringen og adgangsforholdene. Oplys også, om et gammelt apparat skal kobles fra. Du behøver ikke åbne stik eller installationer.',
+  scopeDetails:
+    'Vi tilbyder den elektriske tilslutning via en egnet, eksisterende stikkontakt. Apparatets krav, stiktype og jordforbindelse skal passe til forholdene. Fast tilslutning i en dåse, nye stikkontakter og ændringer af den faste elinstallation er ikke omfattet. Vand, afløb, gas, indbygning og bortkørsel er heller ikke en del af denne ydelse.',
+  processIntro:
+    'Beskriv apparatet, placeringen og den tilslutning, der allerede findes.',
+  completionHeading: 'Vi tilslutter og afprøver',
+  questions: [
+    {
+      question: 'Kan I tilslutte et apparat uden stikprop?',
+      answer:
+        'Nej. Denne ydelse gælder apparater med stikprop, som kan tilsluttes en egnet, eksisterende stikkontakt. Vi udfører ikke fast tilslutning i en dåse eller ændringer af den faste elinstallation.',
+    },
+    {
+      question: 'Passer alle stikpropper til alle stikkontakter?',
+      answer:
+        'Nej. Stiktype og apparatets krav skal passe til stikkontakten, og en nødvendig jordforbindelse skal overføres korrekt. Vi afklarer de konkrete forhold, før vi aftaler tilslutningen.',
+    },
+    {
+      question: 'Tilslutter I også vand og afløb?',
+      answer:
+        'Nej. Her tilbyder vi alene den elektriske tilslutning. Hvis apparatet også kræver vand, afløb eller andre tilslutninger, skal det håndteres særskilt, før det kan tages i brug.',
+    },
+    {
+      question: 'Flytter I apparatet og tager det gamle med?',
+      answer:
+        'Indbæring, tunge løft, indbygning og bortkørsel er ikke inkluderet. Fortæl os om placering og adgangsforhold, så vi kan aftale, hvad der skal være klar ved besøget.',
+    },
+    {
+      question: 'Kan I tilslutte en ovn eller et komfur?',
+      answer:
+        'Kun hvis det konkrete apparat har en passende stikprop og kan tilsluttes uden indgreb i den faste installation. Send os mærke og model samt oplysninger om tilslutningen. Vi vurderer opgaven, før vi laver en aftale.',
+    },
+    {
+      question: 'Hvad koster tilslutningen?',
+      answer:
+        'Vi aftaler pris og omfang ud fra apparatet og de eksisterende forhold. Apparatet og eventuelle materialer betales separat. Du kan også søge om at blive et af vores udvalgte pilotprojekter.',
+    },
+  ],
+};
+
 export const lampPage: ServicePageContent = {
   service: services[0],
   title: 'Lampeopsætning i Storkøbenhavn | Lys & Logik',

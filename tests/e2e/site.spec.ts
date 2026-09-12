@@ -68,7 +68,15 @@ test('shows accessible form errors and focuses the first invalid field', async (
 test('service cards preselect the enquiry category', async ({ page }) => {
   await page.goto('/');
   await page
-    .getByRole('link', { name: 'Beskriv din opgave: Tilslutning af hvidevarer med stikprop' })
+    .getByRole('link', {
+      name: 'Udforsk service: Tilslutning af hvidevarer med stikprop',
+    })
+    .click();
+  await expect(page).toHaveURL(/\/services\/hvidevarer\/$/);
+  await page
+    .locator('main')
+    .getByRole('link', { name: 'Beskriv din opgave', exact: true })
+    .first()
     .click();
   await expect(page.getByLabel('Hvad drejer det sig om?')).toHaveValue(
     'hvidevarer',
@@ -86,7 +94,9 @@ test('complete demo submits locally and can be reset without storing personal da
   await page.getByLabel('Dit navn').fill('Anna Jensen');
   await page.getByLabel('Postnummer').fill('2800');
   await page.getByLabel('Din e-mail').fill('anna@example.com');
-  await page.getByLabel('Hvad drejer det sig om?').selectOption('lampeopsaetning');
+  await page
+    .getByLabel('Hvad drejer det sig om?')
+    .selectOption('lampeopsaetning');
   await page
     .getByLabel('Fortæl lidt om din idé')
     .fill('Vi vil gerne have bedre lys over vores spisebord.');

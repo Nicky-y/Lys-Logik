@@ -46,6 +46,7 @@ export const trustpilotUrl = 'https://www.trustpilot.com/review/lysoglogik.dk';
 export const services = [
   {
     id: 'lampeopsaetning',
+    tag: 'Lamper',
     number: '01',
     page: 'lampeopsaetning',
     teaser: 'Loft- og væglamper på plads i eksisterende lampeudtag.',
@@ -59,6 +60,7 @@ export const services = [
   },
   {
     id: 'stikkontakter',
+    tag: 'Stikkontakter',
     number: '02',
     page: 'stikkontakter',
     teaser:
@@ -73,6 +75,7 @@ export const services = [
   },
   {
     id: 'smart-home',
+    tag: 'Smart-home',
     number: '03',
     page: 'smart-home',
     teaser: 'Få kompatible enheder, apps og lysscener til at arbejde sammen.',
@@ -86,6 +89,7 @@ export const services = [
   },
   {
     id: 'lysstyring-sensorer',
+    tag: 'Lysstyring',
     number: '04',
     page: 'lysstyring',
     teaser: 'Lys, der følger din hverdag med sensorer og tidsstyring.',
@@ -99,8 +103,9 @@ export const services = [
   },
   {
     id: 'hvidevarer',
+    tag: 'Hvidevarer',
     number: '05',
-    page: null,
+    page: 'hvidevarer',
     teaser:
       'Tilslutning med stikprop i en eksisterende, kompatibel stikkontakt.',
     label: serviceLabels.hvidevarer,
@@ -113,6 +118,7 @@ export const services = [
   },
 ] as const satisfies readonly {
   id: Service;
+  tag: string;
   number: string;
   page: string | null;
   teaser: string;

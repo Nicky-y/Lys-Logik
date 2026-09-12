@@ -6,6 +6,30 @@ import { test } from 'node:test';
 const dist = new URL('../../dist/', import.meta.url);
 const html = readFileSync(new URL('index.html', dist), 'utf8');
 
+test('appliance route preserves contact context and limits the offer to electrical plug connection', () => {
+  const base = process.env.GITHUB_ACTIONS === 'true' ? '/Lys-Logik/' : '/';
+  const appliance = readFileSync(
+    new URL('services/hvidevarer/index.html', dist),
+    'utf8',
+  );
+  assert.match(
+    appliance,
+    /<title>Tilslutning af hvidevarer med stikprop i Storkøbenhavn/,
+  );
+  assert.equal([...appliance.matchAll(/<h1\b/g)].length, 1);
+  assert.ok(html.includes(`href="${base}services/hvidevarer/"`));
+  assert.ok(appliance.includes(`href="${base}?service=hvidevarer#kontakt"`));
+  assert.ok(
+    appliance.includes(`src="${base}images/service-hvidevarer-v1.webp"`),
+  );
+  assert.ok(appliance.includes('Vi udfører ikke fast tilslutning i en dåse'));
+  assert.ok(
+    appliance.includes('Her tilbyder vi alene den elektriske tilslutning.'),
+  );
+  assert.ok(appliance.includes('Op til 4 timers gratis arbejde'));
+  assert.ok(!appliance.includes('425 kr'));
+});
+
 test('lighting control route preserves the sensor enquiry choice and existing-installation scope', () => {
   const base = process.env.GITHUB_ACTIONS === 'true' ? '/Lys-Logik/' : '/';
   const lighting = readFileSync(

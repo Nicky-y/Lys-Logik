@@ -32,13 +32,8 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
           >
             <a
               class="catalogue-image-link"
-              href={
-                service.page
-                  ? `${assetBase}services/${service.page}/`
-                  : '#kontakt'
-              }
-              data-service={service.page ? undefined : service.id}
-              aria-label={`${service.page ? 'Læs om' : 'Kontakt os om'} ${service.label}`}
+              href={`${assetBase}services/${service.page}/`}
+              aria-label={`Læs om ${service.label}`}
             >
               <img
                 class="catalogue-image"
@@ -49,6 +44,9 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
                 loading="lazy"
                 decoding="async"
               />
+              <span class="catalogue-tag" aria-hidden="true">
+                {service.tag}
+              </span>
             </a>
             <div class="catalogue-content">
               <div class="catalogue-name">
@@ -60,16 +58,10 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
               <p class="catalogue-description">{service.teaser}</p>
               <a
                 class="catalogue-link"
-                href={
-                  service.page
-                    ? `${assetBase}services/${service.page}/`
-                    : '#kontakt'
-                }
-                data-service={service.page ? undefined : service.id}
-                aria-label={`${service.page ? 'Udforsk service' : 'Beskriv din opgave'}: ${service.label}`}
+                href={`${assetBase}services/${service.page}/`}
+                aria-label={`Udforsk service: ${service.label}`}
               >
-                {service.page ? 'Udforsk service' : 'Beskriv din opgave'}{' '}
-                <Icon name="arrow" size={18} />
+                Udforsk service <Icon name="arrow" size={18} />
               </a>
             </div>
           </article>
@@ -84,6 +76,21 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
 </section>
 
 <style>
+  .catalogue-tag {
+    position: absolute;
+    left: 16px;
+    bottom: 16px;
+    padding: 7px 12px;
+    border-radius: 3px;
+    background: #fff;
+    color: #17252b;
+    font-size: 0.8rem;
+    font-weight: 700;
+    line-height: 1.4;
+    box-shadow: 0 1px 4px rgb(0 0 0 / 12%);
+    pointer-events: none;
+  }
+
   .catalogue-heading {
     display: flex;
     justify-content: space-between;
@@ -116,6 +123,7 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
     border-radius: 4px;
   }
   .catalogue-image-link {
+    position: relative;
     display: block;
     border-radius: 4px;
   }

@@ -17,3 +17,10 @@ Den faglige vurdering af den konkrete opgave og installation er stadig nødvendi
 Kilder: [myndighedens oversigt over arbejde uden autorisation](https://www.sik.dk/privat/goer-det-sikkert/el/goer-det-selv/hvilket-elarbejde-maa-du-lave-uden-autorisation) og [vejledning om eksisterende afbrydere og stikkontakter](https://www.sik.dk/privat/goer-det-sikkert/el/goer-det-selv/saadan-skifter-du-stikkontakt).
 
 Tilbuddet omfatter kompatibel lysstyring, konfigurering og trådløse sensorer. Udskiftning af eksisterende indendørs, normaltætte afbrydere til højst 250 V kræver konkret vurdering af produkt og installation. En sensor eller smart-home-betegnelse gør ikke i sig selv et indgreb tilladt. Nye faste ledninger, nye tilslutningssteder, indbyggede relæer og større indgreb tilbydes ikke på siden.
+
+## Hvidevarer med stikprop – 2026-09-12
+
+Servicesiden omfatter alene elektrisk tilslutning af kompatible apparater med stikprop til en egnet eksisterende stikkontakt. Stiktype, apparatkrav og jordforbindelse skal afklares. Fast tilslutning og ændring af installationen er ikke omfattet. Vand, afløb, indbygning og bortkørsel er fravalgt som forretningsmæssigt ydelsesomfang; dette er ikke en påstand om, at alt sådant arbejde kræver autorisation.
+
+- Sikkerhedsstyrelsen: [Hvilket elarbejde må du lave uden autorisation?](https://www.sik.dk/privat/goer-det-sikkert/el/goer-det-selv/hvilket-elarbejde-maa-du-lave-uden-autorisation)
+- Sikkerhedsstyrelsen: [Bevar jordforbindelsen til hvidevarerne](https://www.sik.dk/erhverv/produkter/el-produkter/vejledninger/sikkerhed-ved-elprodukter/bevar-jordforbindelsen-hvidevarerne)

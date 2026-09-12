@@ -7,6 +7,7 @@ const serviceRoutes: Record<string, string> = {
   stikkontakter: 'stikkontakter',
   'smart-home': 'smart-home',
   'lysstyring-sensorer': 'lysstyring',
+  hvidevarer: 'hvidevarer',
 };
 
 test('catalogue images follow their card destination with keyboard and pointer', async ({
@@ -24,6 +25,22 @@ test('catalogue images follow their card destination with keyboard and pointer',
       .locator('article')
       .filter({ has: page.locator(`#service-${service}`) });
     const imageLink = card.locator('.catalogue-image-link');
+    const tags: Record<string, string> = {
+      lampeopsaetning: 'Lamper',
+      stikkontakter: 'Stikkontakter',
+      'smart-home': 'Smart-home',
+      'lysstyring-sensorer': 'Lysstyring',
+      hvidevarer: 'Hvidevarer',
+    };
+    const tag = imageLink.locator('.catalogue-tag');
+    await expect(tag).toHaveText(tags[service]);
+    await tag.scrollIntoViewIfNeeded();
+    const tagBox = (await tag.boundingBox())!;
+    const linkBox = (await imageLink.boundingBox())!;
+    expect(tagBox.x).toBeGreaterThan(linkBox.x);
+    expect(tagBox.y).toBeGreaterThan(linkBox.y);
+    expect(tagBox.x + tagBox.width).toBeLessThan(linkBox.x + linkBox.width);
+    expect(tagBox.y + tagBox.height).toBeLessThan(linkBox.y + linkBox.height);
     await expect(imageLink).toHaveAccessibleName(/Læs om|Kontakt os om/);
     await expect(imageLink).toHaveAttribute(
       'href',
@@ -116,6 +133,14 @@ test('all five service descriptions select the matching enquiry type', async ({
 });
 
 for (const serviceCase of [
+  {
+    slug: 'hvidevarer',
+    title:
+      'Tilslutning af hvidevarer med stikprop i Storkøbenhavn | Lys & Logik',
+    description: /elektrisk tilslutning af kompatible hvidevarer/,
+    question: 'Tilslutter I også vand og afløb?',
+    answer: 'Her tilbyder vi alene den elektriske tilslutning.',
+  },
   {
     slug: 'lysstyring',
     title: 'Lysstyring og sensorer i Storkøbenhavn | Lys & Logik',
