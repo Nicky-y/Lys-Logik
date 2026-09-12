@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import Icon from '../components/Icon.astro';
 import SiteFooter from '../components/SiteFooter.astro';
+import SiteHeader from '../components/SiteHeader.astro';
 import ServiceCatalogue from '../components/ServiceCatalogue.astro';
 import { site, services, questions } from '../data/site';
 import { resolveLeadFormConfig } from '../lib/lead-form-config';
@@ -22,32 +23,7 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
 
 <Layout>
   <a class="skip-link" href="#indhold">Spring til indhold</a>
-  <header class="site-header">
-    <div class="container header-inner">
-      <a class="brand" href="#" aria-label="Lys og Logik – forside">
-        <img
-          src={`${assetBase}images/logo-v11.png`}
-          alt="Lys & Logik · El og automation"
-          width="1536"
-          height="1024"
-        />
-      </a>
-      <button
-        class="menu-toggle"
-        aria-expanded="false"
-        aria-controls="navigation"
-        aria-label="Åbn menu"><span></span><span></span></button
-      >
-      <nav id="navigation" aria-label="Hovedmenu">
-        <a href="#ydelser">Det hjælper vi med</a>
-        <a href="#pilot">Pilotprojektet <span class="nav-dot"></span></a>
-        <a href="#om-os">Om os</a>
-        <a class="button button-small" href="#kontakt"
-          >Beskriv din opgave <Icon name="arrow" size={17} /></a
-        >
-      </nav>
-    </div>
-  </header>
+  <SiteHeader />
 
   <main id="indhold">
     <section class="hero" aria-labelledby="hero-heading">
@@ -440,92 +416,8 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
   <div class="mobile-cta">
     <a href="#kontakt">Beskriv din opgave <Icon name="arrow" /></a>
   </div>
-  <dialog id="privacy-dialog" aria-labelledby="privacy-title">
-    <button
-      class="dialog-close"
-      id="privacy-close"
-      aria-label="Luk information"
-      type="button">×</button
-    ><p class="eyebrow">
-      {liveForm ? 'DINE OPLYSNINGER' : 'OM DENNE VERSION'}
-    </p><h2 id="privacy-title">
-      {liveForm ? 'Om formularen og dine oplysninger.' : 'En lokal prototype.'}
-    </h2><p>
-      {
-        liveForm
-          ? 'Lys & Logik bruger navn, e-mail, eventuelt telefonnummer, postnummer og opgavebeskrivelse til at vurdere opgaven og kontakte dig. Henvendelsen er uforpligtende.'
-          : 'Dette er en lokal prøvevisning af hjemmesiden.'
-      }
-    </p><p>
-      {
-        liveForm
-          ? 'Oplysningerne gemmes hos vores databaseleverandør Supabase og er kun tilgængelige for medarbejdere med adgang til vores arbejdsrum. Cloudflare leverer hjemmesiden og Turnstile-sikkerhedskontrollen, som beskytter mod misbrug. Vi sender ikke dine oplysninger til markedsføring.'
-          : 'Formularen validerer kun oplysningerne i din browser. Den sender og gemmer dem ikke. Siden bruger ingen analyseværktøjer eller cookies.'
-      }
-    </p><p>
-      Boligbillederne er AI-genererede inspirationsbilleder og viser ikke
-      udførte kundeprojekter.
-    </p><p>
-      {liveForm ? 'Skriv til ' : 'Spørgsmål om hjemmesiden? Skriv til '}<a
-        href={`mailto:${site.email}`}>{site.email}</a
-      >{
-        liveForm
-          ? ', hvis du vil spørge til, rette eller bede om at få slettet oplysninger om din henvendelse.'
-          : '.'
-      }
-    </p>
-  </dialog>
   <script>
     import { initializeLeadForm } from '../lib/lead-form';
-    const toggle = document.querySelector<HTMLButtonElement>('.menu-toggle')!;
-    const nav = document.querySelector<HTMLElement>('#navigation')!;
-    const closeMenu = () => {
-      toggle.setAttribute('aria-expanded', 'false');
-      toggle.setAttribute('aria-label', 'Åbn menu');
-      nav.classList.remove('is-open');
-    };
-    toggle.addEventListener('click', () => {
-      const open = toggle.getAttribute('aria-expanded') !== 'true';
-      toggle.setAttribute('aria-expanded', String(open));
-      toggle.setAttribute('aria-label', open ? 'Luk menu' : 'Åbn menu');
-      nav.classList.toggle('is-open', open);
-    });
-    nav
-      .querySelectorAll('a')
-      .forEach((link) => link.addEventListener('click', closeMenu));
-    document.addEventListener('keydown', (event) => {
-      if (
-        event.key === 'Escape' &&
-        toggle.getAttribute('aria-expanded') === 'true'
-      ) {
-        closeMenu();
-        toggle.focus();
-      }
-    });
-    matchMedia('(min-width: 861px)').addEventListener('change', (event) => {
-      if (event.matches) closeMenu();
-    });
-
     initializeLeadForm();
-    const dialog =
-      document.querySelector<HTMLDialogElement>('#privacy-dialog')!;
-    document
-      .querySelector('#privacy-open')!
-      .addEventListener('click', () => dialog.showModal());
-    document
-      .querySelector('#privacy-close')!
-      .addEventListener('click', () => dialog.close());
-    dialog.addEventListener('click', (event) => {
-      if (event.target === dialog) {
-        const rect = dialog.getBoundingClientRect();
-        if (
-          event.clientX < rect.left ||
-          event.clientX > rect.right ||
-          event.clientY < rect.top ||
-          event.clientY > rect.bottom
-        )
-          dialog.close();
-      }
-    });
   </script>
 </Layout>

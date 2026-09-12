@@ -1,0 +1,68 @@
+---
+import Icon from './Icon.astro';
+interface Props {
+  homeHref?: string;
+  contactHref?: string;
+}
+const { homeHref = '', contactHref = '#kontakt' } = Astro.props;
+const assetBase = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+---
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href={homeHref || '#'} aria-label="Lys og Logik – forside">
+      <img
+        src={`${assetBase}images/logo-v11.png`}
+        alt="Lys & Logik · El og automation"
+        width="1536"
+        height="1024"
+      />
+    </a>
+    <button
+      class="menu-toggle"
+      aria-expanded="false"
+      aria-controls="navigation"
+      aria-label="Åbn menu"><span></span><span></span></button
+    >
+    <nav id="navigation" aria-label="Hovedmenu">
+      <a href={`${homeHref}#ydelser`}>Det hjælper vi med</a>
+      <a href={`${homeHref}#pilot`}
+        >Pilotprojektet <span class="nav-dot"></span></a
+      >
+      <a href={`${homeHref}#om-os`}>Om os</a>
+      <a class="button button-small" href={contactHref}
+        >Beskriv din opgave <Icon name="arrow" size={17} /></a
+      >
+    </nav>
+  </div>
+</header>
+<script>
+  const toggle = document.querySelector<HTMLButtonElement>('.menu-toggle')!;
+  const nav = document.querySelector<HTMLElement>('#navigation')!;
+  const closeMenu = () => {
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.setAttribute('aria-label', 'Åbn menu');
+    nav.classList.remove('is-open');
+  };
+  toggle.addEventListener('click', () => {
+    const open = toggle.getAttribute('aria-expanded') !== 'true';
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.setAttribute('aria-label', open ? 'Luk menu' : 'Åbn menu');
+    nav.classList.toggle('is-open', open);
+  });
+  nav
+    .querySelectorAll('a')
+    .forEach((link) => link.addEventListener('click', closeMenu));
+  document.addEventListener('keydown', (event) => {
+    if (
+      event.key === 'Escape' &&
+      toggle.getAttribute('aria-expanded') === 'true'
+    ) {
+      closeMenu();
+      toggle.focus();
+    }
+  });
+  matchMedia('(min-width: 861px)').addEventListener('change', (event) => {
+    if (event.matches) closeMenu();
+  });
+</script>

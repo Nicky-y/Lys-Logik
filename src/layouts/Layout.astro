@@ -1,6 +1,14 @@
 ---
 import '@fontsource-variable/manrope';
 import '../styles/global.css';
+interface Props {
+  title?: string;
+  description?: string;
+}
+const {
+  title = 'Lys & Logik — El og automation, gjort enkelt',
+  description = 'Lys & Logik – lys og smarte løsninger til hjemmet. Se vores pilotprojekt og fortæl os om din opgave.',
+} = Astro.props;
 
 const assetBase = import.meta.env.BASE_URL.endsWith('/')
   ? import.meta.env.BASE_URL
@@ -12,14 +20,15 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta
-      name="description"
-      content="Lys & Logik – lys og smarte løsninger til hjemmet. Se vores pilotprojekt og fortæl os om din opgave."
-    />
+    <meta name="description" content={description} />
     <meta name="robots" content="noindex, nofollow" />
     <meta name="theme-color" content="#141d23" />
-    <link rel="icon" type="image/png" href={`${assetBase}images/favicon-v19.png`} />
-    <title>Lys & Logik — El og automation, gjort enkelt</title>
+    <link
+      rel="icon"
+      type="image/png"
+      href={`${assetBase}images/favicon-v19.png`}
+    />
+    <title>{title}</title>
   </head>
   <body><slot /></body>
 </html>

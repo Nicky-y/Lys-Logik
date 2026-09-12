@@ -6,10 +6,35 @@ import { test } from 'node:test';
 const dist = new URL('../../dist/', import.meta.url);
 const html = readFileSync(new URL('index.html', dist), 'utf8');
 
+test('lamp service route has its own metadata and base-aware navigation and assets', () => {
+  const base = process.env.GITHUB_ACTIONS === 'true' ? '/Lys-Logik/' : '/';
+  const lamp = readFileSync(
+    new URL('services/lampeopsaetning/index.html', dist),
+    'utf8',
+  );
+  assert.match(lamp, /<title>Lampeopsætning i Storkøbenhavn/);
+  assert.equal([...lamp.matchAll(/<h1\b/g)].length, 1);
+  assert.ok(html.includes(`href="${base}services/lampeopsaetning/"`));
+  assert.ok(lamp.includes(`href="${base}?service=lampeopsaetning#kontakt"`));
+  assert.ok(lamp.includes(`href="${base}#ydelser"`));
+  assert.ok(lamp.includes(`src="${base}images/lighting-960.webp"`));
+  assert.ok(lamp.includes('Op til 4 timers gratis arbejde'));
+  assert.ok(!lamp.includes('425 kr'));
+  const assets = [
+    ...lamp.matchAll(/(?:src|href)="([^"\s]*\/_astro\/[^"\s]+)"/g),
+  ];
+  for (const [, path] of assets) {
+    assert.ok(path.startsWith(`${base}_astro/`), path);
+    assert.ok(existsSync(new URL(path.slice(base.length), dist)), path);
+  }
+});
+
 test('pilot offer and payment terms consistently specify four hours', () => {
   assert.ok(html.includes('Op til 4 timers arbejde.'));
   assert.ok(html.includes('op til 4 timers arbejde uden beregning'));
-  assert.ok(html.includes('Arbejde ud over de 4 timer kræver en særskilt aftale.'));
+  assert.ok(
+    html.includes('Arbejde ud over de 4 timer kræver en særskilt aftale.'),
+  );
   assert.doesNotMatch(html, /(?:8|otte)\s+timer(?:s)?\b/i);
 });
 
@@ -34,7 +59,9 @@ test('production ships the live form with the production endpoint and real widge
 
 test('all five catalogue images ship under the deployment base', () => {
   const base = process.env.GITHUB_ACTIONS === 'true' ? '/Lys-Logik/' : '/';
-  const catalogue = html.match(/<section\b[^>]*id="ydelser"[\s\S]*?<\/section>/)?.[0];
+  const catalogue = html.match(
+    /<section\b[^>]*id="ydelser"[\s\S]*?<\/section>/,
+  )?.[0];
   assert.ok(catalogue, 'service catalogue is rendered');
   const images = [...catalogue.matchAll(/<img\b[^>]*src="([^"]+)"[^>]*>/g)];
   assert.equal(images.length, 5);

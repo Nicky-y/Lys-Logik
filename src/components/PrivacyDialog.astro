@@ -1,0 +1,65 @@
+---
+import { site } from '../data/site';
+interface Props {
+  liveForm: boolean;
+}
+const { liveForm } = Astro.props;
+---
+
+<dialog id="privacy-dialog" aria-labelledby="privacy-title">
+  <button
+    class="dialog-close"
+    id="privacy-close"
+    aria-label="Luk information"
+    type="button">×</button
+  ><p class="eyebrow">
+    {liveForm ? 'DINE OPLYSNINGER' : 'OM DENNE VERSION'}
+  </p><h2 id="privacy-title">
+    {liveForm ? 'Om formularen og dine oplysninger.' : 'En lokal prototype.'}
+  </h2><p>
+    {
+      liveForm
+        ? 'Lys & Logik bruger navn, e-mail, eventuelt telefonnummer, postnummer og opgavebeskrivelse til at vurdere opgaven og kontakte dig. Henvendelsen er uforpligtende.'
+        : 'Dette er en lokal prøvevisning af hjemmesiden.'
+    }
+  </p><p>
+    {
+      liveForm
+        ? 'Oplysningerne gemmes hos vores databaseleverandør Supabase og er kun tilgængelige for medarbejdere med adgang til vores arbejdsrum. Cloudflare leverer hjemmesiden og Turnstile-sikkerhedskontrollen, som beskytter mod misbrug. Vi sender ikke dine oplysninger til markedsføring.'
+        : 'Formularen validerer kun oplysningerne i din browser. Den sender og gemmer dem ikke. Siden bruger ingen analyseværktøjer eller cookies.'
+    }
+  </p><p>
+    Boligbillederne er AI-genererede inspirationsbilleder og viser ikke udførte
+    kundeprojekter.
+  </p><p>
+    {liveForm ? 'Skriv til ' : 'Spørgsmål om hjemmesiden? Skriv til '}<a
+      href={`mailto:${site.email}`}>{site.email}</a
+    >{
+      liveForm
+        ? ', hvis du vil spørge til, rette eller bede om at få slettet oplysninger om din henvendelse.'
+        : '.'
+    }
+  </p>
+</dialog>
+
+<script>
+  const dialog = document.querySelector<HTMLDialogElement>('#privacy-dialog')!;
+  document
+    .querySelector('#privacy-open')!
+    .addEventListener('click', () => dialog.showModal());
+  document
+    .querySelector('#privacy-close')!
+    .addEventListener('click', () => dialog.close());
+  dialog.addEventListener('click', (event) => {
+    if (event.target === dialog) {
+      const rect = dialog.getBoundingClientRect();
+      if (
+        event.clientX < rect.left ||
+        event.clientX > rect.right ||
+        event.clientY < rect.top ||
+        event.clientY > rect.bottom
+      )
+        dialog.close();
+    }
+  });
+</script>

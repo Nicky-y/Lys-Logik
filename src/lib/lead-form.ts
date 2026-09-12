@@ -36,6 +36,18 @@ export function initializeLeadForm() {
   let token = '';
   let widgetId: string | undefined;
   let busy = false;
+  const serviceSelect = form.elements.namedItem('service') as HTMLSelectElement;
+  const requestedService = new URLSearchParams(window.location.search).get(
+    'service',
+  );
+  if (
+    requestedService &&
+    Array.from(serviceSelect.options).some(
+      (option) => option.value === requestedService,
+    )
+  ) {
+    serviceSelect.value = requestedService;
+  }
 
   const showError = (text: string) => {
     summary.hidden = false;

@@ -47,6 +47,8 @@ export const services = [
   {
     id: 'lampeopsaetning',
     number: '01',
+    page: 'lampeopsaetning',
+    teaser: 'Loft- og væglamper på plads i eksisterende lampeudtag.',
     label: serviceLabels.lampeopsaetning,
     image: 'lighting-960.webp',
     imageAlt:
@@ -58,6 +60,9 @@ export const services = [
   {
     id: 'stikkontakter',
     number: '02',
+    page: null,
+    teaser:
+      'Udskiftning af eksisterende indendørs stikkontakter inden for de tilladte rammer.',
     label: serviceLabels.stikkontakter,
     image: 'service-stikkontakter-v1.webp',
     imageAlt:
@@ -69,6 +74,8 @@ export const services = [
   {
     id: 'smart-home',
     number: '03',
+    page: null,
+    teaser: 'Få kompatible enheder, apps og lysscener til at arbejde sammen.',
     label: serviceLabels['smart-home'],
     image: 'service-smart-home-v1.webp',
     imageAlt:
@@ -80,6 +87,8 @@ export const services = [
   {
     id: 'lysstyring-sensorer',
     number: '04',
+    page: null,
+    teaser: 'Lys, der følger din hverdag med sensorer og tidsstyring.',
     label: serviceLabels['lysstyring-sensorer'],
     image: 'smart-home-960.webp',
     imageAlt:
@@ -91,6 +100,9 @@ export const services = [
   {
     id: 'hvidevarer',
     number: '05',
+    page: null,
+    teaser:
+      'Tilslutning med stikprop i en eksisterende, kompatibel stikkontakt.',
     label: serviceLabels.hvidevarer,
     image: 'service-hvidevarer-v1.webp',
     imageAlt:
@@ -102,6 +114,8 @@ export const services = [
 ] as const satisfies readonly {
   id: Service;
   number: string;
+  page: string | null;
+  teaser: string;
   label: string;
   image: string;
   imageAlt: string;

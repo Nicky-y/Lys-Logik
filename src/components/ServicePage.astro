@@ -1,0 +1,345 @@
+---
+import Layout from '../layouts/Layout.astro';
+import SiteHeader from './SiteHeader.astro';
+import SiteFooter from './SiteFooter.astro';
+import Icon from './Icon.astro';
+import { site } from '../data/site';
+import type { ServicePageContent } from '../data/service-pages';
+import { resolveLeadFormConfig } from '../lib/lead-form-config';
+interface Props {
+  content: ServicePageContent;
+}
+const { content } = Astro.props;
+const { service } = content;
+const homeHref = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+const contactHref = `${homeHref}?service=${encodeURIComponent(service.id)}#kontakt`;
+const { live: liveForm } = resolveLeadFormConfig({
+  development: import.meta.env.DEV,
+  endpoint: import.meta.env.PUBLIC_LEAD_ENDPOINT,
+  siteKey: import.meta.env.PUBLIC_TURNSTILE_SITE_KEY,
+});
+---
+
+<Layout title={content.title} description={content.description}>
+  <a class="skip-link" href="#indhold">Spring til indhold</a>
+  <SiteHeader homeHref={homeHref} contactHref={contactHref} />
+  <main id="indhold" class="service-page">
+    <section class="service-hero container" aria-labelledby="service-title">
+      <nav class="breadcrumbs" aria-label="Brødkrummer">
+        <a href={homeHref}>Forside</a><span aria-hidden="true">/</span><a
+          href={`${homeHref}#ydelser`}>Ydelser</a
+        ><span aria-hidden="true">/</span><span aria-current="page"
+          >{service.label}</span
+        >
+      </nav>
+      <div class="hero-grid">
+        <div class="service-hero-copy">
+          <p class="eyebrow">{service.label.toUpperCase()} · {site.area}</p>
+          <h1 id="service-title">{content.heading}</h1>
+          <p class="service-intro">{content.intro}</p>
+          <a class="button" href={contactHref}
+            >Beskriv din opgave <Icon name="arrow" /></a
+          >
+          <p class="small-note">
+            En uforpligtende henvendelse. Vi aftaler omfanget sammen.
+          </p>
+        </div>
+        <figure>
+          <img
+            src={`${homeHref}images/${service.image}`}
+            alt={service.imageAlt}
+            width="960"
+            height="640"
+            fetchpriority="high"
+          /><figcaption>Inspirationsbillede</figcaption>
+        </figure>
+      </div>
+    </section>
+    <section class="section service-help" aria-labelledby="help-title">
+      <div class="container split">
+        <div>
+          <p class="eyebrow">DET KAN VI HJÆLPE MED</p><h2 id="help-title">
+            {content.helpHeading}
+          </h2><ul class="task-list">
+            {
+              content.tasks.map((task) => (
+                <li>
+                  <Icon name="check" size={18} />
+                  {task}
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+        <div class="situations">
+          <h3>Måske kender du det?</h3><ul>
+            {content.situations.map((situation) => <li>{situation}</li>)}
+          </ul><p>{content.preparation}</p>
+        </div>
+      </div>
+    </section>
+    <section class="section container split" aria-labelledby="scope-title">
+      <div>
+        <p class="eyebrow">RAMMER FOR OPGAVEN</p><h2 id="scope-title">
+          {content.scopeHeading}
+        </h2>
+      </div>
+      <div class="scope-copy">
+        <p>{service.scope}</p><p>
+          Vi vurderer lampen, underlaget og de eksisterende forhold, før vi
+          laver en aftale. Vi udfører kun arbejde, der ikke kræver autorisation.
+        </p>
+      </div>
+    </section>
+    <section class="section process-section" aria-labelledby="process-title">
+      <div class="container">
+        <p class="eyebrow">SÅDAN FOREGÅR DET</p><h2 id="process-title">
+          En klar aftale, før vi kommer.
+        </h2>
+        <ol class="process-list">
+          <li>
+            <span>01</span><h3>Fortæl om opgaven</h3><p>
+              Beskriv lamperne, placeringen og det, du gerne vil have hjælp til.
+            </p>
+          </li>
+          <li>
+            <span>02</span><h3>Vi afklarer rammerne</h3><p>
+              Vi gennemgår opgaven med dig og aftaler omfang, materialer, pris
+              og tidspunkt.
+            </p>
+          </li>
+          <li>
+            <span>03</span><h3>Vi får lampen på plads</h3><p>
+              Vi udfører det aftalte arbejde og gennemgår resultatet sammen med
+              dig.
+            </p>
+          </li>
+        </ol>
+      </div>
+    </section>
+    <section class="section container split" aria-labelledby="price-title">
+      <div>
+        <p class="eyebrow">PRIS OG PILOTPROJEKT</p><h2 id="price-title">
+          Opgaven først.<br />Prisen aftaler vi sammen.
+        </h2><p class="price-copy">
+          Materialer og eventuelt nødvendigt lejeudstyr afregnes separat. Du
+          kender aftalen, før vi går i gang.
+        </p>
+      </div>
+      <div class="pilot-panel">
+        <p class="eyebrow">
+          ET AF VORES FØRSTE {site.pilotPlaces} PROJEKTER
+        </p><h3>Op til {site.pilotHours} timers gratis arbejde</h3><p>
+          Vi udvælger {site.pilotPlaces} pilotprojekter. Tilbuddet gælder, hvis din
+          opgave bliver valgt, og vi aftaler at dokumentere forløbet og bruge det
+          som en referencecase.
+        </p><p>
+          Materialer er ikke inkluderet. Arbejde ud over de {site.pilotHours} timer
+          kræver en særskilt aftale.
+        </p><a class="text-link" href={`${homeHref}#pilot`}
+          >Læs om pilotprojektet <Icon name="arrow" size={18} /></a
+        >
+      </div>
+    </section>
+    <section class="section service-faq" aria-labelledby="faq-title">
+      <div class="container split">
+        <div>
+          <p class="eyebrow">GODT AT VIDE</p><h2 id="faq-title">
+            {content.faqHeading}
+          </h2>
+        </div><div class="faq-list">
+          {
+            content.questions.map((item) => (
+              <details>
+                <>
+                  <summary>
+                    {item.question}
+                    <Icon name="plus" size={18} />
+                  </summary>
+                  <p>{item.answer}</p>
+                </>
+              </details>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+    <section class="section container service-end" aria-labelledby="end-title">
+      <h2 id="end-title">{content.contactHeading}</h2><p>
+        Fortæl os om din opgave. Så tager vi den derfra.
+      </p><a class="button" href={contactHref}
+        >Beskriv din opgave <Icon name="arrow" /></a
+      ><a class="text-link" href={`${homeHref}#ydelser`}
+        >Se alle vores ydelser <Icon name="arrow" size={18} /></a
+      >
+    </section>
+  </main>
+  <SiteFooter
+    liveForm={liveForm}
+    homeHref={homeHref}
+    contactHref={contactHref}
+  />
+  <div class="mobile-cta">
+    <a href={contactHref}>Beskriv din opgave <Icon name="arrow" /></a>
+  </div>
+</Layout>
+<style>
+  .service-hero {
+    padding-block: 28px 76px;
+  }
+  .breadcrumbs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 0.8125rem;
+    color: var(--muted);
+    margin-bottom: 42px;
+  }
+  .breadcrumbs a {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .hero-grid,
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 64px;
+    align-items: start;
+  }
+  .hero-grid {
+    align-items: center;
+  }
+  h1 {
+    font-size: clamp(36px, 4.4vw, 60px);
+    line-height: 1.1;
+    letter-spacing: -0.05em;
+    margin-top: 18px;
+  }
+  .service-intro {
+    font-size: 1.0625rem;
+    margin-block: 24px;
+    color: var(--muted);
+  }
+  .small-note {
+    font-size: 0.8125rem;
+    margin-top: 14px;
+    color: var(--muted);
+  }
+  figure {
+    margin: 0;
+  }
+  figure img {
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+    border-radius: 4px;
+  }
+  figcaption {
+    font-size: 0.75rem;
+    margin-top: 8px;
+    color: var(--muted);
+  }
+  .service-help,
+  .service-faq {
+    background: var(--soft);
+  }
+  h2 {
+    margin-top: 14px;
+    font-size: clamp(28px, 3vw, 40px);
+  }
+  .task-list {
+    margin-top: 28px;
+  }
+  .task-list li {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding-block: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+  .situations li {
+    padding-block: 16px;
+    border-bottom: 1px solid var(--line);
+    font-size: 1.125rem;
+  }
+  .situations > p,
+  .scope-copy p + p {
+    margin-top: 24px;
+    color: var(--muted);
+  }
+  .process-section {
+    background: var(--dark);
+    color: white;
+  }
+  .process-list {
+    padding: 0;
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 40px;
+    margin-top: 42px;
+  }
+  .process-list span {
+    color: var(--yellow);
+    font-size: 0.875rem;
+  }
+  .process-list h3 {
+    margin-block: 16px 12px;
+  }
+  .process-list p {
+    color: #bec8ce;
+  }
+  .price-copy {
+    margin-top: 24px;
+  }
+  .pilot-panel {
+    padding: 32px;
+    background: #fff8e7;
+    border: 1px solid #eadab4;
+    border-radius: 4px;
+  }
+  .pilot-panel h3 {
+    margin-top: 14px;
+  }
+  .pilot-panel p + p,
+  .pilot-panel h3 + p {
+    margin-top: 16px;
+  }
+  .pilot-panel a {
+    margin-top: 24px;
+    min-height: 44px;
+  }
+  .service-end {
+    text-align: center;
+  }
+  .service-end p {
+    margin-block: 20px 28px;
+  }
+  .service-end > a {
+    margin: 8px 12px;
+  }
+  @media (max-width: 900px) {
+    .hero-grid,
+    .split {
+      gap: 32px;
+    }
+  }
+  @media (max-width: 700px) {
+    .hero-grid,
+    .split,
+    .process-list {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .service-hero {
+      padding-bottom: 48px;
+    }
+    .breadcrumbs {
+      margin-bottom: 30px;
+    }
+    .pilot-panel {
+      padding: 24px;
+    }
+    .process-list {
+      gap: 32px;
+    }
+  }
+</style>
