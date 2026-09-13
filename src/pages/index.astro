@@ -42,30 +42,30 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
       <div class="container hero-content">
         <div class="hero-copy">
           <p class="eyebrow">
-            <span class="light-dot"></span> EL & AUTOMATION · {site.area}
+            <span class="light-dot"></span> HJÆLP TIL HJEMMET · {site.area}
           </p>
           <h1 id="hero-heading">
-            Godt lys.<br />Gennemtænkte<br /><span>løsninger.</span>
+            Godt lys.<br />En smartere<br /><span>hverdag.</span>
           </h1>
           <p class="hero-description">
-            Vi hjælper med lys og smarte løsninger i hjemmet. Med faglig omtanke
-            og en aftale, du kan forstå.
+            Lampeopsætning, smart-home og mindre opgaver i hjemmet. Vi hjælper
+            dig med en løsning, der passer til din hverdag.
           </p>
           <div class="hero-actions">
-            <a class="button" href="#pilot"
-              >Bliv et af vores pilotprojekter <Icon name="arrow" /></a
+            <a class="button" href="#kontakt"
+              >Beskriv din opgave <Icon name="arrow" /></a
             ><a class="text-link light-link" href="#ydelser"
-              >Se, hvad vi kan hjælpe med <Icon name="down" size={17} /></a
+              >Se vores serviceydelser <Icon name="down" size={17} /></a
             >
           </div>
+          <p class="hero-reassurance">Uforpligtende. Vi aftaler pris og omfang, før vi går i gang.</p>
         </div>
-        <a class="hero-note" href="#pilot"
-          ><span class="note-icon"><Icon name="spark" size={26} /></span><span
-            ><strong>Dit projekt. Vores begyndelse.</strong><span
-              >Vi søger {site.pilotPlaces} hjem med en god idé.</span
-            ></span
-          ><Icon name="arrow" /></a
-        >
+        <a class="hero-note" href="#pilot">
+          <span class="hero-note-label">VI SØGER {site.pilotPlaces} PILOTPROJEKTER</span>
+          <strong>Op til {site.pilotHours} timers<br />gratis arbejde.</strong>
+          <span class="hero-note-terms">Du betaler materialer og evt. lejeudstyr.</span>
+          <span class="hero-note-link">Se pilottilbuddet <Icon name="arrow" size={18} /></span>
+        </a>
       </div>
       <span class="image-credit">Inspirationsbillede</span>
     </section>
