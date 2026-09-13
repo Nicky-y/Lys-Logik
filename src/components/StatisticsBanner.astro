@@ -76,13 +76,13 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
     z-index: 40;
     inset-inline: 16px;
     bottom: 16px;
-    max-width: 40rem;
+    max-width: 72rem;
     max-height: calc(100dvh - 32px);
     overflow-y: auto;
     margin-inline: auto;
     right: 16px;
     left: 16px;
-    padding: 16px 18px;
+    padding: 20px 24px;
     border-radius: 12px;
     background: #141d23;
     color: #f4f6f7;
@@ -90,15 +90,12 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
   }
 
   .statistics-banner-inner {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 14px 18px;
-    align-items: flex-end;
-    justify-content: space-between;
+    display: grid;
+    gap: 12px 32px;
+    align-items: center;
   }
 
   .statistics-banner-copy {
-    flex: 1 1 16rem;
     min-width: 0;
   }
 
@@ -127,6 +124,7 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
+    justify-content: flex-end;
   }
 
   .statistics-banner-actions button {
@@ -139,6 +137,24 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
     font: inherit;
     font-weight: 600;
     cursor: pointer;
+  }
+
+  .statistics-banner-actions .statistics-banner-accept {
+    background: #e8b84a;
+    border-color: #e8b84a;
+    color: #141d23;
+  }
+
+  @media (min-width: 960px) {
+    .statistics-banner-inner {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .statistics-banner { padding: 16px; }
+    .statistics-banner-actions { display: grid; grid-template-columns: 1fr 1fr; }
+    .statistics-banner-actions button { padding-inline: 10px; }
   }
 
   details {

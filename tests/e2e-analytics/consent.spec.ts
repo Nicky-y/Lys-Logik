@@ -267,8 +267,16 @@ test('a storage read failure stops active measurement until a new explicit choic
 
 test('banner details fit narrow screens and privacy information names the provider', async ({
   page,
-}) => {
+}, testInfo) => {
   await page.goto(origin);
+  const initialBox = await page.locator('#statistics-banner').boundingBox();
+  expect(initialBox).not.toBeNull();
+  if (testInfo.project.name === 'desktop') {
+    expect(initialBox!.width).toBeGreaterThan(1000);
+    expect(initialBox!.height).toBeLessThan(220);
+  }
+  await expect(page.locator('[data-consent-accept]')).toHaveCSS('background-color', 'rgb(232, 184, 74)');
+  await page.screenshot({ path: testInfo.outputPath('statistics-banner.png') });
   await page.getByText('Om statistik og cookies', { exact: true }).click();
   const banner = page.locator('#statistics-banner');
   await expect(banner).toContainText('Google Analytics');
