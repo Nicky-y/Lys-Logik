@@ -27,7 +27,7 @@ async function fillEnquiry(page: Page) {
   await page
     .getByLabel('Fortæl lidt om din idé')
     .fill('Vi vil gerne have bedre lys over vores spisebord.');
-  await page.getByLabel('Jeg har læst om pilotprojektet').check();
+  await page.getByLabel('Jeg er indforstået med, at henvendelsen er uforpligtende').check();
 }
 
 test('sends form through the real local endpoint and stores one enquiry with its history', async ({

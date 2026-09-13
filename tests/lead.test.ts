@@ -76,8 +76,11 @@ test('each published catalogue choice is accepted by intake and has an operation
     assert.equal(serviceLabels[service.id], service.label);
   }
 });
-test('requires explicit pilot terms acknowledgement', () => {
-  assert.ok(validateLead({ ...valid, terms: false }).terms);
+test('requires explicit acknowledgement before work is agreed', () => {
+  assert.equal(
+    validateLead({ ...valid, terms: false }).terms,
+    'Bekræft, at pris og omfang aftales, før arbejdet starter.',
+  );
 });
 test('enforces name and description boundaries after trimming', () => {
   assert.ok(validateLead({ ...valid, name: ' A ' }).name);

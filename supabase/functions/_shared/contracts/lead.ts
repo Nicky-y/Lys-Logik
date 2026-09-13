@@ -37,7 +37,7 @@ export const LeadSchema = z.strictObject({
     .min(10, 'Beskriv din opgave med 10–1.500 tegn.')
     .max(1500, 'Beskriv din opgave med 10–1.500 tegn.'),
   terms: z.literal(true, {
-    error: 'Bekræft, at du har læst om pilotprojektet.',
+    error: 'Bekræft, at pris og omfang aftales, før arbejdet starter.',
   }),
 });
 

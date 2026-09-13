@@ -12,7 +12,7 @@ declare global {
 }
 
 export function initializeLeadForm() {
-  const form = document.querySelector<HTMLFormElement>('#pilot-form')!;
+  const form = document.querySelector<HTMLFormElement>('#enquiry-form')!;
   const fields = document.querySelector<HTMLFieldSetElement>('#form-fields')!;
   const success = document.querySelector<HTMLDivElement>('#form-success')!;
   const summary = document.querySelector<HTMLDivElement>(

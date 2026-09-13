@@ -1,0 +1,166 @@
+---
+const assetBase = import.meta.env.BASE_URL.endsWith('/')
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
+---
+
+<aside
+  id="statistics-banner"
+  class="statistics-banner"
+  hidden
+  data-base={assetBase}
+  role="region"
+  aria-labelledby="statistics-banner-title"
+  aria-describedby="statistics-banner-text"
+>
+  <div class="statistics-banner-inner">
+    <div class="statistics-banner-copy">
+      <p id="statistics-banner-title" class="statistics-banner-title">
+        Statistik
+      </p>
+      <p id="statistics-banner-text">
+        Med dit samtykke bruger vi Google Analytics og statistiske cookies til
+        at måle besøg og forbedre hjemmesiden. Vi bruger ikke dit samtykke til
+        annoncering. Du kan afvise og stadig bruge hele siden.
+      </p>
+      <details>
+        <summary>Om statistik og cookies</summary>
+        <p>
+          Google modtager oplysninger om sidebesøg og browser/enhed. Cookies
+          (_ga og _ga_PK63ZEEQM9) kan genkende din browser i op til 180 dage. Vi
+          gemmer også dit valg i browseren i 180 dage. Du kan til enhver tid
+          trække samtykket tilbage via Statistik i sidefoden.
+        </p>
+        <p>
+          Læs om Googles behandling og eventuelle overførsler til andre lande i
+          <a
+            href="https://policies.google.com/privacy"
+            target="_blank"
+            rel="noopener noreferrer">Googles privatlivspolitik</a
+          >. Afvisning stopper fremtidig måling herfra; den sletter ikke
+          allerede modtagne data hos Google.
+        </p>
+      </details>
+      <p
+        data-consent-status
+        class="statistics-banner-status"
+        aria-live="polite"
+      >
+      </p>
+    </div>
+    <div class="statistics-banner-actions">
+      <button
+        type="button"
+        data-consent-reject
+        class="statistics-banner-reject"
+      >
+        Afvis statistik
+      </button>
+      <button
+        type="button"
+        data-consent-accept
+        class="statistics-banner-accept"
+      >
+        Accepter statistik
+      </button>
+    </div>
+  </div>
+</aside>
+
+<style>
+  :global(body) {
+    padding-bottom: var(--statistics-space, 0px);
+  }
+  .statistics-banner {
+    position: fixed;
+    z-index: 40;
+    inset-inline: 16px;
+    bottom: 16px;
+    max-width: 40rem;
+    max-height: calc(100dvh - 32px);
+    overflow-y: auto;
+    margin-inline: auto;
+    right: 16px;
+    left: 16px;
+    padding: 16px 18px;
+    border-radius: 12px;
+    background: #141d23;
+    color: #f4f6f7;
+    box-shadow: 0 12px 40px rgb(0 0 0 / 35%);
+  }
+
+  .statistics-banner-inner {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px 18px;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+
+  .statistics-banner-copy {
+    flex: 1 1 16rem;
+    min-width: 0;
+  }
+
+  .statistics-banner-title {
+    margin: 0 0 6px;
+    font-weight: 650;
+    font-size: 0.95rem;
+  }
+
+  .statistics-banner-copy p {
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: #d5dee3;
+  }
+
+  .statistics-banner-status:empty {
+    display: none;
+  }
+
+  .statistics-banner-status:not(:empty) {
+    margin-top: 8px;
+  }
+
+  .statistics-banner-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .statistics-banner-actions button {
+    min-height: 44px;
+    padding: 0 14px;
+    border-radius: 999px;
+    border: 1px solid #b8c5cc;
+    background: transparent;
+    color: #f4f6f7;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  details {
+    margin-top: 8px;
+    font-size: 0.875rem;
+  }
+  summary {
+    cursor: pointer;
+    min-height: 44px;
+    align-content: center;
+  }
+  details p + p {
+    margin-top: 8px;
+  }
+  a {
+    color: inherit;
+    text-decoration: underline;
+  }
+  button:focus-visible,
+  summary:focus-visible,
+  a:focus-visible {
+    outline: 3px solid #e8b84a;
+    outline-offset: 3px;
+  }
+</style>

@@ -227,15 +227,15 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
         </div>
         <div class="form-card">
           <form
-            id="pilot-form"
+            id="enquiry-form"
             data-lead-endpoint={leadEndpoint}
             data-turnstile-site-key={turnstileSiteKey}
             novalidate
           >
             <fieldset id="form-fields" disabled>
-              <legend class="sr-only">Ansøg om et pilotprojekt</legend>
+              <legend class="sr-only">Send en uforpligtende henvendelse</legend>
               <div class="form-heading">
-                <h3>Fortæl om dit projekt</h3><span>Ca. 2 minutter</span>
+                <h3>Fortæl om din opgave</h3><span>Ca. 2 minutter</span>
               </div>
               <p class="form-demo">
                 {
@@ -332,8 +332,8 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
                   required
                   aria-describedby="terms-error"
                 /><label for="terms"
-                  >Jeg har læst om pilotprojektet og ved, at materialer og evt.
-                  lejeudstyr betales særskilt.</label
+                  >Jeg er indforstået med, at henvendelsen er uforpligtende, og
+                  at pris og omfang aftales, før arbejdet starter.</label
                 >
               </div><span class="field-error" id="terms-error"></span>
               {
@@ -347,14 +347,12 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
               }
               <button class="button form-submit" type="submit"
                 ><span
-                  >{
-                    liveForm ? 'Send din henvendelse' : 'Prøv din ansøgning'
-                  }</span
+                  >{liveForm ? 'Send din henvendelse' : 'Prøv formularen'}</span
                 >
                 <Icon name="arrow" /></button
               >
               <p class="form-bottom-note">
-                Uforpligtende · Vi udvælger {site.pilotPlaces} projekter
+                Uforpligtende · Vi aftaler pris og omfang, før arbejdet starter.
               </p>
               {
                 liveForm && (
@@ -385,13 +383,13 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
               {
                 liveForm
                   ? 'Vi har modtaget din henvendelse.'
-                  : 'Din demoansøgning er klar.'
+                  : 'Din demohenvendelse er klar.'
               }
             </h3><p>
               {
                 liveForm
                   ? 'Din beskrivelse er gemt. Vi gennemgår opgaven og vender tilbage på e-mail. En aftale er først på plads, når vi har aftalt den sammen.'
-                  : 'På den færdige hjemmeside vil vi her bekræfte, at vi har modtaget din ansøgning.'
+                  : 'På den færdige hjemmeside vil vi her bekræfte, at vi har modtaget din henvendelse.'
               }
             </p>{
               liveForm ? (

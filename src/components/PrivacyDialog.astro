@@ -26,9 +26,32 @@ const { liveForm } = Astro.props;
     {
       liveForm
         ? 'Oplysningerne gemmes hos vores databaseleverandør Supabase og er kun tilgængelige for medarbejdere med adgang til vores arbejdsrum. Cloudflare leverer hjemmesiden og Turnstile-sikkerhedskontrollen, som beskytter mod misbrug. Vi sender ikke dine oplysninger til markedsføring.'
-        : 'Formularen validerer kun oplysningerne i din browser. Den sender og gemmer dem ikke. Siden bruger ingen analyseværktøjer eller cookies.'
+        : 'Formularen validerer kun oplysningerne i din browser. Den sender og gemmer dem ikke. På lokale prøvevisninger sendes der heller ikke statistik til Google.'
     }
-  </p><p>
+  </p>
+  <h3>Frivillig statistik</h3>
+  <p>
+    På den offentlige hjemmeside indlæses Google Analytics kun efter dit
+    samtykke. Google modtager oplysninger om sidebesøg og browser/enhed. Vi
+    sender ikke formularfelter med vores sidevisningsmåling. Dit statistikvalg
+    giver ikke samtykke til annoncering.
+  </p>
+  <p>
+    Statistiske cookies (_ga og _ga_PK63ZEEQM9) og dit valg i browserens lokale
+    lager har en varighed på op til 180 dage. Du kan ændre eller trække
+    samtykket tilbage via Statistik i sidefoden. Det stopper fremtidig måling
+    herfra og fjerner hjemmesidens GA-cookies, men sletter ikke allerede
+    modtagne data hos Google.
+  </p>
+  <p>
+    Se <a
+      href="https://policies.google.com/privacy"
+      target="_blank"
+      rel="noopener noreferrer">Googles privatlivspolitik</a
+    >
+    for oplysninger om databehandling og eventuelle overførsler til andre lande.
+  </p>
+  <p>
     Boligbillederne er AI-genererede inspirationsbilleder og viser ikke udførte
     kundeprojekter.
   </p><p>

@@ -96,14 +96,19 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
 
     <div class="footer-bottom">
       <span>© {new Date().getFullYear()} {site.legalName}</span>
-      <button
-        id="privacy-open"
-        type="button"
-        aria-haspopup="dialog"
-        aria-controls="privacy-dialog"
-      >
-        {liveForm ? 'Privatliv' : 'Privatliv & prototype'}
-      </button>
+      <div class="footer-bottom-actions">
+        <button type="button" data-statistics-settings>
+          Statistik
+        </button>
+        <button
+          id="privacy-open"
+          type="button"
+          aria-haspopup="dialog"
+          aria-controls="privacy-dialog"
+        >
+          {liveForm ? 'Privatliv' : 'Privatliv & prototype'}
+        </button>
+      </div>
     </div>
   </div>
 </footer>
@@ -208,6 +213,13 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
     border-top: 1px solid #2b353b;
     padding-block: 14px;
     font-size: 0.75rem;
+  }
+
+  .footer-bottom-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 20px;
+    align-items: center;
   }
 
   .footer-bottom button {

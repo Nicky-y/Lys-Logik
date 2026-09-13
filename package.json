@@ -10,6 +10,7 @@
     "preview": "astro preview --host 127.0.0.1",
     "test": "node --test tests/*.test.ts",
     "test:e2e": "playwright test",
+    "test:e2e:analytics": "playwright test --config playwright.analytics.config.ts",
     "test:e2e:intake": "playwright test --config playwright.intake.config.ts",
     "test:build:pages": "node --test tests/build/pages.test.ts",
     "app:dev": "node operations/dev.mjs",

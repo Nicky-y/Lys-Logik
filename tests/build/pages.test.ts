@@ -123,6 +123,11 @@ test('pilot offer and payment terms consistently specify four hours', () => {
 });
 
 test('production ships the live form with the production endpoint and real widget', () => {
+  const form = html.match(/<form\b[^>]*id="enquiry-form"[\s\S]*?<\/form>/)?.[0];
+  assert.ok(form);
+  assert.doesNotMatch(form, /pilot|ansøg|udvælger/i);
+  assert.ok(form.includes('Send en uforpligtende henvendelse'));
+  assert.ok(form.includes('pris og omfang aftales'));
   assert.match(
     html,
     /data-lead-endpoint="https:\/\/elydnshkxcwlmbdmtpys\.supabase\.co\/functions\/v1\/create-lead"/,

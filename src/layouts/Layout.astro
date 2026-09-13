@@ -1,6 +1,7 @@
 ---
 import '@fontsource-variable/manrope';
 import '../styles/global.css';
+import StatisticsBanner from '../components/StatisticsBanner.astro';
 interface Props {
   title?: string;
   description?: string;
@@ -30,5 +31,12 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
     />
     <title>{title}</title>
   </head>
-  <body><slot /></body>
+  <body>
+    <slot />
+    <StatisticsBanner />
+    <script>
+      import { initAnalytics } from '../lib/analytics';
+      initAnalytics();
+    </script>
+  </body>
 </html>

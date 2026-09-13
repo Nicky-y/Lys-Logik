@@ -57,7 +57,7 @@ test('shows accessible form errors and focuses the first invalid field', async (
   page,
 }) => {
   await page.goto('/#kontakt');
-  await page.getByRole('button', { name: 'Prøv din ansøgning' }).click();
+  await page.getByRole('button', { name: 'Prøv formularen' }).click();
   await expect(page.getByRole('alert')).toContainText(
     'Tjek de markerede felter',
   );
@@ -100,8 +100,8 @@ test('complete demo submits locally and can be reset without storing personal da
   await page
     .getByLabel('Fortæl lidt om din idé')
     .fill('Vi vil gerne have bedre lys over vores spisebord.');
-  await page.getByLabel('Jeg har læst om pilotprojektet').check();
-  await page.getByRole('button', { name: 'Prøv din ansøgning' }).click();
+  await page.getByLabel('Jeg er indforstået med, at henvendelsen er uforpligtende').check();
+  await page.getByRole('button', { name: 'Prøv formularen' }).click();
   await expect(page.locator('#form-success')).toBeFocused();
   await expect(page.getByRole('status')).toContainText(
     'Intet er sendt eller gemt.',
