@@ -1,0 +1,36 @@
+name: Test Windows ship command
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/ship-pages.ps1'
+      - 'scripts/deploy-website.mjs'
+      - 'scripts/build-website.mjs'
+      - 'tests/ship-script.test.ts'
+      - 'package.json'
+      - '.github/workflows/test-ship.yml'
+  pull_request:
+    paths:
+      - 'scripts/ship-pages.ps1'
+      - 'scripts/deploy-website.mjs'
+      - 'scripts/build-website.mjs'
+      - 'tests/ship-script.test.ts'
+      - 'package.json'
+      - '.github/workflows/test-ship.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ship:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Exercise commit, push, deploy and failure paths in temporary repositories
+        run: node --test tests/ship-script.test.ts
