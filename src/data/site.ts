@@ -10,7 +10,7 @@ export const site = {
   cvr: '45 82 71 27',
   area: 'Storkøbenhavn',
   vision:
-    'Vi bygger Lys & Logik med godt elhåndværk som fundament og teknologi som en del af driften. Vi udvikler egne softwareværktøjer og nye arbejdsgange, der skal forbedre planlægning, logistik og dokumentation. Målet er at kunne vokse uden at miste overblik, kvalitet eller nærhed til kunden – hvor formålet i sidste ende er, at gøre det billigere for kunden med forsat samme kvalitet.',
+    'Vi bygger Lys & Logik med godt elhåndværk som fundament og teknologi som en del af driften. Vi udvikler egne softwareværktøjer og nye arbejdsgange, der skal forbedre planlægning, logistik og dokumentation. Målet er at kunne vokse uden at miste overblik, kvalitet eller nærhed til kunden – som i sidste ende har til formål, at gøre det billigere for kunden.',
   email: 'kontakt@lysoglogik.dk',
   phone: '71 41 84 81',
   phoneHref: 'tel:+4571418481',
