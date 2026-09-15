@@ -7,8 +7,8 @@
 | Område | Tests / delt TypeScript-kontrakt |
 | Berørt version og miljø | Lokalt, ukommitteret invitationskode oven på `2d42598` |
 | Påvirkning | Den nye integrationstest kunne ikke indlæse kontrakten |
-| Rettelse | Ikke committet |
-| Udgivelse | Ikke udgivet |
+| Rettelse | `fcfd7cd` |
+| Udgivelse | 2026-09-15; se [udgivelsesrapport](../docs/staff-invitations-release.md) |
 
 ## Symptom og årsag
 

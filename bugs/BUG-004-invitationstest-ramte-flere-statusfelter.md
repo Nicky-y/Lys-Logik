@@ -7,8 +7,8 @@
 | Område | E2E-tests / Indstillinger |
 | Berørt version og miljø | Lokale invitationsændringer oven på `2d42598`; desktop og emuleret Android |
 | Påvirkning | Fire nye testscenarier stoppede før kontrol af de tilsigtede resultater |
-| Rettelse | Ikke committet |
-| Udgivelse | Testrettelse; ikke udgivet |
+| Rettelse | `fcfd7cd` |
+| Udgivelse | Testrettelse; versioneret sammen med `fcfd7cd` |
 
 ## Symptom og årsag
 

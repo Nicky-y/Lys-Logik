@@ -57,7 +57,7 @@ En aktiv ejer kan under **Indstillinger → Medarbejdere og rettigheder** ændre
 
 Prøvevisningen viser en fiktiv ejer med faglig arbejdsrolle og en ekstra fiktiv backoffice-medarbejder. Ændringer og **Opret medarbejder** kan afprøves på `http://127.0.0.1:5174/#/indstillinger` og nulstilles ved genindlæsning. Demoen sender ingen e-mail og opretter ingen Auth-konto.
 
-### Opret medarbejder — forberedt lokalt 15. september 2026
+### Opret medarbejder
 
 En aktiv ejer angiver navn, e-mail, én arbejdsrolle (eller ingen) og selvstændige ejerrettigheder. Appen sender kommandoen til `invite-staff`; Supabase Auth sender et personligt invitationslink. Modtageren verificerer sin e-mail via linket og vælger selv adgangskode. Først derefter oprettes den aktive medarbejderrække. Afventende invitationer vises separat fra aktive medarbejdere og tæller ikke som ekstra ejere.
 
@@ -65,13 +65,15 @@ En aktiv ejer angiver navn, e-mail, én arbejdsrolle (eller ingen) og selvstænd
 
 Samme invitation og indhold genbruges ved tabt svar. Et allerede bekræftet sendeforsøg sender ikke igen. Ved timeout vises usikker afsendelse; et nyt forsøg kan sende endnu en e-mail. Grænser: mindst ét minut mellem forsøg, højst fem forsøg pr. invitation, ti pr. ejer/time og halvtreds samlet/døgn. En unik normaliseret e-mail forhindrer dobbelte invitationer. Historik bevares i `staff_invitations` og private forsøgsrækker; den første adgang registreres dér, senere ændringer i `staff_access_events`.
 
-**Udrulning af dette trin (endnu ikke udført):**
+**Udrulningsrækkefølge:**
 
 1. Anvend `supabase/migrations/20260915000500_staff_invitations.sql` efter adgangsmigrationen.
 2. Udgiv Edge-funktionen `invite-staff` med dens indførte `config.toml`. `verify_jwt=false` ved Edge-gatewayen er bevidst: funktionen videresender callerens bearer-token til PostgREST, som verificerer JWT, og databasekommandoen kræver aktiv ejeradgang før Auth-admin kaldes.
 3. Kontrollér server-runtimeværdierne `SUPABASE_URL`, `SUPABASE_ANON_KEY` og `SUPABASE_SECRET_KEYS`. Funktionen bruger projektets eksisterende `LEAD_SERVER_KEY_NAME` til at vælge den navngivne servernøgle (historisk `default_v1`); uden navneindstilling forventes `default`, og der vælges aldrig automatisk en anden nøgle. Ingen servernøgle må indgå i appbuildet. `STAFF_APP_ORIGINS` er som standard `https://app.lysoglogik.dk`.
 4. Kontrollér Supabase Auths SMTP-konfiguration, afsender og begrænsninger for eksterne modtagere. Auth-mails går gennem Supabase Auths konfigurerede mailtransport; kundemailfunktionen med Resend konfigurerer ikke automatisk Auths SMTP. Tillad redirect til `https://app.lysoglogik.dk/`, som funktionen bruger fast.
 5. Udgiv appen, og aftal en rigtig invitationsprøve. De automatiske tests simulerer Auths maillevering og linkverifikation; de beviser ikke levering fra det hostede Auth-system.
+
+**Produktionsstatus 15. september 2026:** Migrationen og `invite-staff` version 1 er udgivet. Supabase Auth bruger nu Resend SMTP fra `adgang@mail.lysoglogik.dk`, med 30 loginmails/time og offentlig selvoprettelse slået fra efter brugerens godkendelse. Ejerinvitationer og eksisterende login er bevaret. Appens commit `fcfd7cd` er udgivet på `app.lysoglogik.dk`; rettigheder, offentlig kode og konfiguration er verificeret. Ingen rigtig invitationsmail blev sendt under udrulningen. Se [udgivelsesrapport](../docs/staff-invitations-release.md).
 
 Første version har ikke annullering, ændring af afventende rettigheder eller genudsendelse af et bekræftet, men udløbet invitationslink i appen. Disse situationer kræver betroet administration i Supabase; invitationer og forsøgsrækker må ikke blot slettes for at omgå grænserne. Login via vilkårlig e-mail, selvvalgte beføjelser og SMS indgår ikke.
 

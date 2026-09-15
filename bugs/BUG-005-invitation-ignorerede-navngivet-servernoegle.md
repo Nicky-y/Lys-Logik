@@ -7,8 +7,8 @@
 | Område | Backend / runtime-konfiguration |
 | Berørt version og miljø | Lokal invitationsimplementering oven på `2d42598` |
 | Påvirkning | Afsendelse og afslutning ville fejle i et projekt med en konfigureret nøgle under et andet navn end `default` |
-| Rettelse | Ikke committet |
-| Udgivelse | Ikke udgivet; ingen observeret produktionsfejl |
+| Rettelse | `fcfd7cd` |
+| Udgivelse | 2026-09-15; se [udgivelsesrapport](../docs/staff-invitations-release.md) |
 
 ## Symptom, evidens og årsag
 
