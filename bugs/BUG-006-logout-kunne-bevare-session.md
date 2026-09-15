@@ -2,13 +2,13 @@
 
 | Felt | Værdi |
 | --- | --- |
-| Status | Løst og verificeret lokalt |
+| Status | Løst og verificeret; udgivet |
 | Fundet | 2026-09-15 |
 | Område | App / autentifikation |
 | Berørt version og miljø | `2d42598` samt lokale invitationsændringer; Supabase JS/Auth 2.116.0 |
 | Påvirkning | En anden bruger af samme browserprofil kunne genåbne medarbejderens session efter tilsyneladende logout |
-| Rettelse | Ikke committet |
-| Udgivelse | Ikke udgivet; produktionen er ikke afprøvet |
+| Rettelse | `5a4c373` — Fix persisted logout sessions and cross-tab cleanup |
+| Udgivelse | 2026-09-15 kl. 16:32 UTC på `app.lysoglogik.dk`; Cloudflare-version `c5eee770-3722-4d44-bd89-c1d80f795277` |
 
 ## Symptom og bekræftet årsag
 
@@ -51,8 +51,15 @@ En supplerende regression afslørede, at en midlertidig fane også skal reagere 
 
 ## Begrænsninger
 
-Lokal logout lover ikke tilbagekaldelse af tokens på Supabases server under netværksfejl. Allerede afsendte API-kald kan ikke trækkes tilbage. Andre enheder logges ikke ud (`scope: local` bevares). Gamle appversioner i allerede åbne faner skal genindlæses ved udrulning for at få den nye oprydningsadfærd. Der er ikke brugt en fysisk telefon eller produktion til kontrollen.
+Lokal logout lover ikke tilbagekaldelse af tokens på Supabases server under netværksfejl. Allerede afsendte API-kald kan ikke trækkes tilbage. Andre enheder logges ikke ud (`scope: local` bevares). Gamle appversioner i allerede åbne faner skal genindlæses ved udrulning for at få den nye oprydningsadfærd. Selve logout-forløbet er afprøvet med syntetiske data lokalt, ikke med en fysisk telefon eller en produktionskonto.
+
+## Udgivelseskontrol
+
+Udgivelsen blev bygget fra en afgrænset kopi af `5a4c373`, uden de separate lokale invitationsændringer. Alle 258 tracked filer blev sammenlignet med committen; eneste forskel var Windows-linjeskift i 205 filer. På denne kopi bestod de 8 auth-tests, appens TypeScript-/Vite-build og alle 16 fokuserede app-browsertests igen. Den midlertidige testkopis delte `node_modules` gav Vite-advarsler om fontadgang i udviklingsserveren; de berørte ikke logout-kontrollerne eller produktionsbuildet.
+
+Cloudflare dry-run bestod. Efter deploy viste API'et version `c5eee770-3722-4d44-bd89-c1d80f795277` med 100 % trafik og beskeden `5a4c373 - Fix persisted logout sessions and cross-tab cleanup`. Det eksisterende custom domain var fortsat aktivt. Offentlige HTTP-kald gav 200, og HTML, hoved-JavaScript, CSS, service worker, manifest, offline-side og 192 px-ikon matchede buildets bytes. Kontrollen ændrede ingen kundedata. Committen blev ikke pushet i denne arbejdsgang.
 
 ## Historik
 
 - 2026-09-15: Rapporteret i sikkerhedsgennemgang, uafhængigt reproduceret og rettet lokalt som første særskilte sikkerhedsrettelse.
+- 2026-09-15: Committet som `5a4c373`, bygget separat og udgivet. Netværkssandboxen gav først `EACCES`/`fetch failed` ved Wrangler-login; eksisterende login og deploy virkede med godkendt netværksadgang. Ingen ændring af appens credentials eller deploykonfiguration var nødvendig.

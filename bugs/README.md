@@ -10,10 +10,10 @@ Oversigten er startet 15. september 2026 med to dokumenterede fejl fra den senes
 | --- | --- | --- | --- | --- | --- |
 | [BUG-001](BUG-001-adgangstest-uden-arbejdsrolle.md) | Adgangstest forventede kundedata uden arbejdsrolle | Integrationstest / rettigheder | Løst og verificeret | 2026-09-15 | `4c70ea0` |
 | [BUG-002](BUG-002-workflowtests-fejlede-typekontrol.md) | Workflowtests bestod ved kørsel, men fejlede typekontrollen | Tests / build | Løst og verificeret | 2026-09-15 | `91abc31` |
-| [BUG-006](BUG-006-logout-kunne-bevare-session.md) | Logout kunne bevare en brugbar session | App / autentifikation | Løst og verificeret lokalt | 2026-09-15 | Ikke committet |
+| [BUG-006](BUG-006-logout-kunne-bevare-session.md) | Logout kunne bevare en brugbar session | App / autentifikation | Løst og verificeret; udgivet | 2026-09-15 | `5a4c373` |
 | [BUG-007](BUG-007-ugyldige-kald-forbruger-faelles-formularkvote.md) | Ugyldige kald forbruger fælles formularkvote | Backend / formular | Åben | 2026-09-15 | Ikke rettet |
 | [BUG-008](BUG-008-vedhaeftning-stoler-paa-oplyst-filtype.md) | Vedhæftninger stoler på oplyst filtype | Kundemail / filer | Åben | 2026-09-15 | Ikke rettet |
-| [BUG-009](BUG-009-auth-test-matchede-vaertsnavn-som-logout.md) | Auth-test matchede værtsnavn som logout-endpoint | Testfixture | Løst og verificeret | 2026-09-15 | Ikke committet |
+| [BUG-009](BUG-009-auth-test-matchede-vaertsnavn-som-logout.md) | Auth-test matchede værtsnavn som logout-endpoint | Testfixture | Løst og verificeret | 2026-09-15 | `5a4c373` |
 | [BUG-010](BUG-010-intermitterende-timeout-i-logout-browsertest.md) | Intermitterende timeout ved genåbning i logout-test | E2E / testmiljø | Åben – ikke gentaget | 2026-09-15 | Ingen ændring |
 
 Oversigten er ikke en fuldstændig sikkerhedsgennemgang. BUG-007 og BUG-008 er registreret fra den indleverede rapport og behandles som separate rettelser.

@@ -7,7 +7,7 @@
 | Område | Testfixture |
 | Berørt version og miljø | Ny lokal `auth-session.test.ts`; ikke udgivet |
 | Påvirkning | Legitim login-kontrol fejlede med `Unexpected end of JSON input` |
-| Rettelse | Ikke committet |
+| Rettelse | `5a4c373` |
 | Udgivelse | Ikke relevant |
 
 ## Årsag og løsning
