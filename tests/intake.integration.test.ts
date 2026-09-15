@@ -333,7 +333,7 @@ test('anonymous callers cannot read enquiries or execute privileged intake RPCs'
   );
 });
 
-test('login alone grants no lead access; only an active staff membership does', async () => {
+test('login and staff membership alone grant no lead access; an active work role is required', async () => {
   await submit();
   const userId = 'a99f1c8f-49d5-44d9-9142-b1241bbfb166';
   await db.query('insert into auth.users (id) values ($1)', [userId]);
@@ -352,6 +352,23 @@ test('login alone grants no lead access; only an active staff membership does', 
   await db.exec('reset role');
   await db.query(
     "insert into public.staff_members (user_id,display_name) values ($1,'Anna')",
+    [userId],
+  );
+  await db.exec('set role authenticated');
+  assert.equal((await db.query('select * from public.leads')).rows.length, 0);
+  assert.equal(
+    (await db.query('select * from public.lead_events')).rows.length,
+    0,
+  );
+  await assert.rejects(
+    db.query(
+      "update public.staff_members set role='backoffice' where user_id=auth.uid()",
+    ),
+    /permission denied/,
+  );
+  await db.exec('reset role');
+  await db.query(
+    "update public.staff_members set role='backoffice' where user_id=$1",
     [userId],
   );
   await db.exec('set role authenticated');
