@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
   MessageSchema,
+  AttachmentIdSchema,
   type CustomerMessage,
 } from '../supabase/functions/_shared/contracts/mail.ts';
 import { LeadIdSchema } from '../supabase/functions/_shared/contracts/operations.ts';
@@ -59,7 +60,7 @@ test('overlapping pages keep one message with the newest fetched state, determin
 
 test('gallery contains only allowed customer photos, preserving sender warning and message-to-file identity', () => {
   const attachment = {
-    id: id(20),
+    id: AttachmentIdSchema.parse(id(20)),
     filename: 'photo.png',
     size: 100,
     content_type: 'image/png',
@@ -68,9 +69,21 @@ test('gallery contains only allowed customer photos, preserving sender warning a
     sender_matches_customer: false,
     attachments: [
       attachment,
-      { ...attachment, id: id(21), content_type: 'application/pdf' },
-      { ...attachment, id: id(22), content_type: 'image/svg+xml' },
-      { ...attachment, id: id(23), size: 10 * 1024 * 1024 + 1 },
+      {
+        ...attachment,
+        id: AttachmentIdSchema.parse(id(21)),
+        content_type: 'application/pdf',
+      },
+      {
+        ...attachment,
+        id: AttachmentIdSchema.parse(id(22)),
+        content_type: 'image/svg+xml',
+      },
+      {
+        ...attachment,
+        id: AttachmentIdSchema.parse(id(23)),
+        size: 10 * 1024 * 1024 + 1,
+      },
     ],
   });
   const outbound = message(2, {
@@ -81,7 +94,7 @@ test('gallery contains only allowed customer photos, preserving sender warning a
     attachments: [
       {
         ...attachment,
-        id: id(24),
+        id: AttachmentIdSchema.parse(id(24)),
         content_type: 'image/jpeg',
         size: 10 * 1024 * 1024,
       },

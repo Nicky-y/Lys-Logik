@@ -7,7 +7,10 @@ import {
   validLead,
   submissionKey,
 } from './helpers/database.ts';
-import { MailJobSchema } from '../supabase/functions/_shared/contracts/mail.ts';
+import {
+  MailJobSchema,
+  MessageSchema,
+} from '../supabase/functions/_shared/contracts/mail.ts';
 let db: PGlite;
 let leadId: string;
 const staff = '1054ed20-67f4-4ff8-bd50-b423d7b11baf';
@@ -302,20 +305,70 @@ test('a different sender is visibly flagged while preserving the routed customer
 });
 
 test('customer replies with photos stay on an ongoing case and queue a push without returning to the inbox', async () => {
-  await db.query("select public.change_lead_status($1,1,$2,'clarifying','')", [leadId, randomUUID()]);
+  await db.query("select public.change_lead_status($1,1,$2,'clarifying','')", [
+    leadId,
+    randomUUID(),
+  ]);
   await queue();
   const job = (await claim())[0];
-  const received = await db.query<{ id: string }>('select public.receive_customer_mail($1,$2,now(),$3) id', [randomUUID(), randomUUID(), JSON.stringify({
-    from: 'anna@example.com', senderEmail: 'anna@example.com', to: [job.payload.reply_to], subject: 'Billeder af opgaven', body: 'Her kommer billederne.',
-    attachments: [{ id: randomUUID(), filename: 'lampe.jpg', content_type: 'image/jpeg', size: 200 }],
-  })]);
+  const received = await db.query<{ id: string }>(
+    'select public.receive_customer_mail($1,$2,now(),$3) id',
+    [
+      randomUUID(),
+      randomUUID(),
+      JSON.stringify({
+        from: 'anna@example.com',
+        senderEmail: 'anna@example.com',
+        to: [job.payload.reply_to],
+        subject: 'Billeder af opgaven',
+        body: 'Her kommer billederne.',
+        attachments: [
+          {
+            id: randomUUID(),
+            filename: 'lampe.jpg',
+            content_type: 'image/jpeg',
+            size: 200,
+          },
+        ],
+      }),
+    ],
+  );
   assert.ok(received.rows[0].id);
   await login();
-  assert.equal((await db.query('select status from public.leads where id=$1', [leadId])).rows[0].status, 'clarifying');
-  assert.equal((await db.query("select count(*)::int as count from public.leads where status='new'")).rows[0].count, 0);
-  const reply = (await db.query('select lead_id,attachments from public.lead_messages where id=$1', [received.rows[0].id])).rows[0];
+  assert.equal(
+    (
+      await db.query<{ status: string }>(
+        'select status from public.leads where id=$1',
+        [leadId],
+      )
+    ).rows[0].status,
+    'clarifying',
+  );
+  assert.equal(
+    (
+      await db.query<{ count: number }>(
+        "select count(*)::int as count from public.leads where status='new'",
+      )
+    ).rows[0].count,
+    0,
+  );
+  const reply = MessageSchema.pick({ lead_id: true, attachments: true }).parse(
+    (
+      await db.query(
+        'select lead_id,attachments from public.lead_messages where id=$1',
+        [received.rows[0].id],
+      )
+    ).rows[0],
+  );
   assert.equal(reply.lead_id, leadId);
-  assert.equal((reply.attachments as unknown[]).length, 1);
+  assert.equal(reply.attachments.length, 1);
   await db.exec('reset role');
-  assert.equal((await db.query("select count(*)::int as count from lys_private.notification_outbox where kind='message_received.staff'")).rows[0].count, 1);
+  assert.equal(
+    (
+      await db.query<{ count: number }>(
+        "select count(*)::int as count from lys_private.notification_outbox where kind='message_received.staff'",
+      )
+    ).rows[0].count,
+    1,
+  );
 });

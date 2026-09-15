@@ -110,7 +110,12 @@ test('building automation follows review, appointment and customer mail workflow
       [randomUUID(), JSON.stringify(input)],
     )
   ).rows[0].receipt;
-  leadId = (await db.query<{ id: string }>('select id from public.leads where reference=$1', [receipt.reference])).rows[0].id;
+  leadId = (
+    await db.query<{ id: string }>(
+      'select id from public.leads where reference=$1',
+      [receipt.reference],
+    )
+  ).rows[0].id;
   await db.exec('update lys_private.mail_settings set enabled=true');
   await login(technical);
   await review();
@@ -186,14 +191,28 @@ test('reading and internal notes keep an enquiry in the inbox; manual handoff pr
   const original = await state();
   await note('Første telefonkontakt er forsøgt.');
   assert.equal((await state()).status, 'new');
-  assert.equal((await db.query("select count(*)::int as count from public.leads where status='new'")).rows[0].count, 1);
+  assert.equal(
+    (
+      await db.query<{ count: number }>(
+        "select count(*)::int as count from public.leads where status='new'",
+      )
+    ).rows[0].count,
+    1,
+  );
   const commandId = randomUUID();
   const receipt = await status('clarifying', 2, commandId);
   assert.deepEqual(await status('clarifying', 2, commandId), receipt);
   const moved = await state();
   assert.equal(moved.id, original.id);
   assert.deepEqual(moved.original_submission, original.original_submission);
-  assert.equal((await db.query("select count(*)::int as count from public.leads where status='new'")).rows[0].count, 0);
+  assert.equal(
+    (
+      await db.query<{ count: number }>(
+        "select count(*)::int as count from public.leads where status='new'",
+      )
+    ).rows[0].count,
+    0,
+  );
   const history = await events();
   assert.equal(history.length, 3);
   assert.equal(history[2].actor_id, backoffice);
@@ -203,7 +222,10 @@ test('reading and internal notes keep an enquiry in the inbox; manual handoff pr
   assert.equal((await state()).version, 3);
   assert.equal((await events()).length, 3);
   await db.exec('reset role');
-  await assert.rejects(db.query("update public.leads set status='new' where id=$1", [leadId]), /invalid_transition/);
+  await assert.rejects(
+    db.query("update public.leads set status='new' where id=$1", [leadId]),
+    /invalid_transition/,
+  );
 });
 test('a lost response can replay exactly once, even after another later command', async () => {
   const key = randomUUID();
