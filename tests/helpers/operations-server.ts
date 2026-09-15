@@ -6,10 +6,12 @@ const db = await createTestDatabase();
 const staffId = '1054ed20-67f4-4ff8-bd50-b423d7b11baf';
 const techId = 'ec421bef-f031-4416-9f30-21871b4c7d30';
 const outsiderId = '5b9b39fd-cd5d-46ef-8545-eeb43b24a6b7';
+const ownerId = 'dbfd477b-bdf1-4897-9896-a42e2a36c3e6';
 const users = [
   { id: staffId, email: 'staff@example.com' },
   { id: techId, email: 'technical@example.com' },
   { id: outsiderId, email: 'outsider@example.com' },
+  { id: ownerId, email: 'owner@example.com' },
 ];
 const token = (id: string) =>
   `${Buffer.from('{"alg":"HS256","typ":"JWT"}').toString('base64url')}.${Buffer.from(JSON.stringify({ sub: id, exp: 4102444800, role: 'authenticated' })).toString('base64url')}.fixture-only`;
@@ -22,6 +24,10 @@ async function reset() {
   await db.query(
     "insert into public.staff_members(user_id,display_name,role) values ($1,'Backoffice','backoffice'),($2,'Faglig medarbejder','technical')",
     [staffId, techId],
+  );
+  await db.query(
+    "insert into public.staff_members(user_id,display_name,role,is_owner) values($1,'Ejer uden arbejdsrolle',null,true)",
+    [ownerId],
   );
   await db.query('select public.create_lead_submission($1::uuid,$2::jsonb)', [
     submissionKey,
@@ -79,6 +85,31 @@ const server = createServer((req, res) => {
               )
             ).rows[0],
           );
+          return;
+        }
+        if (url.pathname === '/_test/staff-access') {
+          await db.exec('reset role');
+          reply(
+            (
+              await db.query(
+                'select * from public.staff_access_events order by created_at,id',
+              )
+            ).rows,
+          );
+          return;
+        }
+        if (url.pathname === '/_test/staff-access-conflict') {
+          await db.exec('reset role');
+          await db.query(
+            "select set_config('request.jwt.claim.sub',$1,false)",
+            [ownerId],
+          );
+          await db.query('select public.set_staff_access($1,$2,1,$3,false)', [
+            randomUUID(),
+            staffId,
+            'technical',
+          ]);
+          reply({ ok: true });
           return;
         }
         if (url.pathname === '/_test/inbox-pages') {
@@ -232,6 +263,23 @@ const server = createServer((req, res) => {
         await db.exec(user ? 'set role authenticated' : 'set role anon');
         if (url.pathname.startsWith('/rest/v1/rpc/')) {
           const name = url.pathname.split('/').at(-1);
+          if (name === 'set_staff_access') {
+            reply(
+              (
+                await db.query<{ receipt: unknown }>(
+                  'select public.set_staff_access($1,$2,$3,$4,$5) receipt',
+                  [
+                    body.p_command_id,
+                    body.p_user_id,
+                    body.p_expected_version,
+                    body.p_role,
+                    body.p_is_owner,
+                  ],
+                )
+              ).rows[0].receipt,
+            );
+            return;
+          }
           if (name === 'customer_mail_enabled') {
             reply(
               (
@@ -334,14 +382,16 @@ const server = createServer((req, res) => {
           return;
         }
         let rows: unknown[] = [];
-        if (url.pathname === '/rest/v1/staff_members')
+        if (url.pathname === '/rest/v1/staff_members') {
+          const id =
+            url.searchParams.get('user_id')?.replace(/^eq\./, '') ?? null;
           rows = (
             await db.query(
-              'select * from public.staff_members where user_id=$1',
-              [user?.id ?? outsiderId],
+              'select * from public.staff_members where ($1::uuid is null or user_id=$1) order by display_name,user_id',
+              [id],
             )
           ).rows;
-        else if (url.pathname === '/rest/v1/leads') {
+        } else if (url.pathname === '/rest/v1/leads') {
           const id = url.searchParams.get('id')?.replace(/^eq\./, '');
           const statusFilter = url.searchParams.get('status');
           const statuses = statusFilter?.startsWith('in.(')

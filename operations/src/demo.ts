@@ -13,11 +13,15 @@ import {
 import { OperationsError, type OperationsGateway } from './gateway';
 import { collectionForStatus } from './lead-navigation';
 import { copenhagenLocal, copenhagenInstant, shiftDay } from './calendar-time';
+import { createDemoStaffAccess } from './staff-access-demo';
+export { createDemoStaffAccess };
 export const demoStaff = StaffSchema.parse({
   user_id: 'ec421bef-f031-4416-9f30-21871b4c7d30',
   display_name: 'Alex · prøvevisning',
   role: 'technical',
   active: true,
+  is_owner: true,
+  access_version: 1,
 });
 export function createDemoGateway(): OperationsGateway {
   const names = [

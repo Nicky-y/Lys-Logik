@@ -13,7 +13,7 @@ Kør fra `website/`, eller dobbeltklik den tilsvarende startfil:
 | `npm.cmd run app:dev` / `START-APP.cmd`       | http://127.0.0.1:5173/ | Rigtige Supabase-data efter login           |
 | `npm.cmd run app:demo` / `START-APP-DEMO.cmd` | http://127.0.0.1:5174/ | Fiktive sager uden login eller databasekald |
 
-Prøvevisningen nulstilles ved genindlæsning. Den viser en fiktiv faglig medarbejder. Udviklingsserveren er sat til `0.0.0.0`, så telefoner på samme netværk kan åbne computerens lokale IP og port. Brug HTTPS-adressen ovenfor til installation på telefonen; den lokale HTTP-netværksadresse kan kun bruges til browserafprøvning.
+Prøvevisningen nulstilles ved genindlæsning. Den viser en fiktiv ejer med faglig arbejdsrolle. Udviklingsserveren er sat til `0.0.0.0`, så telefoner på samme netværk kan åbne computerens lokale IP og port. Brug HTTPS-adressen ovenfor til installation på telefonen; den lokale HTTP-netværksadresse kan kun bruges til browserafprøvning.
 
 ### Nyt menudesign til lokal gennemgang
 
@@ -27,6 +27,18 @@ Kontrollér navigation, mobilmenu og tilgængelighed med `npx playwright test --
 
 ## Adgang og workflow
 
+### Ejerrettigheder og arbejdsrolle
+
+Adgangen har to uafhængige felter: `is_owner` giver medarbejderadministration; `role` giver arbejdsfunktioner. Arbejdsrollen vælges fra den fælles kontrakt i `supabase/functions/_shared/contracts/staff.ts`: **Backoffice** (`backoffice`), **Faglig** (`technical`) eller **Ingen arbejdsrolle** (`null`). Ejerrettigheder tilføjer aldrig en arbejdsrolle. Databasen afviser andre rolleværdier; nye roller kræver en bevidst kontrakt-, rettigheds- og migrationsændring.
+
+En aktiv ejer kan under **Indstillinger → Medarbejdere og rettigheder** ændre eksisterende medarbejderes arbejdsrolle og ejerrettigheder. Almindelige medarbejdere ser kun deres egen adgang. En ejer uden arbejdsrolle kan administrere medarbejdere, men kan ikke læse kundesager, kalender eller kundemail, skrive noter, godkende fagligt eller modtage kundenotifikationer. Faglig godkendelse kræver fortsat `technical`. En konto med hverken ejerrettigheder eller arbejdsrolle får ingen af disse funktioner.
+
+`set_staff_access` kontrollerer aktiv ejeradgang i databasen. Ændringer bruger versionskontrol og et stabilt kommando-id ved tabte svar. Før/efter, aktør og tidspunkt registreres atomisk i `staff_access_events`. Konflikter kræver ny gennemgang, og den sidste aktive ejer kan ikke fratages ejeradgangen eller deaktiveres. Rettighedsændringer serialiseres før låsning af medarbejderrækker. Profilen kontrolleres ved login, ved tilbagevenden til appen og hvert 30. sekund i forgrunden; ændrede rettigheder rydder tidligere indlæste forespørgsler. Serverkontrollen gælder ved hvert nyt kald.
+
+**Udrulning:** Anvend først `20260915000400_staff_access.sql` (efter indbakkemigrationen), og kør derefter `supabase/operations/bootstrap-owner.sql` fra det betroede SQL-kontrolpanel. Scriptet udpeger alene den eksisterende aktive konto `mnbrom@gmail.com` som første ejer og bevarer arbejdsrollen. Ingen konto bliver ejer automatisk gennem login, e-mail eller brugermetadata. Funktionen til første ejer er utilgængelig for almindelige brugere. Udgiv appen efter migration og ejeropsætning. Disse ændringer er forberedt lokalt; denne sektion er ikke dokumentation for udført produktionsdeploy.
+
+Prøvevisningen viser en fiktiv ejer med faglig arbejdsrolle og en ekstra fiktiv backoffice-medarbejder. Ændringer kan afprøves på `http://127.0.0.1:5174/#/indstillinger` og nulstilles ved genindlæsning. Oprettelse af nye konti og afsendelse af invitationer (**Opret medarbejder**) kommer i næste slice; denne ændring administrerer eksisterende konti.
+
 ### Indbakke og manuel overførsel
 
 Appen åbner i **Indbakke** (`#/indbakke`), som kun viser status `new`. Læsning, noter, e-mails og billeder flytter ikke henvendelsen. **Flyt til Sager** bruger den eksisterende `change_lead_status`-kommando til `clarifying`: samme sag, original henvendelse og samtale bevares, og medarbejder, tidspunkt og overgangen registreres atomisk i historikken. Genforsøg genbruger kommando-id'et, og en gammel version kræver gennemgang før en ny handling.
@@ -35,11 +47,11 @@ Appen åbner i **Indbakke** (`#/indbakke`), som kun viser status `new`. Læsning
 
 Indbakkens røde prik bygger på et separat, adgangskontrolleret databaseantal for alle `new`-henvendelser, uafhængigt af paginering og søgning. Lister filtreres i databasen før paginering. Antal og den åbne oversigt opdateres hvert 30. sekund, ved tilbagevenden til appen og efter gemte ændringer. Fejl vises særskilt; et tidligere kendt antal bevares ved midlertidige forbindelsesfejl.
 
-Notifikationernes eksisterende `#/leads/<id>`-links findes fortsat. Efter indlæsning afgør den gemte status, om sagen åbnes under Indbakke, Sager eller Arkiv. Det gælder også et gammelt link til en henvendelse, der siden er flyttet. Gamle `#/pipeline`, `#/archive` og `#/calendar`-links fungerer fortsat. Installation og enhedens pushindstillinger findes under **Indstillinger**; medarbejderadministration er endnu ikke tilføjet.
+Notifikationernes eksisterende `#/leads/<id>`-links findes fortsat. Efter indlæsning afgør den gemte status, om sagen åbnes under Indbakke, Sager eller Arkiv. Det gælder også et gammelt link til en henvendelse, der siden er flyttet. Gamle `#/pipeline`, `#/archive` og `#/calendar`-links fungerer fortsat. Installation og enhedens pushindstillinger findes under **Indstillinger**; medarbejderadministration findes samme sted for aktive ejere.
 
 Alle tre lokale migrationer er registreret i det hostede projekt: `20260908093333_lead_intake.sql`, `20260908160000_operations.sql` og `20260909034350_calendar.sql`. Kalendermigrationen blev lagt på 9. september 2026. Brugeren har selv gennemført den første appmigration og loginopsætning. Den 8. september 2026 er Niclas verificeret som aktiv `backoffice`. Ingen yderligere invitation er sendt fra denne implementering.
 
-Login alene giver ingen kundeadgang: brugeren skal være aktiv i `staff_members`. `backoffice` kan følge og behandle sager samt tilføje noter. `technical` kan derudover registrere faglig vurdering. Rollen kontrolleres i databasen og kan ikke ændres af medarbejderen selv. Faglig godkendelse er påkrævet før status »Klar til aftale«.
+Login alene giver ingen kundeadgang: brugeren skal være aktiv i `staff_members` og have en arbejdsrolle. `backoffice` kan følge og behandle sager samt tilføje noter. `technical` kan derudover registrere faglig vurdering. Rollen kontrolleres i databasen og kan ikke ændres af medarbejderen selv. Faglig godkendelse er påkrævet før status »Klar til aftale«.
 
 Alle ændringer går gennem syv RPC-kommandoer: `change_lead_status`, `record_lead_review`, `set_lead_waiting`, `add_lead_note`, `create_lead_appointment`, `reschedule_lead_appointment` og `cancel_lead_appointment`. De bruger samme private kommandohåndtering og gemmer ændring, aktør, versionsnummer og historikhændelse i én transaktion. Noter føjes til historikken; kundens oprindelige indsendelse bevares. Arkivering/genåbning kræver en begrundelse.
 

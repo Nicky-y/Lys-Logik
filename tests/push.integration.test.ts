@@ -22,7 +22,7 @@ beforeEach(async () => {
   for (const id of [staff, other]) {
     await db.query('insert into auth.users(id) values($1)', [id]);
     await db.query(
-      "insert into public.staff_members(user_id,display_name) values($1,'Test')",
+      "insert into public.staff_members(user_id,display_name,role) values($1,'Test','backoffice')",
       [id],
     );
   }

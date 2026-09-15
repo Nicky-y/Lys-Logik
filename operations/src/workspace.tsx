@@ -35,6 +35,12 @@ import {
   readWorkspaceRoute,
 } from './lead-navigation';
 import './inbox.css';
+import {
+  canWorkWithCustomers,
+  staffAccessLabel,
+} from '../../supabase/functions/_shared/contracts/staff.ts';
+import type { StaffAccessGateway } from './staff-access';
+import { StaffSettings } from './staff-settings';
 
 const refreshPolicy = {
   refetchInterval: 30000,
@@ -48,13 +54,18 @@ export function Workspace({
   staff,
   demo,
   onSignOut,
+  staffAccess,
+  onAccessChanged,
 }: {
   gateway: OperationsGateway;
   push?: PushController;
   staff: Staff;
   demo: boolean;
   onSignOut: () => void;
+  staffAccess: StaffAccessGateway;
+  onAccessChanged: () => Promise<void>;
 }) {
+  const canWork = canWorkWithCustomers(staff);
   const [view, setView] = useState(() => readWorkspaceRoute(location.hash));
   const [search, setSearch] = useState('');
   const [stage, setStage] = useState('all');
@@ -84,12 +95,13 @@ export function Workspace({
     initialPageParam: 0,
     getNextPageParam: (last, pages) =>
       last.hasMore ? pages.length * 100 : undefined,
-    enabled: isInbox || isCases,
+    enabled: canWork && (isInbox || isCases),
     ...refreshPolicy,
   });
   const inbox = useQuery({
     queryKey: ['inbox-count', staff.user_id],
     queryFn: () => gateway.inboxCount(),
+    enabled: canWork,
     ...refreshPolicy,
   });
   const all = list.data?.pages.flatMap((page) => page.items) ?? [];
@@ -129,8 +141,9 @@ export function Workspace({
     void list.refetch();
     void inbox.refetch();
   };
-  const inboxLabel =
-    inbox.isError || !online
+  const inboxLabel = !canWork
+    ? 'Indbakke – kræver en arbejdsrolle'
+    : inbox.isError || !online
       ? 'Indbakke – status kan ikke opdateres'
       : inbox.isPending
         ? 'Indbakke – henter nye henvendelser'
@@ -148,10 +161,9 @@ export function Workspace({
             .slice(0, 2)
             .join('')
             .toUpperCase(),
-          role:
-            staff.role === 'technical' ? 'Faglig medarbejder' : 'Backoffice',
+          role: staffAccessLabel(staff),
         }}
-        inboxHasActivity={(inbox.data ?? 0) > 0}
+        inboxHasActivity={canWork && (inbox.data ?? 0) > 0}
         inboxLabel={inboxLabel}
         sessionAction={
           <button
@@ -181,7 +193,7 @@ export function Workspace({
             tilbage.
           </p>
         )}
-        {inbox.isError && (
+        {canWork && inbox.isError && (
           <p role="alert" className="error-box">
             Indbakkens antal kunne ikke opdateres.{' '}
             <button
@@ -192,7 +204,18 @@ export function Workspace({
             </button>
           </p>
         )}
-        {view.section.id === 'kalender' ? (
+        {!canWork && view.section.id !== 'indstillinger' ? (
+          <section className="settings-panel">
+            <h2>Ingen arbejdsrolle</h2>
+            <p>
+              Din konto har ikke adgang til kundesager eller kalender.
+              Ejerrettigheder administreres separat.
+            </p>
+            <a className="secondary" href="#/indstillinger">
+              Åbn Indstillinger
+            </a>
+          </section>
+        ) : view.section.id === 'kalender' ? (
           <CalendarView
             gateway={gateway}
             selectedDay={view.day}
@@ -382,20 +405,30 @@ export function Workspace({
             </section>
           </>
         ) : view.section.id === 'indstillinger' ? (
-          <section className="settings-panel">
-            <h2>App og notifikationer</h2>
-            <p>Administrér installation og notifikationer på denne enhed.</p>
-            <div className="settings-actions">
-              <InstallApp />
-              {push ? (
-                <PushSettings controller={push} />
-              ) : (
-                <p className="muted">
-                  Notifikationer er tilgængelige, når du er logget ind i appen.
-                </p>
-              )}
-            </div>
-          </section>
+          <>
+            <StaffSettings
+              staff={staff}
+              gateway={staffAccess}
+              online={online}
+              onAccessChanged={onAccessChanged}
+            />
+            <section className="settings-panel">
+              <h2>App og notifikationer</h2>
+              <p>Administrér installation og notifikationer på denne enhed.</p>
+              <div className="settings-actions">
+                <InstallApp />
+                {push && canWork ? (
+                  <PushSettings controller={push} />
+                ) : (
+                  <p className="muted">
+                    {canWork
+                      ? 'Notifikationer er tilgængelige, når du er logget ind i appen.'
+                      : 'Kundenotifikationer kræver en arbejdsrolle.'}
+                  </p>
+                )}
+              </div>
+            </section>
+          </>
         ) : (
           <section className="ws-page-surface">
             <div className="ws-placeholder">
@@ -408,7 +441,7 @@ export function Workspace({
           </section>
         )}
       </AppShell>
-      {view.lead && (
+      {canWork && view.lead && (
         <LeadDialog
           key={view.lead}
           id={view.lead}

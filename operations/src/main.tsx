@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { createClient, type Session } from '@supabase/supabase-js';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -13,6 +13,10 @@ import { createOperationsGateway, type OperationsGateway } from './gateway';
 import { Workspace } from './workspace';
 import { InstallApp, PwaProvider } from './pwa';
 import { browserPushController } from './push';
+import {
+  createStaffAccessGateway,
+  type StaffAccessGateway,
+} from './staff-access';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -44,6 +48,7 @@ const client =
       })
     : null;
 const liveGateway = client ? createOperationsGateway(client) : null;
+const staffAccessGateway = client ? createStaffAccessGateway(client) : null;
 const pushController =
   client && import.meta.env.VITE_WEB_PUSH_PUBLIC_KEY
     ? browserPushController(client, import.meta.env.VITE_WEB_PUSH_PUBLIC_KEY)
@@ -185,17 +190,24 @@ function SignIn({
 function Application() {
   const [session, setSession] = useState<Session | null>(null);
   const [staff, setStaff] = useState<Staff | null>(null);
+  const staffRef = useRef<Staff | null>(null);
+  const profileRequest = useRef(0);
   const [loading, setLoading] = useState(!demo && !!client);
   const [accessError, setAccessError] = useState('');
   const [needPassword, setNeedPassword] = useState(passwordLink);
   const [demoState, setDemoState] = useState<{
     gateway: OperationsGateway;
     staff: Staff;
+    staffAccess: StaffAccessGateway;
   } | null>(null);
   useEffect(() => {
     if (demo) {
       void import('./demo').then((m) =>
-        setDemoState({ gateway: m.createDemoGateway(), staff: m.demoStaff }),
+        setDemoState({
+          gateway: m.createDemoGateway(),
+          staff: m.demoStaff,
+          staffAccess: m.createDemoStaffAccess(m.demoStaff),
+        }),
       );
     }
   }, []);
@@ -213,6 +225,8 @@ function Application() {
         if (event === 'PASSWORD_RECOVERY') setNeedPassword(true);
         setSession(next);
         if (!next) {
+          profileRequest.current++;
+          staffRef.current = null;
           queryClient.clear();
           setStaff(null);
           setLoading(false);
@@ -224,43 +238,65 @@ function Application() {
       data.subscription.unsubscribe();
     };
   }, []);
-  useEffect(() => {
-    if (!client || !session) return;
-    let current = true;
-    async function load() {
-      setLoading(true);
-      setAccessError('');
-      try {
-        const result = await client!
-          .from('staff_members')
-          .select('user_id,display_name,active,role')
-          .eq('user_id', session!.user.id)
-          .maybeSingle();
-        if (!current) return;
-        if (result.error)
-          throw new Error(
-            'Medarbejderadgangen kunne ikke kontrolleres. Prøv at logge ind igen.',
-          );
-        const member = result.data ? StaffSchema.parse(result.data) : null;
-        setStaff(member?.active ? member : null);
-      } catch (err) {
-        if (current) {
-          setStaff(null);
-          setAccessError(
-            err instanceof Error
-              ? err.message
-              : 'Adgangen kunne ikke kontrolleres.',
-          );
-        }
-      } finally {
-        if (current) setLoading(false);
+  const reloadStaff = useCallback(async () => {
+    if (!client || !session?.user.id) return;
+    const request = ++profileRequest.current;
+    setAccessError('');
+    try {
+      const result = await client!
+        .from('staff_members')
+        .select('user_id,display_name,active,role,is_owner,access_version')
+        .eq('user_id', session!.user.id)
+        .maybeSingle();
+      if (request !== profileRequest.current) return;
+      if (result.error)
+        throw new Error(
+          'Medarbejderadgangen kunne ikke kontrolleres. Prøv at logge ind igen.',
+        );
+      const member = result.data ? StaffSchema.parse(result.data) : null;
+      const previous = staffRef.current;
+      if (
+        previous &&
+        (!member ||
+          !member.active ||
+          previous.role !== member.role ||
+          previous.is_owner !== member.is_owner)
+      )
+        queryClient.clear();
+      staffRef.current = member?.active ? member : null;
+      setStaff(member?.active ? member : null);
+    } catch (err) {
+      if (request === profileRequest.current) {
+        queryClient.clear();
+        staffRef.current = null;
+        setStaff(null);
+        setAccessError(
+          err instanceof Error
+            ? err.message
+            : 'Adgangen kunne ikke kontrolleres.',
+        );
       }
+    } finally {
+      if (request === profileRequest.current) setLoading(false);
     }
-    void load();
-    return () => {
-      current = false;
-    };
   }, [session?.user.id]);
+  useEffect(() => {
+    if (!client || !session?.user.id) return;
+    setLoading(true);
+    void reloadStaff();
+    const refresh = () => {
+      if (document.visibilityState === 'visible') void reloadStaff();
+    };
+    const interval = window.setInterval(refresh, 30000);
+    window.addEventListener('focus', refresh);
+    document.addEventListener('visibilitychange', refresh);
+    return () => {
+      profileRequest.current++;
+      clearInterval(interval);
+      window.removeEventListener('focus', refresh);
+      document.removeEventListener('visibilitychange', refresh);
+    };
+  }, [session?.user.id, reloadStaff]);
   async function signOut() {
     await pushController?.disable().catch(() => {});
     await client?.auth.signOut({ scope: 'local' });
@@ -273,6 +309,18 @@ function Application() {
       <Workspace
         gateway={demoState.gateway}
         staff={demoState.staff}
+        staffAccess={demoState.staffAccess}
+        onAccessChanged={async () => {
+          const current = (await demoState.staffAccess.list()).find(
+            (member) => member.user_id === demoState.staff.user_id,
+          )!;
+          if (
+            current.role !== demoState.staff.role ||
+            current.is_owner !== demoState.staff.is_owner
+          )
+            queryClient.clear();
+          setDemoState({ ...demoState, staff: current });
+        }}
         demo
         onSignOut={() => location.reload()}
       />
@@ -304,6 +352,8 @@ function Application() {
   return (
     <Workspace
       gateway={liveGateway!}
+      staffAccess={staffAccessGateway!}
+      onAccessChanged={reloadStaff}
       push={pushController}
       staff={staff}
       demo={false}

@@ -1,9 +1,10 @@
 import { z } from 'zod';
 import { ServiceSchema } from './service.ts';
+import { StaffIdSchema } from './staff.ts';
+export { StaffIdSchema, StaffSchema, type Staff } from './staff.ts';
 export { serviceLabels } from './service.ts';
 
 export const LeadIdSchema = z.uuid().brand<'LeadId'>();
-export const StaffIdSchema = z.uuid().brand<'StaffId'>();
 export const EventIdSchema = z.uuid().brand<'EventId'>();
 export const CommandIdSchema = z.uuid().brand<'CommandId'>();
 export const AppointmentIdSchema = z.uuid().brand<'AppointmentId'>();
@@ -65,12 +66,6 @@ export const LeadStatusSchema = z.enum([
 ]);
 export const WaitingOnSchema = z.enum(['staff', 'customer']).nullable();
 export const ReviewDecisionSchema = z.enum(['pending', 'approved', 'declined']);
-export const StaffSchema = z.object({
-  user_id: StaffIdSchema,
-  display_name: z.string().min(1),
-  active: z.boolean(),
-  role: z.enum(['backoffice', 'technical']),
-});
 export const OperationsLeadSchema = z.object({
   id: LeadIdSchema,
   reference: z.uuid(),
@@ -175,7 +170,6 @@ export type LeadId = z.infer<typeof LeadIdSchema>;
 export type LeadStatus = z.infer<typeof LeadStatusSchema>;
 export type OperationsLead = z.infer<typeof OperationsLeadSchema>;
 export type LeadEvent = z.infer<typeof LeadEventSchema>;
-export type Staff = z.infer<typeof StaffSchema>;
 export type StaffCommand = z.infer<typeof StaffCommandSchema>;
 export type CommandReceipt = z.infer<typeof CommandReceiptSchema>;
 
