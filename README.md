@@ -2,6 +2,8 @@
 
 Astro-hjemmeside med TypeScript og almindelig CSS samt et separat React-arbejdsrum i `operations/`. Lead-modtagelse og første del af intern sagsbehandling bruger Supabase. Se [backendens status og opsætning](supabase/README.md) og [appens vejledning](operations/README.md).
 
+Se også [fejlhistorikken](bugs/README.md) for kendte fejl, årsager, løsninger og verifikation.
+
 ## Åbn arbejdsrummet
 
 Dobbeltklik `START-APP.cmd` og åbn http://127.0.0.1:5173/ for rigtige data efter medarbejderlogin. `START-APP-DEMO.cmd` åbner en særskilt prøvevisning med fiktive sager på http://127.0.0.1:5174/. Hold terminalen åben. Begge startfiler ligger i denne mappe.
