@@ -44,7 +44,11 @@ const server = createServer((req, res) => {
         'Access-Control-Allow-Headers',
         'authorization,apikey,content-type,x-client-info,range,prefer,accept,range-unit,x-supabase-api-version,accept-profile,content-profile,x-retry-count',
       );
-      res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,OPTIONS');
+      res.setHeader(
+        'Access-Control-Allow-Methods',
+        'GET,HEAD,POST,PUT,OPTIONS',
+      );
+      res.setHeader('Access-Control-Expose-Headers', 'Content-Range');
       res.setHeader('Content-Type', 'application/json');
       const reply = (data: unknown, status = 200) => {
         res.statusCode = status;
@@ -75,6 +79,18 @@ const server = createServer((req, res) => {
               )
             ).rows[0],
           );
+          return;
+        }
+        if (url.pathname === '/_test/inbox-pages') {
+          await db.exec('reset role');
+          await db.query(
+            'select public.create_lead_submission(gen_random_uuid(),$1::jsonb) from generate_series(1,101)',
+            [JSON.stringify({ ...validLead, name: 'Igangværende testkunde' })],
+          );
+          await db.exec(
+            "update public.leads set status='clarifying' where name='Igangværende testkunde'; update public.leads set created_at='2026-01-01T10:00:00Z' where name='Anna Jensen'",
+          );
+          reply({ ok: true });
           return;
         }
         if (url.pathname === '/_test/building-automation') {
@@ -327,13 +343,28 @@ const server = createServer((req, res) => {
           ).rows;
         else if (url.pathname === '/rest/v1/leads') {
           const id = url.searchParams.get('id')?.replace(/^eq\./, '');
+          const statusFilter = url.searchParams.get('status');
+          const statuses = statusFilter?.startsWith('in.(')
+            ? statusFilter.slice(4, -1).split(',')
+            : statusFilter?.startsWith('eq.')
+              ? [statusFilter.slice(3)]
+              : null;
+          if (req.method === 'HEAD') {
+            const result = await db.query<{ count: number }>(
+              'select count(*)::int as count from public.leads where ($1::text[] is null or status::text = any($1::text[]))',
+              [statuses],
+            );
+            res.setHeader('Content-Range', `*/${result.rows[0].count}`);
+            reply(null);
+            return;
+          }
           rows = id
             ? (await db.query('select * from public.leads where id=$1', [id]))
                 .rows
             : (
                 await db.query(
-                  'select * from public.leads order by created_at desc,id limit 100 offset $1',
-                  [Number(url.searchParams.get('offset') ?? 0)],
+                  'select * from public.leads where ($2::text[] is null or status::text = any($2::text[])) order by created_at desc,id limit 100 offset $1',
+                  [Number(url.searchParams.get('offset') ?? 0), statuses],
                 )
               ).rows;
         } else if (url.pathname === '/rest/v1/appointments') {
@@ -394,9 +425,15 @@ const server = createServer((req, res) => {
       res.end();
     });
 });
-server.listen(54327, '127.0.0.1', () =>
-  console.log('Operations PostgreSQL fixture ready'),
+export const operationsServerReady = new Promise<void>((resolve) =>
+  server.listen(54327, '127.0.0.1', resolve),
 );
+export async function stopOperationsServer() {
+  await new Promise<void>((resolve, reject) =>
+    server.close((error) => (error ? reject(error) : resolve())),
+  );
+  await db.close();
+}
 process.on('SIGTERM', () => {
   server.close();
   void db.close().then(() => process.exit(0));

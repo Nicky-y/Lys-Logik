@@ -90,7 +90,15 @@ const server = createServer(async (req, res) => {
     res.end();
   }
 });
-server.listen(5176, '127.0.0.1');
+export const pwaServerReady = new Promise((resolve) =>
+  server.listen(5176, '127.0.0.1', resolve),
+);
+export async function stopPwaServer() {
+  server.closeAllConnections();
+  await new Promise((resolve, reject) =>
+    server.close((error) => (error ? reject(error) : resolve())),
+  );
+}
 process.on('SIGTERM', () => {
   server.closeAllConnections();
   server.close(() => process.exit(0));

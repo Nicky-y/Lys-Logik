@@ -180,6 +180,31 @@ test('status and actor history commit together without changing the original enq
   assert.equal(event.to_status, 'clarifying');
   assert.equal(event.lead_version, 2);
 });
+
+test('reading and internal notes keep an enquiry in the inbox; manual handoff preserves it and is irreversible to new', async () => {
+  await login(backoffice);
+  const original = await state();
+  await note('Første telefonkontakt er forsøgt.');
+  assert.equal((await state()).status, 'new');
+  assert.equal((await db.query("select count(*)::int as count from public.leads where status='new'")).rows[0].count, 1);
+  const commandId = randomUUID();
+  const receipt = await status('clarifying', 2, commandId);
+  assert.deepEqual(await status('clarifying', 2, commandId), receipt);
+  const moved = await state();
+  assert.equal(moved.id, original.id);
+  assert.deepEqual(moved.original_submission, original.original_submission);
+  assert.equal((await db.query("select count(*)::int as count from public.leads where status='new'")).rows[0].count, 0);
+  const history = await events();
+  assert.equal(history.length, 3);
+  assert.equal(history[2].actor_id, backoffice);
+  assert.equal(history[2].from_status, 'new');
+  assert.equal(history[2].to_status, 'clarifying');
+  await assert.rejects(status('new', 3), /invalid_transition/);
+  assert.equal((await state()).version, 3);
+  assert.equal((await events()).length, 3);
+  await db.exec('reset role');
+  await assert.rejects(db.query("update public.leads set status='new' where id=$1", [leadId]), /invalid_transition/);
+});
 test('a lost response can replay exactly once, even after another later command', async () => {
   const key = randomUUID();
   const receipt = await status('clarifying', 1, key);

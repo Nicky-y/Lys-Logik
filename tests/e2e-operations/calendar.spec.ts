@@ -5,7 +5,7 @@ test.beforeEach(async ({ request }) => {
   await request.post('http://127.0.0.1:54327/_test/qualify');
 });
 async function openCase(page: Page) {
-  await page.goto('/');
+  await page.goto('/#/sager');
   await page.getByLabel('E-mail', { exact: true }).fill('staff@example.com');
   await page
     .getByLabel('Adgangskode', { exact: true })

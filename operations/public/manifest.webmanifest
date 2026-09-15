@@ -4,11 +4,11 @@
   "short_name": "Lys & Logik",
   "description": "Jeres fælles arbejdsrum med sager, faglig vurdering og kalender.",
   "lang": "da",
-  "start_url": "/#/pipeline",
+  "start_url": "/#/indbakke",
   "scope": "/",
   "display": "standalone",
   "background_color": "#f6f7f2",
-  "theme_color": "#182a29",
+  "theme_color": "#141d23",
   "prefer_related_applications": false,
   "icons": [
     {

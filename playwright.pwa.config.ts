@@ -1,27 +1,17 @@
 import { defineConfig, devices } from '@playwright/test';
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 export default defineConfig({
   testDir: './tests/e2e-pwa',
   workers: 1,
   reporter: 'list',
+  outputDir: join(tmpdir(), 'lys-logik-pwa-results'),
   use: {
     baseURL: 'http://127.0.0.1:5176',
     trace: 'retain-on-failure',
     reducedMotion: 'reduce',
   },
-  webServer: [
-    {
-      command: 'node tests/helpers/operations-server.ts',
-      url: 'http://127.0.0.1:54327/health',
-      reuseExistingServer: false,
-      timeout: 60000,
-    },
-    {
-      command: 'node tests/helpers/pwa-server.mjs',
-      url: 'http://127.0.0.1:5176',
-      reuseExistingServer: false,
-      timeout: 60000,
-    },
-  ],
+  globalSetup: './tests/helpers/pwa-setup.mjs',
   projects: [
     {
       name: 'desktop',

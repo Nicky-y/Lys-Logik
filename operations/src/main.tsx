@@ -79,7 +79,7 @@ function SignIn({
             : 'Login lykkedes ikke. Kontrollér e-mail og adgangskode.',
         );
       if (initialPassword) {
-        history.replaceState(null, '', location.pathname + '#/pipeline');
+        history.replaceState(null, '', location.pathname + '#/indbakke');
         onDone?.();
       }
     } catch (err) {

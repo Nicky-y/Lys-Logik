@@ -30,7 +30,7 @@ test('backoffice logs in, calls from the customer card and saves a status, waiti
 }) => {
   await login(page);
   await expect(
-    page.getByRole('heading', { name: 'Jeres opgaver. Ét overblik.' }),
+    page.getByRole('heading', { name: 'Indbakke', level: 1 }),
   ).toBeVisible();
   await openLead(page);
   await expect(
@@ -39,10 +39,7 @@ test('backoffice logs in, calls from the customer card and saves a status, waiti
   await expect(
     page.getByRole('button', { name: 'Gem faglig vurdering' }),
   ).toHaveCount(0);
-  await page
-    .getByRole('combobox', { name: 'Status', exact: true })
-    .selectOption('clarifying');
-  await page.getByRole('button', { name: 'Gem status' }).click();
+  await page.getByRole('button', { name: 'Flyt til Sager' }).click();
   await expect(page.getByText('Version 2', { exact: true })).toBeVisible();
   await page.getByLabel('Hvem afventer vi?').selectOption('customer');
   await page.getByRole('button', { name: 'Gem afventer' }).click();
@@ -58,6 +55,8 @@ test('backoffice logs in, calls from the customer card and saves a status, waiti
     await (await request.get('http://127.0.0.1:54327/_test/state')).json(),
   ).toEqual({ leads: 1, events: 4 });
   await page.getByRole('button', { name: 'Luk sag' }).click();
+  if (await page.getByRole('button', { name: 'Åbn menu' }).isVisible())
+    await page.getByRole('button', { name: 'Åbn menu' }).click();
   await page.getByRole('button', { name: 'Log ud', exact: true }).click();
   await expect(
     page.getByRole('heading', { name: 'Velkommen tilbage' }),
@@ -70,26 +69,19 @@ test('pilot interest is visible in the pipeline and case without approving the e
 }) => {
   await request.post('http://127.0.0.1:54327/_test/pilot');
   await login(page);
-  const card = page
-    .locator('.lead-card')
-    .filter({
-      has: page.getByRole('heading', { name: 'Pilotkunden', exact: true }),
-    });
-  const ordinary = page
-    .locator('.lead-card')
-    .filter({
-      has: page.getByRole('heading', { name: 'Anna Jensen', exact: true }),
-    });
+  const card = page.locator('.lead-card').filter({
+    has: page.getByRole('heading', { name: 'Pilotkunden', exact: true }),
+  });
+  const ordinary = page.locator('.lead-card').filter({
+    has: page.getByRole('heading', { name: 'Anna Jensen', exact: true }),
+  });
   await expect(card).toContainText('Ønsker pilotprojekt');
   await expect(ordinary).not.toContainText('Ønsker pilotprojekt');
   await card.click();
   await expect(page.getByRole('dialog')).toContainText(
     'Et pilotforløb aftales særskilt.',
   );
-  await page
-    .getByRole('combobox', { name: 'Status', exact: true })
-    .selectOption('clarifying');
-  await page.getByRole('button', { name: 'Gem status' }).click();
+  await page.getByRole('button', { name: 'Flyt til Sager' }).click();
   await expect(page.getByText('Version 2', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Luk sag' }).click();
   await expect(card).toContainText('Ønsker pilotprojekt');
@@ -127,10 +119,7 @@ test('building automation is labelled in the pipeline and case and keeps its cat
   await card.click();
   const dialog = page.getByRole('dialog');
   await expect(dialog).toContainText('Bygningsautomatik · 0800');
-  await page
-    .getByRole('combobox', { name: 'Status', exact: true })
-    .selectOption('clarifying');
-  await page.getByRole('button', { name: 'Gem status' }).click();
+  await page.getByRole('button', { name: 'Flyt til Sager' }).click();
   await expect(page.getByText('Version 2', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Luk sag' }).click();
   await expect(
@@ -168,11 +157,13 @@ test('technical review must be saved before the lead can be qualified', async ({
     .fill('Installationen er gennemgået og opgaven er egnet.');
   await page.getByRole('button', { name: 'Gem faglig vurdering' }).click();
   await expect(page.getByText('Version 2', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Flyt til Sager' }).click();
+  await expect(page.getByText('Version 3', { exact: true })).toBeVisible();
   await page
     .getByRole('combobox', { name: 'Status', exact: true })
     .selectOption('qualified');
   await page.getByRole('button', { name: 'Gem status' }).click();
-  await expect(page.getByText('Version 3', { exact: true })).toBeVisible();
+  await expect(page.getByText('Version 4', { exact: true })).toBeVisible();
   await expect(
     page.getByText('Faglig vurdering: godkendt', { exact: true }),
   ).toBeVisible();
@@ -213,19 +204,18 @@ test('a stale edit requires the employee to review the current version', async (
 }) => {
   await login(page);
   await openLead(page);
-  await page
-    .getByRole('combobox', { name: 'Status', exact: true })
-    .selectOption('clarifying');
   await request.post('http://127.0.0.1:54327/_test/advance');
-  await page.getByRole('button', { name: 'Gem status' }).click();
+  await page.getByRole('button', { name: 'Flyt til Sager' }).click();
   await expect(
     page.getByText('Der er nyt på sagen.', { exact: true }),
   ).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Gem status' })).toBeDisabled();
+  await expect(
+    page.getByRole('button', { name: 'Flyt til Sager' }),
+  ).toBeDisabled();
   await page
     .getByRole('button', { name: 'Arbejd videre med den viste version' })
     .click();
-  await page.getByRole('button', { name: 'Gem status' }).click();
+  await page.getByRole('button', { name: 'Flyt til Sager' }).click();
   await expect(page.getByText('Version 3', { exact: true })).toBeVisible();
 });
 test('a login without staff membership shows no customer data', async ({
@@ -242,7 +232,7 @@ test('pipeline and case view have no automated accessibility violations or page 
 }) => {
   await login(page);
   await expect(
-    page.getByRole('heading', { name: 'Jeres opgaver. Ét overblik.' }),
+    page.getByRole('heading', { name: 'Indbakke', level: 1 }),
   ).toBeVisible();
   expect(
     (

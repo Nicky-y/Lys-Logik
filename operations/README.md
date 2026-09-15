@@ -27,6 +27,16 @@ Kontrollér navigation, mobilmenu og tilgængelighed med `npx playwright test --
 
 ## Adgang og workflow
 
+### Indbakke og manuel overførsel
+
+Appen åbner i **Indbakke** (`#/indbakke`), som kun viser status `new`. Læsning, noter, e-mails og billeder flytter ikke henvendelsen. **Flyt til Sager** bruger den eksisterende `change_lead_status`-kommando til `clarifying`: samme sag, original henvendelse og samtale bevares, og medarbejder, tidspunkt og overgangen registreres atomisk i historikken. Genforsøg genbruger kommando-id'et, og en gammel version kræver gennemgang før en ny handling.
+
+**Sager** (`#/sager`) viser de øvrige aktive trin. Arkiv findes i Sagers egen underfane. Afviste henvendelser kan arkiveres direkte fra indbakken; genåbning fører til Afklaring under Sager. Migration `20260915000300_inbox_boundary.sql` forhindrer, at behandlede/arkiverede sager får status `new` igen. Den bevarer eksisterende statusovergange ud af `new`, så tidligere appversioners manuelle behandling stadig virker. Nye kundesvar giver fortsat notifikation og bliver på den eksisterende sag.
+
+Indbakkens røde prik bygger på et separat, adgangskontrolleret databaseantal for alle `new`-henvendelser, uafhængigt af paginering og søgning. Lister filtreres i databasen før paginering. Antal og den åbne oversigt opdateres hvert 30. sekund, ved tilbagevenden til appen og efter gemte ændringer. Fejl vises særskilt; et tidligere kendt antal bevares ved midlertidige forbindelsesfejl.
+
+Notifikationernes eksisterende `#/leads/<id>`-links findes fortsat. Efter indlæsning afgør den gemte status, om sagen åbnes under Indbakke, Sager eller Arkiv. Det gælder også et gammelt link til en henvendelse, der siden er flyttet. Gamle `#/pipeline`, `#/archive` og `#/calendar`-links fungerer fortsat. Installation og enhedens pushindstillinger findes under **Indstillinger**; medarbejderadministration er endnu ikke tilføjet.
+
 Alle tre lokale migrationer er registreret i det hostede projekt: `20260908093333_lead_intake.sql`, `20260908160000_operations.sql` og `20260909034350_calendar.sql`. Kalendermigrationen blev lagt på 9. september 2026. Brugeren har selv gennemført den første appmigration og loginopsætning. Den 8. september 2026 er Niclas verificeret som aktiv `backoffice`. Ingen yderligere invitation er sendt fra denne implementering.
 
 Login alene giver ingen kundeadgang: brugeren skal være aktiv i `staff_members`. `backoffice` kan følge og behandle sager samt tilføje noter. `technical` kan derudover registrere faglig vurdering. Rollen kontrolleres i databasen og kan ikke ændres af medarbejderen selv. Faglig godkendelse er påkrævet før status »Klar til aftale«.
@@ -50,7 +60,9 @@ Kalenderen sender endnu ingen kundemail og synkroniserer ikke med Google Calenda
 | Fil                                                     | Ansvar                                                              |
 | ------------------------------------------------------- | ------------------------------------------------------------------- |
 | `src/main.tsx`                                          | Login, invitationslink, medarbejderkontrol og sammensætning         |
-| `src/workspace.tsx`                                     | Pipeline og sagsvisning, formularer, fejl og genindlæsning          |
+| `src/workspace.tsx`                                     | Indbakke, sagsoversigter, paginering og sammensætning i den nye ramme |
+| `src/lead-detail.tsx`                                   | Sagsvisning, manuel overførsel, eksisterende handlinger og historik |
+| `src/lead-navigation.ts`                                | Grænsen mellem Indbakke/Sager/Arkiv og gamle/nye links |
 | `src/calendar.tsx`                                      | Månedskalender, dagsoversigt og aftaleformularer                    |
 | `src/calendar-time.ts`                                  | Dansk tidszone, kalenderdage og validering af lokale klokkeslæt     |
 | `src/gateway.ts`                                        | Validerede databasekald og genbrug af kommando-id ved genforsøg     |

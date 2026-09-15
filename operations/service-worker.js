@@ -41,7 +41,7 @@ self.addEventListener('notificationclick', (event) => {
     typeof id === 'string' &&
     /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
   const target =
-    self.location.origin + (valid ? '/#/leads/' + id : '/#/pipeline');
+    self.location.origin + (valid ? '/#/leads/' + id : '/#/indbakke');
   event.waitUntil(
     // Let Android reopen the installed app, even if an old WindowClient is
     // suspended. Start during the click event, before any other async work.

@@ -79,7 +79,7 @@ test('push displays fixed private text, groups retries and opens only the matchi
     waitUntil,
   });
   await completion;
-  assert.equal(opened[1], 'https://app.example/#/pipeline');
+  assert.equal(opened[1], 'https://app.example/#/indbakke');
   handlers.push({
     data: {
       json: () => {

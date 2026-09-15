@@ -215,7 +215,7 @@ export function availableTransitions(lead: OperationsLead): LeadStatus[] {
     case 'new':
       return ['clarifying', ...qualify, ...archive];
     case 'clarifying':
-      return ['new', ...qualify, ...archive];
+      return [...qualify, ...archive];
     case 'qualified':
       return ['clarifying', ...archive];
     case 'scheduled':

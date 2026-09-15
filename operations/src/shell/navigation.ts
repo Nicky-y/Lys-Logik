@@ -48,7 +48,7 @@ export const workspaceSections = [
   {
     id: 'indbakke',
     label: 'Indbakke',
-    description: 'Et sted til nye henvendelser og svar fra kunder.',
+    description: 'Nye henvendelser, der venter på den første behandling.',
     icon: Inbox,
   },
 ] as const;

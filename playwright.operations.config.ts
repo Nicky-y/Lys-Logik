@@ -1,26 +1,17 @@
 import { defineConfig, devices } from '@playwright/test';
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 export default defineConfig({
   testDir: './tests/e2e-operations',
   workers: 1,
   reporter: 'list',
+  outputDir: join(tmpdir(), 'lys-logik-operations-results'),
   use: {
     baseURL: 'http://127.0.0.1:5175',
     trace: 'retain-on-failure',
     reducedMotion: 'reduce',
   },
-  webServer: [
-    {
-      command: 'node tests/helpers/operations-server.ts',
-      url: 'http://127.0.0.1:54327/health',
-      reuseExistingServer: false,
-      timeout: 60000,
-    },
-    {
-      command: 'node tests/helpers/operations-vite.mjs',
-      url: 'http://127.0.0.1:5175',
-      reuseExistingServer: false,
-    },
-  ],
+  globalSetup: './tests/helpers/operations-setup.mjs',
   projects: [
     {
       name: 'desktop',

@@ -68,7 +68,7 @@ export function CalendarView({
       <div className="page-heading">
         <div>
           <p className="eyebrow">PLADS TIL GODT HÅNDVÆRK</p>
-          <h1>En aftale ad gangen.</h1>
+          <h2>En aftale ad gangen.</h2>
           <p className="muted">
             Jeres fælles kalender. Alle tider er dansk tid.
           </p>

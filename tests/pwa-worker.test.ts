@@ -136,7 +136,7 @@ test('manifest has a stable identity, standalone launch and required icon sizes'
     ),
   );
   assert.equal(manifest.id, '/');
-  assert.equal(manifest.start_url, '/#/pipeline');
+  assert.equal(manifest.start_url, '/#/indbakke');
   assert.equal(manifest.scope, '/');
   assert.equal(manifest.display, 'standalone');
   for (const size of [192, 512]) {

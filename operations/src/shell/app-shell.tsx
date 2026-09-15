@@ -8,6 +8,8 @@ interface AppShellProps {
   children: ReactNode;
   profile: { name: string; initials: string; role: string };
   inboxHasActivity?: boolean;
+  inboxLabel?: string;
+  sessionAction?: ReactNode;
   preview?: boolean;
 }
 
@@ -17,6 +19,8 @@ export function AppShell({
   children,
   profile,
   inboxHasActivity = false,
+  inboxLabel,
+  sessionAction,
   preview = false,
 }: AppShellProps) {
   const [collapsed, setCollapsed] = useState(false);
@@ -152,6 +156,9 @@ export function AppShell({
               </span>
             )}
           </div>
+          {sessionAction && (
+            <div className="ws-session-action">{sessionAction}</div>
+          )}
         </div>
       </>
     );
@@ -236,7 +243,10 @@ export function AppShell({
               href="#/indbakke"
               className="ws-inbox ws-icon-button"
               aria-current={section.id === 'indbakke' ? 'page' : undefined}
-              aria-label={`Indbakke${inboxHasActivity ? (preview ? ' – eksempel på nye henvendelser' : ' – nye henvendelser') : ''}`}
+              aria-label={
+                inboxLabel ??
+                `Indbakke${inboxHasActivity ? (preview ? ' – eksempel på nye henvendelser' : ' – nye henvendelser') : ''}`
+              }
               title={preview ? 'Indbakke · eksempel' : 'Indbakke'}
             >
               <Inbox size={22} strokeWidth={1.65} aria-hidden="true" />

@@ -22,7 +22,7 @@ async function login(page: Page) {
     .fill('fixture-password');
   await page.getByRole('button', { name: 'Log ind', exact: true }).click();
   await expect(
-    page.getByRole('link', { name: 'Kalender', exact: true }),
+    page.getByRole('heading', { name: 'Indbakke', level: 1, exact: true }),
   ).toBeVisible();
 }
 
@@ -107,6 +107,8 @@ test('login survives reopening, offline launch reveals no customer data and logo
   await expect(page.getByText('Anna Jensen')).toHaveCount(0);
   await context.setOffline(false);
   await page.getByRole('link', { name: 'Prøv igen' }).click();
+  if (await page.getByRole('button', { name: 'Åbn menu' }).isVisible())
+    await page.getByRole('button', { name: 'Åbn menu' }).click();
   await page.getByRole('button', { name: 'Log ud', exact: true }).click();
   await page.reload();
   await expect(

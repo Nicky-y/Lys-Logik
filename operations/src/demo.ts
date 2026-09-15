@@ -11,6 +11,7 @@ import {
   type Appointment,
 } from '../../supabase/functions/_shared/contracts/operations.ts';
 import { OperationsError, type OperationsGateway } from './gateway';
+import { collectionForStatus } from './lead-navigation';
 import { copenhagenLocal, copenhagenInstant, shiftDay } from './calendar-time';
 export const demoStaff = StaffSchema.parse({
   user_id: 'ec421bef-f031-4416-9f30-21871b4c7d30',
@@ -114,11 +115,17 @@ export function createDemoGateway(): OperationsGateway {
     ]);
   });
   return {
-    async list(offset) {
+    async list(offset, collection) {
+      const matches = [...data.values()].filter(
+        (lead) => collectionForStatus(lead.status) === collection,
+      );
       return {
-        items: structuredClone([...data.values()].slice(offset, offset + 100)),
-        hasMore: false,
+        items: structuredClone(matches.slice(offset, offset + 100)),
+        hasMore: offset + 100 < matches.length,
       };
+    },
+    async inboxCount() {
+      return [...data.values()].filter((lead) => lead.status === 'new').length;
     },
     async lead(id) {
       const lead = data.get(id);
@@ -149,15 +156,13 @@ export function createDemoGateway(): OperationsGateway {
         );
       return {
         items: structuredClone(
-          matches
-            .slice(offset, offset + 100)
-            .map((item) => ({
-              ...item,
-              lead: {
-                name: data.get(item.lead_id)!.name,
-                postal_code: data.get(item.lead_id)!.postal_code,
-              },
-            })),
+          matches.slice(offset, offset + 100).map((item) => ({
+            ...item,
+            lead: {
+              name: data.get(item.lead_id)!.name,
+              postal_code: data.get(item.lead_id)!.postal_code,
+            },
+          })),
         ),
         hasMore: offset + 100 < matches.length,
       };

@@ -40,6 +40,15 @@ test.beforeEach(async ({ page, request }) => {
     .getByLabel('Adgangskode', { exact: true })
     .fill('fixture-password');
   await page.getByRole('button', { name: 'Log ind', exact: true }).click();
+  const menu = page.getByRole('button', { name: 'Åbn menu' });
+  await expect(
+    page.getByRole('heading', { name: 'Indbakke', level: 1 }),
+  ).toBeVisible();
+  if (await menu.isVisible()) await menu.click();
+  await page
+    .getByRole('navigation', { name: 'Appens hovedmenu' })
+    .getByRole('link', { name: 'Indstillinger', exact: true })
+    .click();
   await page
     .getByRole('button', { name: 'Notifikationer', exact: true })
     .click();

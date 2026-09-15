@@ -5,6 +5,7 @@ import {
 } from './customer-mail';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { z } from 'zod';
+import type { LeadCollection } from './lead-navigation';
 import {
   OperationsLeadSchema,
   LeadEventSchema,
@@ -17,11 +18,18 @@ import {
   type CommandReceipt,
   AppointmentSchema,
   type Appointment,
+  pipelineStatuses,
+  archiveStatuses,
 } from '../../supabase/functions/_shared/contracts/operations.ts';
 
 export interface OperationsGateway {
   mail?: CustomerMailGateway;
-  list(offset: number): Promise<{ items: OperationsLead[]; hasMore: boolean }>;
+  list(
+    offset: number,
+    collection: LeadCollection,
+  ): Promise<{ items: OperationsLead[]; hasMore: boolean }>;
+  /** Counts every new enquiry under the current staff member's access, independently of loaded pages. */
+  inboxCount(): Promise<number>;
   lead(id: LeadId): Promise<OperationsLead>;
   history(id: LeadId): Promise<LeadEvent[]>;
   appointment(id: LeadId): Promise<Appointment | null>;
@@ -86,16 +94,31 @@ export function createOperationsGateway(
 ): OperationsGateway {
   return {
     mail: createCustomerMailGateway(client),
-    async list(offset) {
+    async list(offset, collection) {
+      const statuses =
+        collection === 'inbox'
+          ? ['new']
+          : collection === 'archive'
+            ? archiveStatuses
+            : pipelineStatuses.filter((status) => status !== 'new');
       const { data, error } = await client
         .from('leads')
         .select('*')
+        .in('status', statuses)
         .order('created_at', { ascending: false })
         .order('id')
         .range(offset, offset + 99);
       check(error);
       const items = z.array(OperationsLeadSchema).parse(data);
       return { items, hasMore: items.length === 100 };
+    },
+    async inboxCount() {
+      const { count, error } = await client
+        .from('leads')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'new');
+      check(error);
+      return z.number().int().nonnegative().parse(count);
     },
     async lead(id) {
       const { data, error } = await client
