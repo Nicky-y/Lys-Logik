@@ -1,5 +1,13 @@
 # Grundlag for servicesidernes afgrænsning
 
+## Bygningsautomatik — kontrolleret 2026-09-15
+
+[BR18 §§ 295–296](https://www.bygningsreglementet.dk/tekniske-bestemmelser/11/krav/295_296/) er grundlaget for FAQ'ens korte omtale af dimensionerende varme- eller kølebehov over 290 kW, forbeholdene for eksisterende bygninger og funktionsafprøvning. PDF'en fra Energiforum Danmark, som blev delt under researchen, er et høringssvar og anvendes ikke som gældende lovgrundlag.
+
+Siden beskriver afklaring og konfigurering af kompatible eksisterende systemer. Den lover ikke bestemte energibesparelser, integration med alle fabrikater, myndighedsgodkendelse eller autorisationskrævende installationsarbejde. Konkrete systemer og leverancer skal stadig afklares fagligt.
+
+Servicesiden og formularen bruger kategorien `bygningsautomatik`, som deles med backend og medarbejderappen. Tidligere links med `service=andet&topic=bygningsautomatik` vælger den nye kategori for nye henvendelser. Gemte henvendelser og deres oprindelige snapshots omklassificeres ikke. Se [udgivelsesrækkefølge og kontrol](building-automation-pipeline.md), før ændringen aktiveres i produktion.
+
 ## Stikkontakter — kontrolleret 2026-09-12
 
 Officielle kilder:

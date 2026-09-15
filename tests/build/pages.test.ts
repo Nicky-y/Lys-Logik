@@ -6,6 +6,41 @@ import { test } from 'node:test';
 const dist = new URL('../../dist/', import.meta.url);
 const html = readFileSync(new URL('index.html', dist), 'utf8');
 
+test('building automation has a complete service route and uses the supported enquiry contract', () => {
+  const base = process.env.GITHUB_ACTIONS === 'true' ? '/Lys-Logik/' : '/';
+  const automation = readFileSync(
+    new URL('services/bygningsautomatik/index.html', dist),
+    'utf8',
+  );
+  assert.match(automation, /<title>Bygningsautomatik i Storkøbenhavn/);
+  assert.equal([...automation.matchAll(/<h1\b/g)].length, 1);
+  assert.ok(html.includes(`href="${base}services/bygningsautomatik/"`));
+  assert.ok(
+    automation.includes(
+      `src="${base}images/service-bygningsautomatik-v2.webp"`,
+    ),
+  );
+  assert.ok(
+    automation.includes(`href="${base}?service=bygningsautomatik#kontakt"`),
+  );
+  assert.ok(!automation.includes('topic=bygningsautomatik'));
+  assert.ok(html.includes('value="bygningsautomatik"'));
+  assert.ok(
+    automation.includes(
+      'Vi udfører kun arbejde, der ikke kræver autorisation.',
+    ),
+  );
+  assert.ok(automation.includes('Op til 4 timers gratis arbejde'));
+  assert.ok(
+    automation.includes(
+      'https://www.bygningsreglementet.dk/tekniske-bestemmelser/11/krav/295_296/',
+    ),
+  );
+  for (const section of ['help', 'scope', 'process', 'price', 'faq', 'end']) {
+    assert.ok(automation.includes(`id="${section}-title"`));
+  }
+});
+
 test('appliance route preserves contact context and limits the offer to electrical plug connection', () => {
   const base = process.env.GITHUB_ACTIONS === 'true' ? '/Lys-Logik/' : '/';
   const appliance = readFileSync(
@@ -146,7 +181,7 @@ test('production ships the live form with the production endpoint and real widge
   assert.match(html, /<fieldset\b[^>]*id="form-fields"[^>]*disabled/);
 });
 
-test('all five catalogue images ship under the deployment base', () => {
+test('all six catalogue images ship under the deployment base', () => {
   const base = process.env.GITHUB_ACTIONS === 'true' ? '/Lys-Logik/' : '/';
   const catalogue = html.match(
     /<section\b[^>]*id="ydelser"[\s\S]*?<\/section>/,
@@ -159,11 +194,13 @@ test('all five catalogue images ship under the deployment base', () => {
         'Fra den gode belysning til de små smarte detaljer. Vi finder en løsning, der giver mening for dig.',
       ),
   );
-  assert.equal([...catalogue.matchAll(/aria-label="Læs mere:/g)].length, 5);
+  assert.equal([...catalogue.matchAll(/aria-label="Læs mere:/g)].length, 6);
+  assert.ok(catalogue.includes('aria-label="Læs om Bygningsautomatik"'));
+  assert.ok(!catalogue.includes('/services/null/'));
   assert.ok(!catalogue.includes('Udforsk service'));
   const images = [...catalogue.matchAll(/<img\b[^>]*src="([^"]+)"[^>]*>/g)];
-  assert.equal(images.length, 5);
-  assert.equal(new Set(images.map((image) => image[1])).size, 5);
+  assert.equal(images.length, 6);
+  assert.equal(new Set(images.map((image) => image[1])).size, 6);
   for (const [tag, path] of images) {
     assert.ok(path.startsWith(`${base}images/`), path);
     assert.ok(existsSync(new URL(path.slice(base.length), dist)), path);

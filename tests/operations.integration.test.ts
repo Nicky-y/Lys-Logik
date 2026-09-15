@@ -97,6 +97,70 @@ async function events() {
   ).rows;
 }
 
+test('building automation follows review, appointment and customer mail workflows with its original category', async () => {
+  await db.exec('reset role');
+  const input = {
+    ...validLead,
+    service: 'bygningsautomatik',
+    description: 'Ventilationen kører om natten.',
+  };
+  const receipt = (
+    await db.query<{ receipt: { reference: string } }>(
+      'select public.create_lead_submission($1::uuid,$2::jsonb) receipt',
+      [randomUUID(), JSON.stringify(input)],
+    )
+  ).rows[0].receipt;
+  leadId = (await db.query<{ id: string }>('select id from public.leads where reference=$1', [receipt.reference])).rows[0].id;
+  await db.exec('update lys_private.mail_settings set enabled=true');
+  await login(technical);
+  await review();
+  await status('qualified', 2);
+  await login(backoffice);
+  await db.query(
+    'select public.create_lead_appointment($1,$2,$3,$4,$5,$6,$7)',
+    [
+      leadId,
+      3,
+      randomUUID(),
+      'Gennemgang af ventilation',
+      'Eksempelvej 12',
+      '2026-09-16T09:00:00+02:00',
+      '2026-09-16T11:00:00+02:00',
+    ],
+  );
+  const messageId = randomUUID();
+  await db.query('select public.queue_customer_message($1,$2,$3,$4)', [
+    messageId,
+    leadId,
+    'Din bygningsautomatik',
+    'Send gerne billeder af de eksisterende systemer.',
+  ]);
+  const saved = await state();
+  const parsed = OperationsLeadSchema.parse(JSON.parse(JSON.stringify(saved)));
+  assert.equal(parsed.service, 'bygningsautomatik');
+  assert.equal(parsed.status, 'scheduled');
+  assert.equal(parsed.version, 4);
+  assert.deepEqual(saved.original_submission, input);
+  assert.equal((await events()).length, 4);
+  assert.equal(
+    (
+      await db.query('select id from public.appointments where lead_id=$1', [
+        leadId,
+      ])
+    ).rows.length,
+    1,
+  );
+  assert.equal(
+    (
+      await db.query(
+        'select id from public.lead_messages where id=$1 and lead_id=$2',
+        [messageId, leadId],
+      )
+    ).rows.length,
+    1,
+  );
+});
+
 test('status and actor history commit together without changing the original enquiry', async () => {
   const receipt = CommandReceiptSchema.parse(await status('clarifying'));
   const lead = OperationsLeadSchema.parse(

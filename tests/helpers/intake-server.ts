@@ -38,6 +38,14 @@ const server = createServer(async (incoming, outgoing) => {
       outgoing.end(JSON.stringify(rows[0]));
       return;
     }
+    if (incoming.url === '/_test/enquiries') {
+      const { rows } = await db.query(
+        'select reference,service,original_submission from public.leads order by created_at',
+      );
+      outgoing.setHeader('Content-Type', 'application/json');
+      outgoing.end(JSON.stringify(rows));
+      return;
+    }
     if (incoming.url !== '/create-lead') {
       outgoing.statusCode = 404;
       outgoing.end();

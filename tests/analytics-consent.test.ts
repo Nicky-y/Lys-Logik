@@ -40,6 +40,13 @@ test('only known routes survive page-location sanitization, including legacy Pag
     const origin = 'https://example.test';
     assert.equal(
       pageLocation(
+        `${origin}${base}services/bygningsautomatik/?topic=private#phone`,
+        base,
+      ),
+      `${origin}${base}services/bygningsautomatik/`,
+    );
+    assert.equal(
+      pageLocation(
         `${origin}${base}services/smart-home/?email=private#phone`,
         base,
       ),

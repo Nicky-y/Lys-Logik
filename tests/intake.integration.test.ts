@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import { after, before, beforeEach, test } from 'node:test';
 import type { PGlite } from '@electric-sql/pglite';
 import { OperationsLeadSchema } from '../supabase/functions/_shared/contracts/operations.ts';
@@ -40,6 +41,7 @@ async function counts() {
 
 test('catalogue services and historical categories retain their exact intake snapshots', async () => {
   const services = [
+    'bygningsautomatik',
     'lampeopsaetning',
     'stikkontakter',
     'smart-home',
@@ -68,10 +70,10 @@ test('catalogue services and historical categories retain their exact intake sna
     assert.deepEqual(await submit(key, lead), receipt);
   }
   assert.deepEqual(await counts(), {
-    leads: 8,
-    events: 8,
-    deliveries: 16,
-    submissions: 8,
+    leads: 9,
+    events: 9,
+    deliveries: 18,
+    submissions: 9,
   });
   await assert.rejects(
     submit('00000000-0000-4000-8000-999999999999', {
@@ -80,11 +82,58 @@ test('catalogue services and historical categories retain their exact intake sna
     }),
   );
   assert.deepEqual(await counts(), {
-    leads: 8,
-    events: 8,
-    deliveries: 16,
-    submissions: 8,
+    leads: 9,
+    events: 9,
+    deliveries: 18,
+    submissions: 9,
   });
+});
+
+test('building automation migration preserves older other enquiries and their replay receipts', async () => {
+  const previousMigration = await readFile(
+    new URL(
+      '../supabase/migrations/20260912000100_service_catalogue.sql',
+      import.meta.url,
+    ),
+    'utf8',
+  );
+  const migration = await readFile(
+    new URL(
+      '../supabase/migrations/20260915000100_building_automation_service.sql',
+      import.meta.url,
+    ),
+    'utf8',
+  );
+  await db.exec(previousMigration);
+  const oldInput = {
+    ...validLead,
+    service: 'andet',
+    description: 'Bygningsautomatik: Ventilationen kører om natten.',
+  };
+  try {
+    const receipt = await submit(submissionKey, oldInput);
+    const before = (await db.query('select * from public.leads')).rows;
+    const beforeCounts = await counts();
+    await assert.rejects(
+      submit('00000000-0000-4000-8000-999999999999', {
+        ...validLead,
+        service: 'bygningsautomatik',
+      }),
+    );
+    await db.exec(migration);
+    assert.deepEqual(
+      (await db.query('select * from public.leads')).rows,
+      before,
+    );
+    assert.deepEqual(await submit(submissionKey, oldInput), receipt);
+    assert.deepEqual(await counts(), beforeCounts);
+    await submit('00000000-0000-4000-8000-999999999999', {
+      ...validLead,
+      service: 'bygningsautomatik',
+    });
+  } finally {
+    await db.exec(migration);
+  }
 });
 
 test('migration atomically creates snapshot, receipt, event and two pending delivery intents', async () => {

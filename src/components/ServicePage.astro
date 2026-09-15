@@ -22,7 +22,7 @@ const { live: liveForm } = resolveLeadFormConfig({
 
 <Layout title={content.title} description={content.description}>
   <a class="skip-link" href="#indhold">Spring til indhold</a>
-  <SiteHeader homeHref={homeHref} contactHref={contactHref} />
+  <SiteHeader homeHref={homeHref} />
   <main id="indhold" class="service-page">
     <section class="service-hero container" aria-labelledby="service-title">
       <nav class="breadcrumbs" aria-label="Brødkrummer">
@@ -154,6 +154,13 @@ const { live: liveForm } = resolveLeadFormConfig({
                     <Icon name="plus" size={18} />
                   </summary>
                   <p>{item.answer}</p>
+                  {item.reference && (
+                    <p>
+                      <a class="text-link" href={item.reference.href}>
+                        {item.reference.label} <Icon name="arrow" size={18} />
+                      </a>
+                    </p>
+                  )}
                 </>
               </details>
             ))

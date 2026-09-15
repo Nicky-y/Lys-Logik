@@ -64,6 +64,53 @@ test('backoffice logs in, calls from the customer card and saves a status, waiti
   ).toBeVisible();
   await expect(page.getByText('Anna Jensen')).toHaveCount(0);
 });
+test('building automation is labelled in the pipeline and case and keeps its category after a status change', async ({
+  page,
+  request,
+}) => {
+  await request.post('http://127.0.0.1:54327/_test/building-automation');
+  await login(page);
+  const card = page.getByRole('link').filter({
+    has: page.getByRole('heading', {
+      name: 'Bygningsautomatik test',
+      exact: true,
+    }),
+  });
+  await expect(
+    card.getByText('Bygningsautomatik', { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Anna Jensen', exact: true }),
+  ).toBeVisible();
+  await card.click();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog).toContainText('Bygningsautomatik · 0800');
+  await page
+    .getByRole('combobox', { name: 'Status', exact: true })
+    .selectOption('clarifying');
+  await page.getByRole('button', { name: 'Gem status' }).click();
+  await expect(page.getByText('Version 2', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Luk sag' }).click();
+  await expect(
+    card.getByText('Bygningsautomatik', { exact: true }),
+  ).toBeVisible();
+  const rows = await (
+    await request.get('http://127.0.0.1:54327/_test/building-automation')
+  ).json();
+  expect(rows).toHaveLength(1);
+  expect(rows[0]).toMatchObject({
+    service: 'bygningsautomatik',
+    status: 'clarifying',
+    original_submission: {
+      service: 'bygningsautomatik',
+      description: 'Ventilationen kører om natten.',
+    },
+  });
+  expect(
+    await (await request.get('http://127.0.0.1:54327/_test/state')).json(),
+  ).toEqual({ leads: 2, events: 3 });
+});
+
 test('technical review must be saved before the lead can be qualified', async ({
   page,
 }) => {
@@ -170,7 +217,9 @@ test('pipeline and case view have no automated accessibility violations or page 
   await openLead(page);
   const bounds = await page.getByRole('dialog').boundingBox();
   expect(bounds?.x).toBeGreaterThanOrEqual(0);
-  expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(page.viewportSize()!.width);
+  expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(
+    page.viewportSize()!.width,
+  );
   expect(
     (
       await new AxeBuilder({ page })

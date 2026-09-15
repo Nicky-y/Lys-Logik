@@ -33,6 +33,7 @@ export function pageLocation(url: string, base: string): string {
   const path = parsed.pathname.slice(root.length);
   const routes = [
     '',
+    'services/bygningsautomatik/',
     'services/lampeopsaetning/',
     'services/stikkontakter/',
     'services/smart-home/',

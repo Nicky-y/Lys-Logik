@@ -37,9 +37,14 @@ export function initializeLeadForm() {
   let widgetId: string | undefined;
   let busy = false;
   const serviceSelect = form.elements.namedItem('service') as HTMLSelectElement;
-  const requestedService = new URLSearchParams(window.location.search).get(
-    'service',
-  );
+  const query = new URLSearchParams(window.location.search);
+  // Previously shared links used "andet" plus a known topic. New submissions
+  // select the native category; existing saved enquiries are never rewritten.
+  const requestedService =
+    query.get('service') === 'andet' &&
+    query.get('topic') === 'bygningsautomatik'
+      ? 'bygningsautomatik'
+      : query.get('service');
   if (
     requestedService &&
     Array.from(serviceSelect.options).some(

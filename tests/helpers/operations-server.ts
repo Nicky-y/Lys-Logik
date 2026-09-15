@@ -77,6 +77,31 @@ const server = createServer((req, res) => {
           );
           return;
         }
+        if (url.pathname === '/_test/building-automation') {
+          await db.exec('reset role');
+          if (req.method === 'POST') {
+            await db.query(
+              'select public.create_lead_submission($1::uuid,$2::jsonb)',
+              [
+                randomUUID(),
+                JSON.stringify({
+                  ...validLead,
+                  name: 'Bygningsautomatik test',
+                  service: 'bygningsautomatik',
+                  description: 'Ventilationen kører om natten.',
+                }),
+              ],
+            );
+          }
+          reply(
+            (
+              await db.query(
+                "select service,status,original_submission from public.leads where service='bygningsautomatik'",
+              )
+            ).rows,
+          );
+          return;
+        }
         if (url.pathname === '/_test/advance') {
           await db.exec('reset role');
           await db.query(

@@ -28,7 +28,7 @@ test('loads local images and navigation without browser errors', async ({
       .toBe(true);
   }
   expect(await page.locator('.brand img').first().getAttribute('src')).toBe(
-    '/images/logo-v11.png',
+    '/images/logo-v32.png',
   );
   expect(errors).toEqual([]);
   await page.evaluate(() => window.scrollTo(0, 0));

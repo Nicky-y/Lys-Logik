@@ -3,8 +3,10 @@ import Layout from '../layouts/Layout.astro';
 import Icon from '../components/Icon.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import SiteHeader from '../components/SiteHeader.astro';
+import HeroVideo from '../components/HeroVideo.astro';
+import '@fontsource-variable/outfit';
 import ServiceCatalogue from '../components/ServiceCatalogue.astro';
-import { site, services, questions } from '../data/site';
+import { site, catalogueServices, questions } from '../data/site';
 import { resolveLeadFormConfig } from '../lib/lead-form-config';
 const {
   endpoint: leadEndpoint,
@@ -16,34 +18,17 @@ const {
   siteKey: import.meta.env.PUBLIC_TURNSTILE_SITE_KEY,
 });
 
-const assetBase = import.meta.env.BASE_URL.endsWith('/')
-  ? import.meta.env.BASE_URL
-  : `${import.meta.env.BASE_URL}/`;
 ---
 
 <Layout>
   <a class="skip-link" href="#indhold">Spring til indhold</a>
-  <SiteHeader />
+  <SiteHeader overlay />
 
   <main id="indhold">
-    <section class="hero" aria-labelledby="hero-heading">
-      <picture class="hero-image"
-        ><source
-          srcset={`${assetBase}images/hero-960.webp 960w, ${assetBase}images/hero.webp 1536w`}
-          type="image/webp"
-        /><img
-          src={`${assetBase}images/hero.webp`}
-          alt="Varmt lys ved et moderne hjem i skumringen. Inspirationsbillede."
-          width="1536"
-          height="1024"
-          fetchpriority="high"
-        /></picture
-      >
+    <section class="hero hero-immersive" aria-labelledby="hero-heading">
+      <HeroVideo />
       <div class="container hero-content">
         <div class="hero-copy">
-          <p class="eyebrow">
-            <span class="light-dot"></span> HJÆLP TIL HJEMMET · {site.area}
-          </p>
           <h1 id="hero-heading">
             Godt lys.<br />En smartere<br /><span>hverdag.</span>
           </h1>
@@ -67,7 +52,6 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
           <span class="hero-note-link">Se pilottilbuddet <Icon name="arrow" size={18} /></span>
         </a>
       </div>
-      <span class="image-credit">Inspirationsbillede</span>
     </section>
 
     <div class="promise-strip">
@@ -305,7 +289,7 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
                   required
                   aria-describedby="service-error"
                   ><option value="">Vælg en opgavetype</option>{
-                    services.map((service) => (
+                    catalogueServices.map((service) => (
                       <option value={service.id}>{service.label}</option>
                     ))
                   }<option value="andet">Noget andet</option></select

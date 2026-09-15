@@ -56,6 +56,7 @@ test('requires four postcode digits and preserves leading zeroes', () => {
 });
 test('accepts each available service and rejects unknown values', () => {
   for (const service of [
+    'bygningsautomatik',
     'lampeopsaetning',
     'stikkontakter',
     'smart-home',
@@ -70,7 +71,7 @@ test('accepts each available service and rejects unknown values', () => {
 });
 
 test('each published catalogue choice is accepted by intake and has an operations label', () => {
-  assert.equal(services.length, 5);
+  assert.equal(services.length, 6);
   for (const service of services) {
     assert.equal(ServiceSchema.parse(service.id), service.id);
     assert.equal(serviceLabels[service.id], service.label);

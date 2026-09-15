@@ -4,10 +4,11 @@ Dato: 2026-09-12. Billederne er inspiration, ikke dokumentation af udførte kund
 
 ## Eksisterende billeder
 
+- Bygningsautomatik: `public/images/service-bygningsautomatik-v2.webp`, fra brugerens `marketing/assets/ChatGPT Image 15. sep. 2026, 02.20.50.png`. Udskiftet 15. september 2026 med versionen uden tablet i forgrunden. Nedskaleret til 960 px bredde og konverteret til WebP; motivet er uændret. Både kataloget og servicesiden bruger denne version. Kataloget viser illustrationen i samme 3:2-format som de øvrige kort.
 - Lampeopsætning: `public/images/lighting-960.webp`.
 - Lysstyring og sensorer: `public/images/smart-home-960.webp`.
 
-Begge genbruges fra hjemmesidens eksisterende billedmateriale uden ændringer.
+Lampe- og lysstyringsbilledet genbruges fra hjemmesidens eksisterende billedmateriale uden ændringer.
 
 ## Nye billeder
 

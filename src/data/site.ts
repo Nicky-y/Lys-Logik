@@ -10,7 +10,7 @@ export const site = {
   cvr: '45 82 71 27',
   area: 'Storkøbenhavn',
   vision:
-    'Vi bygger Lys & Logik med godt elhåndværk som fundament og teknologi som en del af driften. Vi udvikler egne softwareværktøjer og nye arbejdsgange, der skal forbedre planlægning, logistik og dokumentation. Målet er at kunne vokse uden at miste overblik, kvalitet eller nærhed til kunden – som i sidste ende har til formål, at gøre det billigere for kunden.',
+    'Vi bygger Lys & Logik med godt elhåndværk som fundament og teknologi som en del af driften. Vi udvikler egne softwareværktøjer og nye arbejdsgange, der skal forbedre planlægning, logistik og dokumentation. Målet er at kunne vokse uden at miste overblik, kvalitet eller nærhed til kunden.',
   email: 'kontakt@lysoglogik.dk',
   phone: '71 41 84 81',
   phoneHref: 'tel:+4571418481',
@@ -43,11 +43,27 @@ export const socialProfiles = [
 
 export const trustpilotUrl = 'https://www.trustpilot.com/review/lysoglogik.dk';
 
+export const buildingAutomationService = {
+  id: 'bygningsautomatik',
+  tag: 'Automatik',
+  number: '01',
+  page: 'bygningsautomatik',
+  label: serviceLabels.bygningsautomatik,
+  teaser: 'Styring og overblik over bygningens lys, varme og ventilation.',
+  image: 'service-bygningsautomatik-v2.webp',
+  imageAlt:
+    'Illustration af en erhvervsbygning med samlet styring af lys, ventilation og varme.',
+  text: 'Vi hjælper med afklaring og konfigurering af kompatible eksisterende systemer til bygningens lys, varme og ventilation.',
+  scope:
+    'Vi starter med at afklare bygningens eksisterende systemer og de funktioner, du har brug for. Vi påtager os kun arbejde, der kan udføres uden autorisation.',
+} as const;
+
+/** Services currently supported by the enquiry form and backend. */
 export const services = [
   {
     id: 'lampeopsaetning',
     tag: 'Lamper',
-    number: '01',
+    number: '06',
     page: 'lampeopsaetning',
     teaser: 'Loft- og væglamper på plads i eksisterende lampeudtag.',
     label: serviceLabels.lampeopsaetning,
@@ -116,6 +132,7 @@ export const services = [
     scope:
       'Stikproppen skal passe til en eksisterende stikkontakt, og tilslutningen skal kunne ske uden værktøj. Fast tilslutning og VVS-arbejde er ikke omfattet.',
   },
+  buildingAutomationService,
 ] as const satisfies readonly {
   id: Service;
   tag: string;
@@ -128,6 +145,11 @@ export const services = [
   text: string;
   scope: string;
 }[];
+
+/** Shared display order for the catalogue and enquiry form; preserves service-page bindings. */
+export const catalogueServices = [...services].sort(
+  (left, right) => Number(left.number) - Number(right.number),
+);
 
 export const questions = [
   {

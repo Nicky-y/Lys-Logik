@@ -1,5 +1,5 @@
 ---
-import { services } from '../data/site';
+import { catalogueServices } from '../data/site';
 import Icon from './Icon.astro';
 const assetBase = import.meta.env.BASE_URL.endsWith('/')
   ? import.meta.env.BASE_URL
@@ -25,7 +25,7 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
 
     <div class="catalogue-list">
       {
-        services.map((service) => (
+        catalogueServices.map((service) => (
           <article
             class="catalogue-item"
             aria-labelledby={`service-${service.id}`}

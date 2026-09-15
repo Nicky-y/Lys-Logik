@@ -3,6 +3,7 @@ import { z } from 'zod';
 /** Current catalogue choices plus historical categories retained on existing enquiries. */
 export const ServiceSchema = z.enum(
   [
+    'bygningsautomatik',
     'lampeopsaetning',
     'stikkontakter',
     'smart-home',
@@ -18,6 +19,7 @@ export const ServiceSchema = z.enum(
 export type Service = z.infer<typeof ServiceSchema>;
 
 export const serviceLabels: Record<Service, string> = {
+  bygningsautomatik: 'Bygningsautomatik',
   lampeopsaetning: 'Lampeopsætning',
   stikkontakter: 'Udskiftning af stikkontakter',
   'smart-home': 'Smart-home opsætning og konfigurering',

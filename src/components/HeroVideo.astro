@@ -1,0 +1,104 @@
+---
+const assetBase = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+const poster = assetBase + 'images/hero-video-poster.webp';
+---
+
+<div class="hero-image" aria-hidden="true">
+  <img src={poster} alt="" width="1600" height="900" fetchpriority="high" />
+  <video
+    id="hero-video"
+    class="hero-video"
+    data-src={assetBase + 'videos/hero-home.mp4'}
+    poster={poster}
+    muted
+    loop
+    playsinline
+    preload="none"
+    tabindex="-1"
+  ></video>
+</div>
+<button
+  class="hero-video-toggle"
+  type="button"
+  aria-controls="hero-video"
+  aria-label="Afspil baggrundsvideo"
+  title="Afspil baggrundsvideo"
+  hidden
+>
+  <svg class="video-play-icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m8 5 11 7-11 7Z" /></svg>
+  <svg class="video-pause-icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 5h4v14H7zM14 5h4v14h-4z" /></svg>
+</button>
+
+<script>
+  const video = document.querySelector<HTMLVideoElement>('#hero-video')!;
+  const toggle = document.querySelector<HTMLButtonElement>('.hero-video-toggle')!;
+  const motion = matchMedia('(prefers-reduced-motion: reduce)');
+  const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+  let wantsPlayback = !motion.matches && !connection?.saveData;
+  let inView = true;
+  video.muted = true;
+  toggle.hidden = false;
+
+  const updateButton = () => {
+    const playing = !video.paused;
+    const label = playing ? 'Sæt baggrundsvideo på pause' : 'Afspil baggrundsvideo';
+    toggle.setAttribute('aria-label', label);
+    toggle.title = label;
+    toggle.classList.toggle('is-playing', playing);
+  };
+  const syncPlayback = () => {
+    if (!wantsPlayback || !inView || document.hidden) {
+      video.pause();
+      return;
+    }
+    if (!video.getAttribute('src')) video.src = video.dataset.src!;
+    void video.play().catch(updateButton);
+  };
+  toggle.addEventListener('click', () => {
+    wantsPlayback = video.paused;
+    syncPlayback();
+  });
+  video.addEventListener('play', updateButton);
+  video.addEventListener('pause', updateButton);
+  motion.addEventListener('change', () => {
+    wantsPlayback = !motion.matches && !connection?.saveData;
+    syncPlayback();
+  });
+  document.addEventListener('visibilitychange', syncPlayback);
+  new IntersectionObserver(([entry]) => {
+    inView = entry.isIntersecting;
+    syncPlayback();
+  }).observe(video);
+  syncPlayback();
+</script>
+
+<style>
+  .hero-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+  .hero-video-toggle {
+    position: absolute;
+    right: 20px;
+    bottom: 16px;
+    z-index: 3;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid #ffffff70;
+    border-radius: 50%;
+    background: #0b131a99;
+    color: white;
+  }
+  .hero-video-toggle[hidden],
+  .video-pause-icon,
+  .is-playing .video-play-icon { display: none; }
+  .is-playing .video-pause-icon { display: block; }
+  .hero-video-toggle:hover { background: #0b131ae6; }
+  .hero-video-toggle:focus-visible { outline: 3px solid var(--yellow); outline-offset: 4px; }
+</style>

@@ -1,4 +1,4 @@
-import { services } from './site';
+import { buildingAutomationService, services } from './site';
 
 /** Content for a published service page; catalogue entries can exist before their page. */
 export interface ServicePageContent {
@@ -17,8 +17,82 @@ export interface ServicePageContent {
   scopeDetails: string;
   processIntro: string;
   completionHeading: string;
-  questions: { question: string; answer: string }[];
+  questions: {
+    question: string;
+    answer: string;
+    reference?: { label: string; href: string };
+  }[];
 }
+
+export const buildingAutomationPage: ServicePageContent = {
+  service: buildingAutomationService,
+  title: 'Bygningsautomatik i Storkøbenhavn | Lys & Logik',
+  description:
+    'Bygningsautomatik med fokus på styring, energioverblik og drift i Storkøbenhavn. Vi afklarer dine eksisterende anlæg og mulighederne, før vi aftaler opgaven.',
+  heading: 'Få bygningens teknik til at arbejde sammen.',
+  helpHeading: 'Fra daglige indstillinger til bedre overblik.',
+  scopeHeading: 'Vi tager udgangspunkt i din bygning.',
+  faqHeading: 'Spørgsmål om bygningsautomatik.',
+  contactHeading: 'Hvad skal din bygning kunne gøre bedre?',
+  intro:
+    'Lys, varme og ventilation skal passe til den måde, bygningen bliver brugt på. Bygningsautomatik kan samle styring og driftsinformation, så det bliver lettere at følge forbruget og opdage, når noget ikke fungerer som forventet. Vi starter med dine eksisterende anlæg og det, du gerne vil forbedre.',
+  tasks: [
+    'Afklaring af eksisterende styring og ønskede funktioner',
+    'Tidsplaner, der passer til bygningens brugstider',
+    'Overblik over energidata fra kompatible systemer',
+    'Tilpasning af indstillinger inden for det aftalte omfang',
+    'Gennemgang af driftsinformation og tilgængelige alarmer',
+    'Afprøvning og gennemgang af de aftalte funktioner',
+  ],
+  situations: [
+    'Lys eller ventilation kører, selv om bygningen står tom.',
+    'Indstillinger bliver ændret manuelt fra rum til rum.',
+    'Forbruget stiger, men du mangler overblik over hvorfor.',
+  ],
+  preparation:
+    'Fortæl os, hvad bygningen bruges til, hvilke anlæg og styringssystemer du har, og hvad du oplever i den daglige drift. Mærke, model og eksisterende dokumentation hjælper os med at afklare mulighederne. Del ikke adgangskoder i din henvendelse; nødvendig adgang aftaler vi særskilt.',
+  scopeDetails:
+    'Mulighederne afhænger af systemernes kompatibilitet, dokumentationen og den adgang, der kan gives. Vi aftaler konkret, hvilke indstillinger og funktioner vi kan arbejde med. Nye faste ledninger, ændringer i eltavler og autorisationskrævende tilslutninger er ikke omfattet. En gennemgang af styringen er heller ikke i sig selv en dokumentation for, at hele bygningen opfylder bygningsreglementet.',
+  processIntro:
+    'Beskriv bygningen, de eksisterende anlæg og de problemer eller ønsker, du vil have afklaret.',
+  completionHeading: 'Vi tilpasser og gennemgår',
+  questions: [
+    {
+      question: 'Hvad er bygningsautomatik?',
+      answer:
+        'Bygningsautomatik er systemer, der styrer og følger bygningens tekniske anlæg, for eksempel varme, ventilation og belysning. Funktionerne kan omfatte tidsplaner, behovsstyring, energioverblik og alarmer. Omfanget afhænger af bygningen og de tilsluttede anlæg.',
+    },
+    {
+      question: 'Kan vi bruge de systemer, vi allerede har?',
+      answer:
+        'Det undersøger vi først. Det afhænger af de konkrete anlæg, deres funktioner og mulighederne for adgang og samspil. En eksisterende CTS- eller BMS-løsning kan være et udgangspunkt, men vi lover ikke integration med alle fabrikater eller systemer.',
+    },
+    {
+      question: 'Er der lovkrav om bygningsautomatik i min bygning?',
+      answer:
+        'BR18 § 295 omfatter bygninger under § 260 med et dimensionerende varmebehov eller kølebehov over 290 kW. For eksisterende bygninger gælder kravet, når det er teknisk gennemførligt og rentabelt, og fristen var udgangen af 2025. § 296 kræver funktionsafprøvning før ibrugtagning. Det er ikke et generelt krav til alle bygninger; din bygning og dokumentationen skal vurderes konkret.',
+      reference: {
+        label: 'Læs de gældende krav i BR18 §§ 295–296',
+        href: 'https://www.bygningsreglementet.dk/tekniske-bestemmelser/11/krav/295_296/',
+      },
+    },
+    {
+      question: 'Kan I udføre hele elinstallationen?',
+      answer:
+        'Nej. Vi udfører kun arbejde, der ikke kræver autorisation. Hvis løsningen kræver nye faste ledninger, ændringer i eltavler eller autorisationskrævende tilslutninger, skal de dele håndteres særskilt af en autoriseret virksomhed. Opgavens grænser afklares, før vi laver en aftale.',
+    },
+    {
+      question: 'Kan I garantere en bestemt energibesparelse?',
+      answer:
+        'Nej. Potentialet afhænger blandt andet af de eksisterende indstillinger, anlæggenes stand og bygningens brug. Forbrug før og efter skal vurderes med hensyn til eksempelvis vejr og brugstider. Vi aftaler de konkrete funktioner og opfølgningen frem for at love en fast besparelsesprocent.',
+    },
+    {
+      question: 'Hvad koster en opgave med bygningsautomatik?',
+      answer:
+        'Prisen afhænger af systemerne, den tilgængelige dokumentation og de funktioner, vi aftaler. Vi afklarer omfang og pris, før arbejdet starter. Eventuelt udstyr og licenser aftales særskilt. Et mindre, afgrænset forløb kan komme i betragtning som pilotprojekt efter en konkret vurdering.',
+    },
+  ],
+};
 
 export const appliancePage: ServicePageContent = {
   service: services[4],

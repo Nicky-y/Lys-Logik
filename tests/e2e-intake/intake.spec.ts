@@ -18,16 +18,22 @@ test.beforeEach(async ({ page, request }) => {
   await page.goto('/#kontakt');
 });
 
-async function fillEnquiry(page: Page) {
+async function fillEnquiry(
+  page: Page,
+  service: string | null = 'lampeopsaetning',
+) {
   await page.getByLabel('Dit navn').fill('Anna Jensen');
   await page.getByLabel('Din e-mail').fill('anna@example.com');
   await page.getByLabel('Telefon (valgfrit)').fill('12 34 56 78');
   await page.getByLabel('Postnummer').fill('2800');
-  await page.getByLabel('Hvad drejer det sig om?').selectOption('lampeopsaetning');
+  if (service)
+    await page.getByLabel('Hvad drejer det sig om?').selectOption(service);
   await page
     .getByLabel('Fortæl lidt om din idé')
     .fill('Vi vil gerne have bedre lys over vores spisebord.');
-  await page.getByLabel('Jeg er indforstået med, at henvendelsen er uforpligtende').check();
+  await page
+    .getByLabel('Jeg er indforstået med, at henvendelsen er uforpligtende')
+    .check();
 }
 
 test('sends form through the real local endpoint and stores one enquiry with its history', async ({
@@ -49,6 +55,43 @@ test('sends form through the real local endpoint and stores one enquiry with its
       session: sessionStorage.length,
     })),
   ).toEqual({ local: 0, session: 0 });
+});
+
+test('building automation service page submits its own category to the real endpoint and database', async ({
+  page,
+  request,
+}) => {
+  await page.goto('/services/bygningsautomatik/');
+  await page
+    .locator('main')
+    .getByRole('link', { name: 'Beskriv din opgave', exact: true })
+    .first()
+    .click();
+  await expect(page.getByLabel('Hvad drejer det sig om?')).toHaveValue(
+    'bygningsautomatik',
+  );
+  await fillEnquiry(page, null);
+  await page
+    .getByLabel('Fortæl lidt om din idé')
+    .fill('Ventilationen kører om natten.');
+  await page.getByRole('button', { name: 'Send din henvendelse' }).click();
+  await expect(page.locator('#form-success')).toBeVisible();
+  const reference = await page.locator('#lead-reference').textContent();
+  const enquiries = await (
+    await request.get('http://127.0.0.1:54325/_test/enquiries')
+  ).json();
+  expect(enquiries).toHaveLength(1);
+  expect(enquiries[0]).toMatchObject({
+    reference,
+    service: 'bygningsautomatik',
+    original_submission: {
+      service: 'bygningsautomatik',
+      description: 'Ventilationen kører om natten.',
+    },
+  });
+  expect(
+    await (await request.get('http://127.0.0.1:54325/_test/state')).json(),
+  ).toEqual({ leads: 1, newLeads: 1, events: 1, deliveries: 2 });
 });
 
 test('lost response preserves fields and retry confirms the same database enquiry', async ({

@@ -1,18 +1,19 @@
 ---
-import Icon from './Icon.astro';
+import { site } from '../data/site';
+
 interface Props {
   homeHref?: string;
-  contactHref?: string;
+  overlay?: boolean;
 }
-const { homeHref = '', contactHref = '#kontakt' } = Astro.props;
+const { homeHref = '', overlay = false } = Astro.props;
 const assetBase = import.meta.env.BASE_URL.replace(/\/?$/, '/');
 ---
 
-<header class="site-header">
+<header class:list={['site-header', { 'site-header-overlay': overlay }]}>
   <div class="container header-inner">
     <a class="brand" href={homeHref || '#'} aria-label="Lys og Logik – forside">
       <img
-        src={`${assetBase}images/logo-v11.png`}
+        src={`${assetBase}images/${overlay ? 'logo-v32.png' : 'logo-v11.png'}`}
         alt="Lys & Logik · El og automation"
         width="1536"
         height="1024"
@@ -28,12 +29,42 @@ const assetBase = import.meta.env.BASE_URL.replace(/\/?$/, '/');
       <a href={`${homeHref}#ydelser`}>Det hjælper vi med</a>
       <a href="#footer-kontakt">Kontakt</a>
       <a href={`${homeHref}#om-os`}>Om os</a>
-      <a class="button button-small" href={contactHref}
-        >Beskriv din opgave <Icon name="arrow" size={17} /></a
-      >
+      <a class="button button-small" href={site.phoneHref}>Ring +45 {site.phone}</a>
     </nav>
   </div>
 </header>
+<style>
+  .site-header-overlay {
+    position: absolute;
+    inset: 0 0 auto;
+    height: 166px;
+    color: #fff;
+    border: 0;
+    background: linear-gradient(180deg, #071016d9, #07101670 65%, transparent);
+  }
+  .site-header-overlay .brand { width: 240px; height: 148px; }
+  .site-header-overlay .brand img {
+    width: 240px;
+    height: 160px;
+    object-fit: contain;
+    transform: translateY(-6px);
+  }
+  .site-header-overlay #navigation > a:not(.button):hover { color: var(--yellow); }
+  .site-header-overlay .menu-toggle { border-color: #ffffff80; }
+  .site-header-overlay .menu-toggle span { background: #fff; }
+  @media (max-width: 860px) {
+    .site-header-overlay { height: 128px; }
+    .site-header-overlay .brand { width: 180px; height: 110px; }
+    .site-header-overlay .brand img { width: 180px; height: 120px; transform: translateY(-5px); }
+    .site-header-overlay #navigation {
+      top: 127px;
+      background: #10191ff5;
+      color: #fff;
+      border-color: #ffffff35;
+      backdrop-filter: blur(16px);
+    }
+  }
+</style>
 <script>
   const toggle = document.querySelector<HTMLButtonElement>('.menu-toggle')!;
   const nav = document.querySelector<HTMLElement>('#navigation')!;

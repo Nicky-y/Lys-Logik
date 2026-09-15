@@ -3,12 +3,98 @@ import AxeBuilder from '@axe-core/playwright';
 
 // URL slugs and persisted enquiry choices are deliberately separate.
 const serviceRoutes: Record<string, string> = {
+  bygningsautomatik: 'bygningsautomatik',
   lampeopsaetning: 'lampeopsaetning',
   stikkontakter: 'stikkontakter',
   'smart-home': 'smart-home',
   'lysstyring-sensorer': 'lysstyring',
   hvidevarer: 'hvidevarer',
 };
+
+test('building automation leads the six-card catalogue and opens its service page', async ({
+  page,
+}, testInfo) => {
+  await page.goto('/#ydelser');
+  const catalogue = page.getByRole('region', { name: 'Serviceydelser' });
+  const cards = catalogue.getByRole('article');
+  await expect(cards.locator('.catalogue-number')).toHaveText([
+    '01',
+    '02',
+    '03',
+    '04',
+    '05',
+    '06',
+  ]);
+  await expect(cards.getByRole('heading')).toHaveText([
+    'Bygningsautomatik',
+    'Udskiftning af stikkontakter',
+    'Smart-home opsætning og konfigurering',
+    'Lysstyring og sensorer',
+    'Tilslutning af hvidevarer med stikprop',
+    'Lampeopsætning',
+  ]);
+  const automation = cards.first();
+  const photo = automation.getByRole('img');
+  await expect(photo).toHaveAttribute(
+    'src',
+    '/images/service-bygningsautomatik-v2.webp',
+  );
+  await photo.scrollIntoViewIfNeeded();
+  await expect
+    .poll(() =>
+      photo.evaluate(
+        (image: HTMLImageElement) => image.complete && image.naturalWidth > 0,
+      ),
+    )
+    .toBe(true);
+  await expect(automation.locator('.catalogue-tag')).toHaveText('Automatik');
+  await expect(automation.locator('.catalogue-description')).toContainText(
+    'lys, varme og ventilation',
+  );
+  for (const width of [320, 768, 1440]) {
+    await page.setViewportSize({ width, height: 1000 });
+    const box = (await photo.boundingBox())!;
+    expect(box.width / box.height).toBeCloseTo(1.5, 1);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+  }
+  await page.setViewportSize(testInfo.project.use.viewport!);
+  for (const className of ['.catalogue-image-link', '.catalogue-link']) {
+    await page.goto('/#ydelser');
+    const link = automation.locator(className);
+    await expect(link).toHaveAttribute('href', '/services/bygningsautomatik/');
+    await expect(link).toHaveAccessibleName(/Læs (om|mere:) Bygningsautomatik/);
+    if (className === '.catalogue-image-link') {
+      await link.focus();
+      await page.keyboard.press('Enter');
+    } else {
+      await link.click();
+    }
+    await expect(page).toHaveURL(/\/services\/bygningsautomatik\/$/);
+    const heroImage = page.locator('.service-hero img');
+    await expect(heroImage).toHaveAttribute(
+      'src',
+      '/images/service-bygningsautomatik-v2.webp',
+    );
+    await expect
+      .poll(() =>
+        heroImage.evaluate(
+          (image: HTMLImageElement) => image.complete && image.naturalWidth > 0,
+        ),
+      )
+      .toBe(true);
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+      'Få bygningens teknik til at arbejde sammen.',
+    );
+  }
+  await page.goto('/#ydelser');
+  await catalogue.screenshot({
+    path: testInfo.outputPath('six-service-catalogue.png'),
+  });
+});
 
 test('catalogue image arrows stay fixed during hover zoom and remain clickable', async ({
   page,
@@ -17,14 +103,24 @@ test('catalogue image arrows stay fixed during hover zoom and remain clickable',
   await expect(
     page.getByRole('heading', { name: 'Serviceydelser', exact: true }),
   ).toBeVisible();
-  await expect(page.locator('.catalogue-image-arrow')).toHaveCount(5);
-  const link = page.locator('.catalogue-image-link').first();
+  await expect(page.locator('.catalogue-image-arrow')).toHaveCount(6);
+  const link = page.getByRole('link', {
+    name: 'Læs om Lampeopsætning',
+    exact: true,
+  });
   const photo = link.locator('img');
   const arrow = link.locator('.catalogue-image-arrow');
+  const arrowPosition = () =>
+    arrow.evaluate((element: HTMLElement) => ({
+      x: element.offsetLeft,
+      y: element.offsetTop,
+      width: element.offsetWidth,
+      height: element.offsetHeight,
+    }));
   await link.scrollIntoViewIfNeeded();
   if (testInfo.project.name === 'desktop') {
     await page.emulateMedia({ reducedMotion: 'no-preference' });
-    const before = await arrow.boundingBox();
+    const before = await arrowPosition();
     await link.hover();
     await expect(photo).toHaveCSS(
       'transform',
@@ -32,14 +128,16 @@ test('catalogue image arrows stay fixed during hover zoom and remain clickable',
     );
     await expect(link).toHaveCSS('outline-style', 'none');
     await expect(link).toHaveCSS('overflow', 'hidden');
-    expect(await arrow.boundingBox()).toEqual(before);
+    expect(await arrowPosition()).toEqual(before);
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await expect(photo).toHaveCSS('transform', 'none');
     await link.focus();
     await expect(link).toHaveCSS('outline-style', 'solid');
   }
-  const box = (await arrow.boundingBox())!;
-  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+  const box = await arrowPosition();
+  await link.click({
+    position: { x: box.x + box.width / 2, y: box.y + box.height / 2 },
+  });
   await expect(page).toHaveURL(/\/services\/lampeopsaetning\/$/);
 });
 
@@ -99,15 +197,16 @@ test('catalogue images follow their card destination with keyboard and pointer',
   }
 });
 
-test('all five service descriptions select the matching enquiry type', async ({
+test('all six service descriptions select the matching enquiry type', async ({
   page,
 }, testInfo) => {
   await page.goto('/#ydelser');
   const catalogue = page.getByRole('region', {
     name: 'Serviceydelser',
   });
-  await expect(catalogue.getByRole('article')).toHaveCount(5);
+  await expect(catalogue.getByRole('article')).toHaveCount(6);
   const choices = [
+    ['bygningsautomatik', 'Bygningsautomatik'],
     ['lampeopsaetning', 'Lampeopsætning'],
     ['stikkontakter', 'Udskiftning af stikkontakter'],
     ['smart-home', 'Smart-home opsætning og konfigurering'],
@@ -136,9 +235,7 @@ test('all five service descriptions select the matching enquiry type', async ({
       catalogue.getByRole('heading', { name, exact: true }),
     ).toBeVisible();
     if (serviceRoutes[value]) {
-      await article
-        .getByRole('link', { name: `Læs mere: ${name}` })
-        .click();
+      await article.getByRole('link', { name: `Læs mere: ${name}` }).click();
       await expect(page).toHaveURL(
         new RegExp(`/services/${serviceRoutes[value]}/?$`),
       );
@@ -154,11 +251,12 @@ test('all five service descriptions select the matching enquiry type', async ({
     }
     await expect(page.getByLabel('Hvad drejer det sig om?')).toHaveValue(value);
   }
-  await expect(page.locator('#service option')).toHaveCount(7);
+  await expect(page.locator('#service option')).toHaveCount(8);
+  await expect(page.locator('#service option').nth(1)).toHaveAttribute('value', 'bygningsautomatik');
   const imageSources = await catalogue
     .getByRole('img')
     .evaluateAll((images) => images.map((image) => image.getAttribute('src')));
-  expect(new Set(imageSources).size).toBe(5);
+  expect(new Set(imageSources).size).toBe(6);
   await expect(catalogue).toContainText(
     'Vi udfører kun arbejde, der ikke kræver autorisation.',
   );
@@ -166,6 +264,13 @@ test('all five service descriptions select the matching enquiry type', async ({
 });
 
 for (const serviceCase of [
+  {
+    slug: 'bygningsautomatik',
+    title: 'Bygningsautomatik i Storkøbenhavn | Lys & Logik',
+    description: /styring, energioverblik og drift/,
+    question: 'Kan I udføre hele elinstallationen?',
+    answer: 'Vi udfører kun arbejde, der ikke kræver autorisation.',
+  },
   {
     slug: 'hvidevarer',
     title:
@@ -210,6 +315,7 @@ for (const serviceCase of [
     const errors: string[] = [];
     page.on('pageerror', (error) => errors.push(error.message));
     await page.goto(`/services/${serviceCase.slug}/`);
+    await page.locator('[data-consent-reject]').click();
     await expect(page).toHaveTitle(serviceCase.title);
     await expect(page.locator('meta[name="description"]')).toHaveAttribute(
       'content',
@@ -287,4 +393,43 @@ test('service query accepts a visible choice and ignores unknown input', async (
   );
   await page.goto('/?service=not-a-service#kontakt');
   await expect(page.getByLabel('Hvad drejer det sig om?')).toHaveValue('');
+});
+
+test('building automation enquiry uses its native category and requires a customer description', async ({
+  page,
+}) => {
+  await page.goto('/services/bygningsautomatik/');
+  await page
+    .locator('main')
+    .getByRole('link', { name: 'Beskriv din opgave', exact: true })
+    .first()
+    .click();
+  await expect(page).toHaveURL(/\?service=bygningsautomatik#kontakt$/);
+  await expect(page.getByLabel('Hvad drejer det sig om?')).toHaveValue(
+    'bygningsautomatik',
+  );
+  await expect(page.getByLabel('Fortæl lidt om din idé')).toHaveValue('');
+  await page.getByLabel('Dit navn').fill('Teknisk test');
+  await page.getByLabel('Postnummer').fill('2600');
+  await page.getByLabel('Din e-mail', { exact: true }).fill('test@example.com');
+  await page.getByRole('checkbox').check();
+  await page.getByRole('button', { name: 'Prøv formularen' }).click();
+  await expect(page.locator('#description-error')).toContainText(
+    'Beskriv din opgave med 10–1.500 tegn.',
+  );
+  await page
+    .getByLabel('Fortæl lidt om din idé')
+    .fill('Ventilationen kører om natten.');
+  await page.getByRole('button', { name: 'Prøv formularen' }).click();
+  await expect(page.locator('#form-success')).toBeVisible();
+  await page.goto('/?service=andet&topic=bygningsautomatik#kontakt');
+  await expect(page.getByLabel('Hvad drejer det sig om?')).toHaveValue(
+    'bygningsautomatik',
+  );
+  await expect(page.getByLabel('Fortæl lidt om din idé')).toHaveValue('');
+  await page.goto(
+    '/?service=andet&topic=%3Cscript%3Eunknown%3C%2Fscript%3E#kontakt',
+  );
+  await expect(page.getByLabel('Fortæl lidt om din idé')).toHaveValue('');
+  await expect(page.getByLabel('Hvad drejer det sig om?')).toHaveValue('andet');
 });

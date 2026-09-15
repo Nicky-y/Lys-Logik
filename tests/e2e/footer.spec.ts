@@ -1,11 +1,74 @@
 import { expect, test } from '@playwright/test';
 
+test('header call action follows About and stays usable on home and service pages', async ({
+  page,
+}, testInfo) => {
+  const mobile = testInfo.project.name === 'mobile';
+  for (const path of ['/', '/services/hvidevarer/']) {
+    await page.goto(path);
+    if (mobile) await page.getByRole('button', { name: 'Åbn menu' }).click();
+    const menu = page.getByRole('navigation', { name: 'Hovedmenu' });
+    const call = menu.getByRole('link', {
+      name: 'Ring +45 71 41 84 81',
+      exact: true,
+    });
+    await expect(call).toHaveAttribute('href', 'tel:+4571418481');
+    await expect(menu.getByRole('link').last()).toHaveText(
+      'Ring +45 71 41 84 81',
+    );
+    expect(
+      await call.evaluate(
+        (element) => element.previousElementSibling?.textContent,
+      ),
+    ).toBe('Om os');
+    await expect(call).toBeVisible();
+    const primary = page.locator('main .button').first();
+    await expect(call).toHaveCSS(
+      'background-color',
+      await primary.evaluate(
+        (element) => getComputedStyle(element).backgroundColor,
+      ),
+    );
+    await call.focus();
+    await expect(call).toBeFocused();
+    for (const width of mobile ? [320, 390, 768] : [861, 1024, 1440]) {
+      await page.setViewportSize({ width, height: 1000 });
+      const box = (await call.boundingBox())!;
+      expect(box.height).toBeGreaterThanOrEqual(44);
+      expect(box.x).toBeGreaterThanOrEqual(0);
+      expect(box.x + box.width).toBeLessThanOrEqual(width);
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+      ).toBe(true);
+      if (!mobile) {
+        const about = (await menu
+          .getByRole('link', { name: 'Om os', exact: true })
+          .boundingBox())!;
+        expect(box.x).toBeGreaterThan(about.x + about.width);
+      }
+    }
+    if (mobile) await page.getByRole('button', { name: 'Luk menu' }).click();
+  }
+  await page.setViewportSize(testInfo.project.use.viewport!);
+  await page.goto('/');
+  await page.locator('[data-consent-reject]').click();
+  if (mobile) await page.getByRole('button', { name: 'Åbn menu' }).click();
+  await page.screenshot({
+    path: testInfo.outputPath('header-call-action.png'),
+  });
+});
+
 test('header contact opens footer contact details on home and service pages', async ({
   page,
 }, testInfo) => {
   for (const path of ['/', '/services/hvidevarer/']) {
     await page.goto(path);
     const menu = page.getByRole('navigation', { name: 'Hovedmenu' });
+    await expect(
+      menu.getByRole('link', { name: 'Beskriv din opgave', exact: true }),
+    ).toHaveCount(0);
     await expect(
       menu.getByRole('link', { name: 'Pilotprojektet', exact: true }),
     ).toHaveCount(0);
