@@ -80,6 +80,8 @@ export const OperationsLeadSchema = z.object({
   postal_code: z.string().regex(/^\d{4}$/),
   service: ServiceSchema,
   description: z.string(),
+  // Missing/null means the original form did not ask; true is not approval.
+  pilot_requested: z.boolean().nullish(),
   status: LeadStatusSchema,
   version: LeadVersionSchema,
   waiting_on: WaitingOnSchema,

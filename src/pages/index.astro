@@ -6,6 +6,7 @@ import SiteHeader from '../components/SiteHeader.astro';
 import HeroVideo from '../components/HeroVideo.astro';
 import '@fontsource-variable/outfit';
 import ServiceCatalogue from '../components/ServiceCatalogue.astro';
+import PilotSection from '../components/PilotSection.astro';
 import { site, catalogueServices, questions } from '../data/site';
 import { resolveLeadFormConfig } from '../lib/lead-form-config';
 const {
@@ -18,7 +19,6 @@ const {
   siteKey: import.meta.env.PUBLIC_TURNSTILE_SITE_KEY,
 });
 const assetBase = import.meta.env.BASE_URL.replace(/\/?$/, '/');
-
 ---
 
 <Layout>
@@ -44,13 +44,21 @@ const assetBase = import.meta.env.BASE_URL.replace(/\/?$/, '/');
               >Se vores serviceydelser <Icon name="down" size={17} /></a
             >
           </div>
-          <p class="hero-reassurance">Uforpligtende. Vi aftaler pris og omfang, før vi går i gang.</p>
+          <p class="hero-reassurance">
+            Uforpligtende. Vi aftaler pris og omfang, før vi går i gang.
+          </p>
         </div>
         <a class="hero-note" href="#pilot">
-          <span class="hero-note-label">VI SØGER {site.pilotPlaces} PILOTPROJEKTER</span>
+          <span class="hero-note-label"
+            >VI SØGER {site.pilotPlaces} PILOTPROJEKTER</span
+          >
           <strong>Op til {site.pilotHours} timers<br />gratis arbejde.</strong>
-          <span class="hero-note-terms">Du betaler materialer og evt. lejeudstyr.</span>
-          <span class="hero-note-link">Se pilottilbuddet <Icon name="arrow" size={18} /></span>
+          <span class="hero-note-terms"
+            >Du betaler materialer og evt. lejeudstyr.</span
+          >
+          <span class="hero-note-link"
+            >Se pilottilbuddet <Icon name="arrow" size={18} /></span
+          >
         </a>
       </div>
     </section>
@@ -65,43 +73,7 @@ const assetBase = import.meta.env.BASE_URL.replace(/\/?$/, '/');
 
     <ServiceCatalogue />
 
-    <section id="pilot" class="section pilot-section">
-      <div class="container pilot-grid">
-        <div class="pilot-copy">
-          <p class="eyebrow">
-            <span class="light-dot"></span> VI SØGER VORES FØRSTE {
-              site.pilotPlaces
-            } PROJEKTER
-          </p><h2>Din idé kan blive<br />vores første kapitel.</h2><p>
-            Vi er ved at starte Lys & Logik. Derfor søger vi tre mindre
-            projekter, hvor vi kan vise, hvad godt håndværk og gennemtænkte
-            løsninger kan gøre.
-          </p><p>
-            Du får hjælp til din opgave. Vi får en god historie at fortælle — og
-            billeder af arbejdet, efter aftale med dig.
-          </p><a class="button" href="#kontakt"
-            >Fortæl os om dit projekt <Icon name="arrow" /></a
-          >
-        </div>
-        <div class="pilot-offer">
-          <span class="offer-tag">PILOTPROJEKTET</span><div class="price">
-            0<span>kr.</span>
-          </div><h3>
-            i arbejdsløn.<br />Op til {site.pilotHours} timers arbejde.
-          </h3><div class="offer-divider"></div><ul>
-            <li>
-              <Icon name="check" /> Du betaler materialer og evt. lejeudstyr
-            </li><li>
-              <Icon name="check" /> Vi aftaler opgaven og omfanget på forhånd
-            </li><li>
-              <Icon name="check" /> Vi dokumenterer projektet efter aftale
-            </li>
-          </ul><p>
-            En ansøgning er uforpligtende. Vi udvælger tre egnede opgaver.
-          </p><span class="offer-corner" aria-hidden="true">L&L</span>
-        </div>
-      </div>
-    </section>
+    <PilotSection />
 
     <section class="section process-section">
       <div class="container">
@@ -248,6 +220,24 @@ const assetBase = import.meta.env.BASE_URL.replace(/\/?$/, '/');
                 hidden
               >
               </div>
+              <div class="checkbox-field pilot-choice">
+                <input
+                  type="checkbox"
+                  id="pilotRequested"
+                  name="pilotRequested"
+                  aria-describedby="pilot-choice-hint pilotRequested-error"
+                />
+                <label for="pilotRequested">
+                  <strong
+                    >Jeg vil gerne komme i betragtning til et pilotprojekt</strong
+                  >
+                  <span id="pilot-choice-hint"
+                    >Valgfrit · Op til {site.pilotHours} timers gratis arbejde. Vi
+                    aftaler først, om opgaven passer til pilotforløbet.</span
+                  >
+                </label>
+              </div>
+              <span class="field-error" id="pilotRequested-error"></span>
               <div class="form-row">
                 <div class="field">
                   <label for="name">Dit navn</label><input
@@ -408,9 +398,6 @@ const assetBase = import.meta.env.BASE_URL.replace(/\/?$/, '/');
     </section>
   </main>
   <SiteFooter liveForm={liveForm} />
-  <div class="mobile-cta">
-    <a href="#kontakt">Beskriv din opgave <Icon name="arrow" /></a>
-  </div>
   <script>
     import { initializeLeadForm } from '../lib/lead-form';
     initializeLeadForm();

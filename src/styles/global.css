@@ -368,10 +368,16 @@ p {
   font-weight: 650;
   color: var(--yellow);
 }
-.hero-note:hover { border-color: var(--yellow); }
+.hero-note:hover {
+  border-color: var(--yellow);
+}
 /* The homepage video extends behind its transparent navigation. */
-.hero.hero-immersive { min-height: 100svh; }
-.hero-immersive .hero-image img { object-position: center; }
+.hero.hero-immersive {
+  min-height: 100svh;
+}
+.hero-immersive .hero-image img {
+  object-position: center;
+}
 .hero-immersive #hero-heading {
   font-family: 'Outfit Variable', var(--font);
   font-size: clamp(3.25rem, 6.6vw, 6rem);
@@ -380,7 +386,9 @@ p {
   letter-spacing: -0.045em;
   margin-top: 0;
   color: #f7f6f0;
-  text-shadow: 0 3px 2px #00000014, 0 12px 36px #00000040;
+  text-shadow:
+    0 3px 2px #00000014,
+    0 12px 36px #00000040;
 }
 .hero-immersive #hero-heading span {
   font-weight: 650;
@@ -397,13 +405,22 @@ p {
   }
 }
 @media (max-width: 860px) {
-  .hero-immersive #hero-heading { font-size: clamp(3rem, 7.8vw, 4.25rem); }
+  .hero-immersive #hero-heading {
+    font-size: clamp(3rem, 7.8vw, 4.25rem);
+  }
 }
 @media (max-width: 600px) {
-  .hero-immersive #hero-heading { font-size: clamp(2.625rem, 11.8vw, 3.625rem); line-height: 1.04; }
+  .hero-immersive #hero-heading {
+    font-size: clamp(2.625rem, 11.8vw, 3.625rem);
+    line-height: 1.04;
+  }
 }
 @media (forced-colors: active) {
-  .hero-immersive #hero-heading span { color: CanvasText; background: none; filter: none; }
+  .hero-immersive #hero-heading span {
+    color: CanvasText;
+    background: none;
+    filter: none;
+  }
 }
 .hero-immersive .hero-content {
   min-height: 100svh;
@@ -413,7 +430,13 @@ p {
 }
 .hero-immersive:after {
   background:
-    linear-gradient(90deg, #091116ed 0%, #091116cc 28%, #09111670 58%, #09111635 100%),
+    linear-gradient(
+      90deg,
+      #091116ed 0%,
+      #091116cc 28%,
+      #09111670 58%,
+      #09111635 100%
+    ),
     linear-gradient(0deg, #060d11a6, transparent 45%);
 }
 @media (max-width: 860px) {
@@ -477,99 +500,6 @@ p {
   font-size: 0.875rem;
   color: var(--muted);
   margin-bottom: 4px;
-}
-.pilot-section {
-  background: var(--soft);
-}
-.pilot-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 110px;
-  align-items: center;
-}
-.pilot-copy h2 {
-  margin-top: 18px;
-  margin-bottom: 24px;
-}
-.pilot-copy > p:not(.eyebrow) {
-  color: var(--muted);
-  font-size: 0.9375rem;
-  margin-top: 15px;
-}
-.pilot-copy .button {
-  margin-top: 29px;
-}
-.pilot-copy .light-dot {
-  background: #b77b04;
-}
-.pilot-offer {
-  background: var(--yellow);
-  padding: 39px 42px 33px;
-  position: relative;
-  overflow: hidden;
-  border-radius: 6px;
-  transform: rotate(1deg);
-}
-.offer-tag {
-  font-size: 0.75rem;
-  letter-spacing: 0.15em;
-  font-weight: 750;
-}
-.price {
-  font-size: 7.375rem;
-  font-weight: 650;
-  line-height: 1.2;
-  letter-spacing: -0.08em;
-  margin-top: 16px;
-}
-.price span {
-  font-size: 2.0625rem;
-  letter-spacing: -0.04em;
-  margin-left: 12px;
-  font-weight: 550;
-}
-.pilot-offer h3 {
-  font-size: 1.625rem;
-  line-height: 1.35;
-  letter-spacing: -0.035em;
-}
-.offer-divider {
-  height: 1px;
-  background: #19232933;
-  margin: 25px 0;
-}
-.pilot-offer ul {
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.pilot-offer li {
-  font-size: 0.8125rem;
-  line-height: 1.65;
-  display: flex;
-  gap: 9px;
-  align-items: flex-start;
-}
-.pilot-offer li svg {
-  width: 16px;
-  height: 20px;
-}
-.pilot-offer > p {
-  font-size: 0.75rem;
-  line-height: 1.7;
-  margin-top: 23px;
-  max-width: 275px;
-}
-.offer-corner {
-  position: absolute;
-  bottom: 17px;
-  right: 24px;
-  font-size: 1.875rem;
-  letter-spacing: -0.08em;
-  font-weight: 800;
-  color: #73531d;
-  transform: rotate(-8deg);
 }
 .process-section h2 {
   margin-top: 15px;
@@ -940,6 +870,29 @@ details[open] .faq-plus {
   width: 24px;
   height: 24px;
 }
+.pilot-choice {
+  padding: 16px;
+  margin-bottom: 24px;
+  border: 1px solid #ead398;
+  border-radius: 4px;
+  background: #fff8e7;
+}
+.pilot-choice label strong {
+  display: block;
+  color: var(--ink);
+  font-weight: 650;
+  line-height: 1.5;
+}
+.pilot-choice label span {
+  display: block;
+  margin-top: 5px;
+  color: #5e5541;
+  font-size: 0.75rem;
+  line-height: 1.65;
+}
+.pilot-choice input:before {
+  content: none;
+}
 .form-submit {
   width: 100%;
   margin-top: 23px;
@@ -994,9 +947,6 @@ fieldset {
 }
 .form-success > .button {
   margin-top: 30px;
-}
-.mobile-cta {
-  display: none;
 }
 dialog {
   border: 1px solid var(--line);
@@ -1063,16 +1013,12 @@ dialog p:not(.eyebrow) {
   .hero-content {
     gap: 10px;
   }
-  .pilot-grid,
   .about-grid,
   .contact-grid {
     gap: 60px;
   }
   .hero h1 {
     font-size: 3.75rem;
-  }
-  .pilot-offer {
-    padding: 33px;
   }
   .faq-grid {
     gap: 40px;
@@ -1205,30 +1151,6 @@ dialog p:not(.eyebrow) {
   }
   .circle-arrow svg {
     width: 16px;
-  }
-  .pilot-grid {
-    gap: 40px;
-  }
-  .pilot-offer {
-    padding: 28px 24px;
-  }
-  .price {
-    font-size: 6.1875rem;
-  }
-  .pilot-offer h3 {
-    font-size: 1.4375rem;
-  }
-  .pilot-offer li {
-    font-size: 0.75rem;
-  }
-  .pilot-copy h2 {
-    font-size: 2.1875rem;
-  }
-  .pilot-copy > p:not(.eyebrow) {
-    font-size: 0.875rem;
-  }
-  .pilot-copy .eyebrow {
-    font-size: 0.75rem;
   }
   .process-grid {
     gap: 35px;
@@ -1369,37 +1291,6 @@ dialog p:not(.eyebrow) {
     font-size: 0.875rem;
     margin-top: 18px;
   }
-  .pilot-grid {
-    grid-template-columns: 1fr;
-    gap: 38px;
-  }
-  .pilot-copy h2 {
-    font-size: 2.3125rem;
-  }
-  .pilot-copy > p:not(.eyebrow) {
-    font-size: 0.875rem;
-  }
-  .pilot-copy .button {
-    font-size: 0.8125rem;
-  }
-  .pilot-offer {
-    padding: 30px;
-    max-width: 470px;
-    width: calc(100% - 7px);
-    margin: auto;
-  }
-  .price {
-    font-size: 7rem;
-  }
-  .pilot-offer h3 {
-    font-size: 1.6875rem;
-  }
-  .pilot-offer li {
-    font-size: 0.75rem;
-  }
-  .pilot-offer > p {
-    font-size: 0.75rem;
-  }
   .process-section h2 {
     font-size: 2.1875rem;
     max-width: 330px;
@@ -1527,29 +1418,6 @@ dialog p:not(.eyebrow) {
   .contact-section {
     padding-bottom: 58px;
   }
-  .mobile-cta {
-    display: block;
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 25;
-    padding: 10px 20px max(10px, env(safe-area-inset-bottom));
-    background: #ffffffed;
-    backdrop-filter: blur(12px);
-    border-top: 1px solid #dedede;
-  }
-  .mobile-cta a {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 0.875rem;
-    font-weight: 750;
-    min-height: 46px;
-    background: var(--yellow);
-    padding: 12px 19px;
-    border-radius: 3px;
-  }
   dialog {
     padding: 30px 23px;
   }
@@ -1588,7 +1456,6 @@ dialog p:not(.eyebrow) {
   background: var(--ink);
 }
 .section-heading > p,
-.pilot-copy > p:not(.eyebrow),
 .process-grid p,
 .about-grid > div > p:not(.eyebrow),
 .about-values p,
@@ -1598,8 +1465,7 @@ dialog p:not(.eyebrow) {
   font-size: 1rem;
 }
 .field label,
-.checkbox-field label,
-.pilot-offer li {
+.checkbox-field label {
   font-size: 0.875rem;
 }
 .field input,

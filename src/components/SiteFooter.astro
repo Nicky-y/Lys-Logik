@@ -300,7 +300,7 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
 
   @media (max-width: 600px) {
     .footer-bottom {
-      padding-bottom: calc(88px + env(safe-area-inset-bottom));
+      padding-bottom: max(14px, env(safe-area-inset-bottom));
     }
   }
 </style>

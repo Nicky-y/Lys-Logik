@@ -13,10 +13,10 @@ const assetBase = import.meta.env.BASE_URL.replace(/\/?$/, '/');
   <div class="container header-inner">
     <a class="brand" href={homeHref || '#'} aria-label="Lys og Logik – forside">
       <img
-        src={`${assetBase}images/${overlay ? 'logo-v32.png' : 'logo-v11.png'}`}
+        src={`${assetBase}images/${overlay ? 'logo-v34.png' : 'logo-v11.png'}`}
         alt="Lys & Logik · El og automation"
-        width="1536"
-        height="1024"
+        width={overlay ? 1254 : 1536}
+        height={overlay ? 1254 : 1024}
       />
     </a>
     <button
@@ -46,7 +46,7 @@ const assetBase = import.meta.env.BASE_URL.replace(/\/?$/, '/');
   .site-header-overlay .brand img {
     width: 240px;
     height: 160px;
-    object-fit: contain;
+    object-fit: cover;
     transform: translateY(-6px);
   }
   .site-header-overlay #navigation > a:not(.button):hover { color: var(--yellow); }

@@ -12,7 +12,11 @@ test('contact section reuses responsive hero artwork with deployment-safe paths'
   assert.ok(section);
   assert.ok(section.includes('class="contact-background" aria-hidden="true"'));
   assert.ok(section.includes(`src="${base}images/hero.webp"`));
-  assert.ok(section.includes(`srcset="${base}images/hero-960.webp 960w, ${base}images/hero.webp 1536w"`));
+  assert.ok(
+    section.includes(
+      `srcset="${base}images/hero-960.webp 960w, ${base}images/hero.webp 1536w"`,
+    ),
+  );
   assert.ok(section.includes('loading="lazy"'));
   for (const path of ['images/hero.webp', 'images/hero-960.webp']) {
     assert.ok(existsSync(new URL(path, dist)));
@@ -162,7 +166,16 @@ test('lamp service route has its own metadata and base-aware navigation and asse
 });
 
 test('pilot offer and payment terms consistently specify four hours', () => {
-  assert.ok(html.includes('Op til 4 timers arbejde.'));
+  const pilot = html.match(/<section id="pilot"[\s\S]*?<\/section>/)?.[0];
+  assert.ok(pilot);
+  const text = pilot.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
+  assert.match(text, /Op til 4 timers arbejde/);
+  assert.match(text, /0 kr\. i arbejdsløn/);
+  assert.match(text, /3 udvalgte projekter/);
+  assert.match(text, /Materialer og evt\. lejeudstyr/);
+  assert.match(text, /efter aftale med dig.*referencecase/);
+  assert.match(text, /Pilotønsket markeres i formularen/);
+  assert.doesNotMatch(text, /Skriv “pilotprojekt”/);
   assert.ok(html.includes('op til 4 timers arbejde uden beregning'));
   assert.ok(
     html.includes('Arbejde ud over de 4 timer kræver en særskilt aftale.'),
@@ -173,7 +186,10 @@ test('pilot offer and payment terms consistently specify four hours', () => {
 test('production ships the live form with the production endpoint and real widget', () => {
   const form = html.match(/<form\b[^>]*id="enquiry-form"[\s\S]*?<\/form>/)?.[0];
   assert.ok(form);
-  assert.doesNotMatch(form, /pilot|ansøg|udvælger/i);
+  const pilotChoice = form.match(/<input\b[^>]*id="pilotRequested"[^>]*>/)?.[0];
+  assert.ok(pilotChoice);
+  assert.doesNotMatch(pilotChoice, /\b(?:checked|required)\b/);
+  assert.match(pilotChoice, /type="checkbox"/);
   assert.ok(form.includes('Send en uforpligtende henvendelse'));
   assert.ok(form.includes('pris og omfang aftales'));
   assert.match(

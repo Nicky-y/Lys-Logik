@@ -23,6 +23,7 @@ export function initializeLeadForm() {
   )!;
   const defaultButtonText = buttonText.textContent;
   const names: LeadField[] = [
+    'pilotRequested',
     'name',
     'email',
     'phone',
@@ -70,6 +71,16 @@ export function initializeLeadForm() {
     token = '';
     if (widgetId !== undefined) window.turnstile?.reset(widgetId);
   }
+  document
+    .querySelectorAll<HTMLAnchorElement>('[data-pilot]')
+    .forEach((link) => {
+      link.addEventListener('click', () => {
+        if (!busy)
+          (
+            form.elements.namedItem('pilotRequested') as HTMLInputElement
+          ).checked = true;
+      });
+    });
   document
     .querySelectorAll<HTMLAnchorElement>('[data-service]')
     .forEach((link) => {
@@ -127,6 +138,7 @@ export function initializeLeadForm() {
       service: String(data.get('service') ?? ''),
       description: String(data.get('description') ?? ''),
       terms: data.get('terms') === 'on',
+      pilotRequested: data.get('pilotRequested') === 'on',
     };
     const errors = validateLead(input);
     const invalid = names.filter((name) => errors[name]);

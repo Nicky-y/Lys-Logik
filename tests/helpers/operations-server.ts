@@ -102,6 +102,30 @@ const server = createServer((req, res) => {
           );
           return;
         }
+        if (url.pathname === '/_test/pilot') {
+          await db.exec('reset role');
+          if (req.method === 'POST') {
+            await db.query(
+              'select public.create_lead_submission($1::uuid,$2::jsonb)',
+              [
+                randomUUID(),
+                JSON.stringify({
+                  ...validLead,
+                  name: 'Pilotkunden',
+                  pilotRequested: true,
+                }),
+              ],
+            );
+          }
+          reply(
+            (
+              await db.query(
+                'select pilot_requested,description,original_submission,status,review_decision from public.leads where pilot_requested=true',
+              )
+            ).rows,
+          );
+          return;
+        }
         if (url.pathname === '/_test/advance') {
           await db.exec('reset role');
           await db.query(

@@ -592,6 +592,16 @@ small {
   color: #616e5d;
   font-size: 0.67rem;
 }
+.pilot-request {
+  display: inline-block;
+  padding: 5px 9px;
+  margin-bottom: 8px;
+  border-radius: 5px;
+  background: #fff3cd;
+  color: #614800;
+  font-size: 12px;
+  font-weight: 600;
+}
 .card-description {
   font-size: 0.72rem;
   color: #6a7566;

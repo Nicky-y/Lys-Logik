@@ -2,6 +2,20 @@
 
 Lead-modtagelse er implementeret: formular → servervalidering → atomisk lagring af sag, oprettelseshistorik og ventende notifikationer. P1 tilføjer medarbejderadgang, statuskommandoer, faglig vurdering, afventer-markering og noter gennem [React-arbejdsrummet](../operations/README.md). Websitet er fortsat statisk Astro.
 
+## Pilotønske fra formularen — 15. september 2026
+
+Formularens valgfrie `pilotRequested` gemmes i den oprindelige indsendelse. Appen læser det afledte `leads.pilot_requested` og viser “Ønsker pilotprojekt”. Det ændrer hverken opgavebeskrivelse, status, faglig vurdering eller aftalevilkår. Ældre indsendelser uden feltet bevares uændret og har `NULL` i den afledte kolonne. Genforsøg sammenlignes fortsat med hele den oprindelige indsendelse.
+
+Ved udgivelse skal rækkefølgen være:
+
+1. Anvend `20260915000200_pilot_request.sql` på Supabase.
+2. Deploy `create-lead` med den opdaterede fælles kontrakt.
+3. Deploy appen og derefter hjemmesiden, inklusive GitHub Pages.
+
+Den gamle backend afviser det nye felt. Et website-push eller `ship -Deploy` alene aktiverer derfor ikke hele ændringen. Ved frontend-rollback accepterer den nye backend fortsat de gamle syv felter.
+
+Produktionsstatus: Migrationen er anvendt på `elydnshkxcwlmbdmtpys`, og `create-lead` version 26 er aktiv. Metadata, afledt pilotfelt og afvisning af anonym læsning/RPC er verificeret. HTTP-kontrollen accepterer både de gamle syv felter og det nye boolean-felt; en tom bot-token sikrer, at kontrollen hverken opretter sager eller sender mails. Appen er udgivet som Cloudflare-version `7be93a0f-aca5-4869-a1f3-a623960a34b0`; offentlige JS/CSS-filer, service worker og manifest matcher det testede build. De 133 unit-/integrationstests og 20 PWA-scenarier består.
+
 ## Status 9. september 2026
 
 - Den interne PWA er udgivet på [lys-og-logik-app.mnbrom.workers.dev](https://lys-og-logik-app.mnbrom.workers.dev/). Supabase Auth `site_url` peger nu på denne adresse; øvrige redirectindstillinger er bevaret. Anonym læsning af sager, aftaler og medarbejdere er verificeret afvist. Se [installation og udgivelsesstatus](../operations/README.md#installation-på-android-og-hosting).

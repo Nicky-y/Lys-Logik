@@ -64,6 +64,48 @@ test('backoffice logs in, calls from the customer card and saves a status, waiti
   ).toBeVisible();
   await expect(page.getByText('Anna Jensen')).toHaveCount(0);
 });
+test('pilot interest is visible in the pipeline and case without approving the enquiry', async ({
+  page,
+  request,
+}) => {
+  await request.post('http://127.0.0.1:54327/_test/pilot');
+  await login(page);
+  const card = page
+    .locator('.lead-card')
+    .filter({
+      has: page.getByRole('heading', { name: 'Pilotkunden', exact: true }),
+    });
+  const ordinary = page
+    .locator('.lead-card')
+    .filter({
+      has: page.getByRole('heading', { name: 'Anna Jensen', exact: true }),
+    });
+  await expect(card).toContainText('Ønsker pilotprojekt');
+  await expect(ordinary).not.toContainText('Ønsker pilotprojekt');
+  await card.click();
+  await expect(page.getByRole('dialog')).toContainText(
+    'Et pilotforløb aftales særskilt.',
+  );
+  await page
+    .getByRole('combobox', { name: 'Status', exact: true })
+    .selectOption('clarifying');
+  await page.getByRole('button', { name: 'Gem status' }).click();
+  await expect(page.getByText('Version 2', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Luk sag' }).click();
+  await expect(card).toContainText('Ønsker pilotprojekt');
+  const rows = await (
+    await request.get('http://127.0.0.1:54327/_test/pilot')
+  ).json();
+  expect(rows).toHaveLength(1);
+  expect(rows[0]).toMatchObject({
+    pilot_requested: true,
+    status: 'clarifying',
+    review_decision: 'pending',
+    original_submission: { pilotRequested: true },
+  });
+  expect(rows[0].description).toBe(rows[0].original_submission.description);
+});
+
 test('building automation is labelled in the pipeline and case and keeps its category after a status change', async ({
   page,
   request,

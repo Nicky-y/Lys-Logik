@@ -491,6 +491,9 @@ function LeadCard({ lead }: { lead: OperationsLead }) {
         {lead.postal_code}
       </span>
       <p className="card-description">{lead.description}</p>
+      {lead.pilot_requested === true && (
+        <span className="pilot-request">Ønsker pilotprojekt</span>
+      )}
       {lead.waiting_on && (
         <span className={`waiting waiting-${lead.waiting_on}`}>
           <Clock3 size={13} />
@@ -687,6 +690,12 @@ function LeadContent({
       </div>
       <section className="detail-section">
         <h3>Kundens opgave</h3>
+        {lead.pilot_requested === true && (
+          <p>
+            <span className="pilot-request">Ønsker pilotprojekt</span>{' '}
+            <small className="muted">Et pilotforløb aftales særskilt.</small>
+          </p>
+        )}
         <p className="preserve">{lead.description}</p>
         <small className="muted">Modtaget {dateTime(lead.created_at)}</small>
       </section>

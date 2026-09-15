@@ -57,6 +57,38 @@ test('sends form through the real local endpoint and stores one enquiry with its
   ).toEqual({ local: 0, session: 0 });
 });
 
+test('optional pilot checkbox stores interest separately and resets for the next enquiry', async ({
+  page,
+  request,
+}) => {
+  const choice = page.locator('#pilotRequested');
+  await expect(choice).not.toBeChecked();
+  await fillEnquiry(page);
+  const description = await page.locator('#description').inputValue();
+  await choice.check();
+  await page.getByRole('button', { name: 'Send din henvendelse' }).click();
+  await expect(page.locator('#form-success')).toBeVisible();
+  await page.getByRole('button', { name: 'Ny henvendelse' }).click();
+  await expect(choice).not.toBeChecked();
+  await fillEnquiry(page);
+  await page.getByRole('button', { name: 'Send din henvendelse' }).click();
+  await expect(page.locator('#form-success')).toBeVisible();
+  const rows = await (
+    await request.get('http://127.0.0.1:54325/_test/enquiries')
+  ).json();
+  expect(rows).toHaveLength(2);
+  expect(
+    rows.map((row: { pilot_requested: boolean }) => row.pilot_requested),
+  ).toEqual([true, false]);
+  for (const row of rows) {
+    expect(row.description).toBe(description);
+    expect(row.original_submission).toMatchObject({
+      description,
+      pilotRequested: row.pilot_requested,
+    });
+  }
+});
+
 test('building automation service page submits its own category to the real endpoint and database', async ({
   page,
   request,
@@ -99,6 +131,7 @@ test('lost response preserves fields and retry confirms the same database enquir
   request,
 }) => {
   let first = true;
+  await page.locator('#pilotRequested').check();
   const keys: string[] = [];
   await page.route('http://127.0.0.1:54325/create-lead', async (route) => {
     if (route.request().method() !== 'POST') {
@@ -119,6 +152,7 @@ test('lost response preserves fields and retry confirms the same database enquir
   );
   await expect(page.getByLabel('Din e-mail')).toHaveValue('anna@example.com');
   await expect(page.locator('#form-success')).toBeHidden();
+  await expect(page.locator('#pilotRequested')).toBeChecked();
   await page.getByRole('button', { name: 'Send din henvendelse' }).click();
   await expect(page.locator('#form-success')).toBeVisible();
   expect(keys).toHaveLength(2);

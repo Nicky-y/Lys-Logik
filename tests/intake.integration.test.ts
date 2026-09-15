@@ -136,6 +136,76 @@ test('building automation migration preserves older other enquiries and their re
   }
 });
 
+test('pilot interest retains the exact snapshot and does not approve work or duplicate retries', async () => {
+  for (const [index, pilotRequested] of [undefined, false, true].entries()) {
+    const input =
+      pilotRequested === undefined
+        ? validLead
+        : { ...validLead, pilotRequested };
+    const key = `00000000-0000-4000-8000-${String(index).padStart(12, '0')}`;
+    const receipt = await submit(key, input);
+    const row = (
+      await db.query<Record<string, unknown>>(
+        'select * from public.leads where reference=$1',
+        [receipt.reference],
+      )
+    ).rows[0];
+    const lead = OperationsLeadSchema.parse(JSON.parse(JSON.stringify(row)));
+    assert.equal(lead.pilot_requested, pilotRequested ?? null);
+    assert.equal(lead.description, validLead.description);
+    assert.equal(lead.status, 'new');
+    assert.equal(lead.review_decision, 'pending');
+    assert.deepEqual(row.original_submission, input);
+    assert.deepEqual(await submit(key, input), receipt);
+    await assert.rejects(
+      submit(key, { ...validLead, pilotRequested: !pilotRequested }),
+      /submission_conflict/,
+    );
+    await assert.rejects(
+      db.query(
+        'update public.leads set pilot_requested=false where reference=$1',
+        [receipt.reference],
+      ),
+      /can only be updated to DEFAULT/,
+    );
+  }
+  assert.deepEqual(await counts(), {
+    leads: 3,
+    events: 3,
+    deliveries: 6,
+    submissions: 3,
+  });
+});
+
+test('pilot migration preserves pre-existing snapshots and their retry receipts', async () => {
+  const migration = await readFile(
+    new URL(
+      '../supabase/migrations/20260915000200_pilot_request.sql',
+      import.meta.url,
+    ),
+    'utf8',
+  );
+  await db.exec(
+    'alter table public.leads drop column pilot_requested, drop constraint lead_pilot_request_boolean',
+  );
+  try {
+    const receipt = await submit();
+    const before = (await db.query('select * from public.leads')).rows[0];
+    await db.exec(migration);
+    const { pilot_requested, ...after } = (
+      await db.query<Record<string, unknown>>('select * from public.leads')
+    ).rows[0];
+    assert.equal(pilot_requested, null);
+    assert.deepEqual(after, before);
+    assert.deepEqual(await submit(), receipt);
+  } finally {
+    await db.exec(
+      'alter table public.leads drop column if exists pilot_requested, drop constraint if exists lead_pilot_request_boolean',
+    );
+    await db.exec(migration);
+  }
+});
+
 test('migration atomically creates snapshot, receipt, event and two pending delivery intents', async () => {
   const receipt = await submit();
   assert.match(receipt.reference, /^[0-9a-f-]{36}$/);
@@ -230,6 +300,10 @@ test('database rejects invalid payloads even if application validation is bypass
     { ...validLead, email: 'invalid' },
     { ...validLead, phone: '+4612345678' },
     { ...validLead, description: 'tiny' },
+    ...['true', 'false', 1, 0, null].map((pilotRequested) => ({
+      ...validLead,
+      pilotRequested,
+    })),
   ]) {
     await assert.rejects(submit(submissionKey, lead));
   }

@@ -5,9 +5,9 @@ test('video hero starts behind the larger white-logo navigation and covers the v
   await page.goto('/');
   const header = page.locator('.site-header');
   await expect(header).toHaveClass(/site-header-overlay/);
-  await expect(header.locator('.brand img')).toHaveAttribute('src', '/images/logo-v32.png');
-  await expect.poll(() => header.locator('.brand img').evaluate((img: HTMLImageElement) => img.naturalWidth)).toBe(1536);
-  expect(await header.locator('.brand img').evaluate((img: HTMLImageElement) => img.naturalHeight)).toBe(1024);
+  await expect(header.locator('.brand img')).toHaveAttribute('src', '/images/logo-v34.png');
+  await expect.poll(() => header.locator('.brand img').evaluate((img: HTMLImageElement) => img.naturalWidth)).toBe(1254);
+  expect(await header.locator('.brand img').evaluate((img: HTMLImageElement) => img.naturalHeight)).toBe(1254);
   const layout = await page.evaluate(() => {
     const hero = document.querySelector('.hero')!.getBoundingClientRect();
     const header = document.querySelector('.site-header')!.getBoundingClientRect();

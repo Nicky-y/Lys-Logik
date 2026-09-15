@@ -21,6 +21,22 @@ const valid: LeadInput = {
   terms: true,
 };
 
+test('pilot interest is optional and strictly boolean without rewriting old snapshots', () => {
+  assert.deepEqual(LeadSchema.parse(valid), valid);
+  for (const pilotRequested of [true, false]) {
+    assert.deepEqual(LeadSchema.parse({ ...valid, pilotRequested }), {
+      ...valid,
+      pilotRequested,
+    });
+  }
+  for (const pilotRequested of ['true', 'false', 1, 0, null]) {
+    assert.equal(
+      LeadSchema.safeParse({ ...valid, pilotRequested }).success,
+      false,
+    );
+  }
+});
+
 test('email is required; phone is optional', () => {
   assert.deepEqual(validateLead(valid), {});
   assert.ok(validateLead({ ...valid, email: '', phone: '12345678' }).email);

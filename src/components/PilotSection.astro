@@ -1,0 +1,238 @@
+---
+import Icon from './Icon.astro';
+import { site } from '../data/site';
+---
+
+<section
+  id="pilot"
+  class="section pilot-section"
+  aria-labelledby="pilot-heading"
+>
+  <div class="container pilot-grid">
+    <div class="pilot-copy">
+      <p class="eyebrow">PILOTPROJEKTER · {site.area.toUpperCase()}</p>
+      <h2 id="pilot-heading">
+        Få hjælp til dit hjem.<br /><span>Hjælp os godt fra start.</span>
+      </h2>
+      <p class="pilot-intro">
+        Vi søger {site.pilotPlaces} mindre opgaver, som kan blive de første referencer
+        for Lys &amp; Logik. Du får op til {site.pilotHours} timers arbejde uden beregning.
+        Vi får muligheden for at vise, hvad vi kan.
+      </p>
+      <div class="pilot-exchange">
+        <div>
+          <h3>En opgave, der passer til dit hjem</h3>
+          <p>
+            For eksempel lampeopsætning, smart home eller lysstyring. Vi
+            vurderer sammen, om din opgave passer til pilotforløbet.
+          </p>
+        </div>
+        <div>
+          <h3>En reference, vi kan vise frem</h3>
+          <p>
+            Til gengæld må vi efter aftale med dig tage før- og efterbilleder og
+            bruge forløbet som en referencecase.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <aside class="pilot-offer" aria-labelledby="pilot-offer-title">
+      <div class="pilot-offer-heading">
+        <h3 id="pilot-offer-title">Pilottilbuddet</h3>
+        <span>{site.pilotPlaces} udvalgte projekter</span>
+      </div>
+      <p class="pilot-limit">Op til</p>
+      <p class="pilot-hours">
+        <strong>{site.pilotHours}</strong>{' '}
+        <span>timers arbejde{' '}<b>0 kr. i arbejdsløn</b></span>
+      </p>
+      <dl class="pilot-terms">
+        <div><dt>Du betaler</dt><dd>Materialer og evt. lejeudstyr.</dd></div>
+        <div>
+          <dt>Vi aftaler først</dt><dd>Opgave, omfang og alle udgifter.</dd>
+        </div>
+        <div>
+          <dt>Hvis opgaven tager længere tid</dt><dd>
+            Arbejde ud over de {site.pilotHours} timer kræver en særskilt aftale.
+          </dd>
+        </div>
+      </dl>
+      <a
+        class="button pilot-action"
+        href="#kontakt"
+        data-pilot
+        aria-describedby="pilot-enquiry-hint"
+      >
+        Foreslå et pilotprojekt <Icon name="arrow" />
+      </a>
+      <p class="pilot-enquiry-hint" id="pilot-enquiry-hint">
+        Pilotønsket markeres i formularen.<br />Henvendelsen er uforpligtende.
+      </p>
+    </aside>
+  </div>
+</section>
+
+<style>
+  .pilot-section {
+    background: var(--soft);
+  }
+  .pilot-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: clamp(40px, 7vw, 96px);
+    align-items: center;
+  }
+  .pilot-copy .eyebrow {
+    color: #805315;
+  }
+  .pilot-copy h2 {
+    margin-block: 20px 24px;
+    font-size: clamp(2.125rem, 3.15vw, 2.875rem);
+    line-height: 1.17;
+    text-wrap: balance;
+  }
+  .pilot-copy h2 span {
+    color: #62696c;
+  }
+  .pilot-intro,
+  .pilot-exchange p {
+    color: var(--muted);
+    font-size: 1rem;
+    line-height: 1.85;
+    max-width: 48ch;
+  }
+  .pilot-exchange {
+    display: grid;
+    gap: 24px;
+    margin-top: 36px;
+    padding-top: 28px;
+    border-top: 1px solid var(--line);
+  }
+  .pilot-exchange h3 {
+    font-size: 1rem;
+    margin-bottom: 7px;
+  }
+  .pilot-exchange p {
+    font-size: 0.9375rem;
+  }
+  .pilot-offer {
+    padding: clamp(28px, 3vw, 44px);
+    background: var(--yellow);
+    color: var(--ink);
+    border: 1px solid #e8af38;
+    border-radius: 8px;
+  }
+  .pilot-offer-heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+  }
+  .pilot-offer-heading h3 {
+    font-size: 1rem;
+    letter-spacing: 0;
+  }
+  .pilot-offer-heading > span,
+  .pilot-limit {
+    color: #3e3b31;
+    font-size: 0.8125rem;
+  }
+  .pilot-limit {
+    margin-top: 28px;
+  }
+  .pilot-hours {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    margin-top: 4px;
+  }
+  .pilot-hours strong {
+    font-family: 'Outfit Variable', var(--font);
+    font-size: 7rem;
+    line-height: 1;
+    font-weight: 550;
+    color: var(--ink);
+  }
+  .pilot-hours > span {
+    font-size: 1.375rem;
+    line-height: 1.4;
+  }
+  .pilot-hours b {
+    display: block;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--ink);
+    margin-top: 5px;
+  }
+  .pilot-terms {
+    margin: 28px 0;
+    padding-top: 24px;
+    border-top: 1px solid #19232933;
+    display: grid;
+    gap: 17px;
+  }
+  .pilot-terms dt {
+    font-size: 0.875rem;
+    font-weight: 650;
+  }
+  .pilot-terms dd {
+    margin: 4px 0 0;
+    font-size: 0.875rem;
+    color: #3e3b31;
+    line-height: 1.6;
+  }
+  .pilot-action {
+    width: 100%;
+    justify-content: space-between;
+    gap: 16px;
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .pilot-action:hover {
+    background: #28363f;
+  }
+  .pilot-action:focus-visible {
+    outline-color: var(--ink);
+  }
+  .pilot-enquiry-hint {
+    font-size: 0.8125rem;
+    line-height: 1.65;
+    color: #3e3b31;
+    margin-top: 16px;
+  }
+  @media (max-width: 860px) {
+    .pilot-grid {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 36px;
+    }
+    .pilot-copy,
+    .pilot-offer {
+      width: 100%;
+      max-width: 620px;
+      margin-inline: auto;
+    }
+    .pilot-copy h2 {
+      font-size: clamp(2rem, 5vw, 2.625rem);
+    }
+  }
+  @media (max-width: 400px) {
+    .pilot-offer {
+      padding: 24px 20px;
+    }
+    .pilot-hours {
+      gap: 16px;
+    }
+    .pilot-hours strong {
+      font-size: 6rem;
+    }
+    .pilot-hours > span {
+      font-size: 1.125rem;
+    }
+    .pilot-action {
+      padding-inline: 16px;
+      font-size: 0.875rem;
+    }
+  }
+</style>

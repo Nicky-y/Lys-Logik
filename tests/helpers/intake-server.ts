@@ -40,7 +40,7 @@ const server = createServer(async (incoming, outgoing) => {
     }
     if (incoming.url === '/_test/enquiries') {
       const { rows } = await db.query(
-        'select reference,service,original_submission from public.leads order by created_at',
+        'select reference,service,description,pilot_requested,original_submission from public.leads order by created_at',
       );
       outgoing.setHeader('Content-Type', 'application/json');
       outgoing.end(JSON.stringify(rows));

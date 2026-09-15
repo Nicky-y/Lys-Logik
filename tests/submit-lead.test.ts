@@ -4,6 +4,33 @@ import { createLeadSender } from '../src/lib/submit-lead.ts';
 import { validLead, submissionKey } from './helpers/database.ts';
 
 const reference = '19d43304-9a15-4398-8709-3f263241d184';
+test('pilot interest survives retries and changing it starts a distinct submission', async () => {
+  const keys: string[] = [];
+  const payloads: unknown[] = [];
+  const identities = [submissionKey, '755d91f3-d760-4faf-b659-7612d996a050'];
+  let next = 0;
+  const send = createLeadSender(
+    'https://backend.example',
+    async (_url, init) => {
+      keys.push(new Headers(init?.headers).get('Idempotency-Key')!);
+      payloads.push(JSON.parse(String(init?.body)).lead);
+      throw new TypeError('lost response');
+    },
+    () => identities[next++],
+  );
+  for (const pilotRequested of [true, true, false]) {
+    await assert.rejects(send({ ...validLead, pilotRequested }, 'token'));
+  }
+  assert.deepEqual(keys, [identities[0], identities[0], identities[1]]);
+  assert.deepEqual(
+    payloads,
+    [true, true, false].map((pilotRequested) => ({
+      ...validLead,
+      pilotRequested,
+    })),
+  );
+});
+
 test('a lost acknowledgement reuses the same key and preserves the payload', async () => {
   const keys: string[] = [];
   let attempts = 0;

@@ -39,14 +39,16 @@ export const LeadSchema = z.strictObject({
   terms: z.literal(true, {
     error: 'Bekræft, at pris og omfang aftales, før arbejdet starter.',
   }),
+  // Interest only, not acceptance. Omission preserves older retry snapshots.
+  pilotRequested: z.boolean().optional(),
 });
 
 /** Validated enquiry snapshot; repeated customers are intentionally not merged. */
 export type LeadSubmission = z.infer<typeof LeadSchema>;
 export type LeadInput = Record<
-  Exclude<keyof LeadSubmission, 'terms'>,
+  Exclude<keyof LeadSubmission, 'terms' | 'pilotRequested'>,
   string
-> & { terms: boolean };
+> & { terms: boolean; pilotRequested?: boolean };
 export type LeadField = keyof LeadInput;
 export type LeadErrors = Partial<Record<LeadField, string>>;
 
