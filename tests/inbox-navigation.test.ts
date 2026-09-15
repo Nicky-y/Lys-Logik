@@ -1,11 +1,17 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { LeadIdSchema } from '../supabase/functions/_shared/contracts/operations.ts';
+import {
+  LeadIdSchema,
+  LeadStatusSchema,
+} from '../supabase/functions/_shared/contracts/operations.ts';
 import {
   collectionForStatus,
   leadPath,
   readWorkspaceRoute,
+  collectionPath,
+  statusesForCollection,
 } from '../operations/src/lead-navigation.ts';
+import { caseTrackForStatus } from '../operations/src/case-tracks.ts';
 
 const id = LeadIdSchema.parse('82b2db71-774d-47f7-bfe3-b386992320ce');
 test('inbox is the default; saved status decides the home of each enquiry', () => {
@@ -47,4 +53,58 @@ test('invalid deep-link identities and calendar dates do not enter a query', () 
     assert.equal(readWorkspaceRoute(path).lead, undefined);
   for (const date of ['2026-02-30', '2019-09-15', '2101-01-01'])
     assert.equal(readWorkspaceRoute(`#/kalender/${date}`).day, undefined);
+});
+
+test('the two case tracks partition all six case statuses without including inbox or archive', () => {
+  assert.deepEqual(statusesForCollection('cases', 'planning'), [
+    'clarifying',
+    'qualified',
+    'scheduled',
+  ]);
+  assert.deepEqual(statusesForCollection('cases', 'settlement'), [
+    'completed',
+    'invoiced',
+    'paid',
+  ]);
+  for (const status of LeadStatusSchema.options) {
+    const expected = ['clarifying', 'qualified', 'scheduled'].includes(status)
+      ? 'planning'
+      : ['completed', 'invoiced', 'paid'].includes(status)
+        ? 'settlement'
+        : undefined;
+    assert.equal(caseTrackForStatus(status), expected, status);
+    const route = readWorkspaceRoute(leadPath(id, status));
+    assert.equal(route.lead, id);
+    assert.equal(route.collection, collectionForStatus(status));
+    if (expected) {
+      assert.equal(route.caseTrack, expected);
+      assert.equal(
+        collectionPath(route.collection, route.caseTrack),
+        expected === 'planning' ? '#/sager' : '#/sager/opfoelgning',
+      );
+    }
+  }
+  for (const track of ['planning', 'settlement'] as const) {
+    assert.deepEqual(statusesForCollection('inbox', track), ['new']);
+    assert.deepEqual(statusesForCollection('archive', track), [
+      'rejected',
+      'outside_scope',
+      'cancelled',
+    ]);
+  }
+});
+
+test('follow-up deep links retain their track and legacy case links default to planning', () => {
+  for (const suffix of ['', `/leads/${id}`]) {
+    const route = readWorkspaceRoute(`#/sager/opfoelgning${suffix}`);
+    assert.equal(route.section.id, 'sager');
+    assert.equal(route.collection, 'cases');
+    assert.equal(route.caseTrack, 'settlement');
+  }
+  assert.equal(readWorkspaceRoute('#/sager').caseTrack, 'planning');
+  assert.equal(readWorkspaceRoute('#/pipeline').caseTrack, 'planning');
+  assert.equal(
+    readWorkspaceRoute('#/sager/opfoelgning/leads/not-an-id').lead,
+    undefined,
+  );
 });

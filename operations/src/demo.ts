@@ -11,7 +11,7 @@ import {
   type Appointment,
 } from '../../supabase/functions/_shared/contracts/operations.ts';
 import { OperationsError, type OperationsGateway } from './gateway';
-import { collectionForStatus } from './lead-navigation';
+import { statusesForCollection } from './lead-navigation';
 import { copenhagenLocal, copenhagenInstant, shiftDay } from './calendar-time';
 import { createDemoStaffAccess } from './staff-access-demo';
 import { createDemoCustomerMail } from './demo-mail';
@@ -34,6 +34,9 @@ export function createDemoGateway(): OperationsGateway {
     'Peter Sørensen',
     'Maria Nielsen',
     'Mikkel Larsen',
+    'Louise Hansen',
+    'Rasmus Møller',
+    'Nina Pedersen',
   ];
   const descriptions = [
     'Vi drømmer om bedre lys over spisebordet og i vores køkken. Kan I hjælpe med at finde den rigtige løsning?',
@@ -43,6 +46,9 @@ export function createDemoGateway(): OperationsGateway {
     'Kan vores eksisterende spots skiftes til et varmere lys? Vi sender gerne billeder.',
     'Vi har aftalt at få monteret pendlerne over køkkenøen. Adgang gennem gården.',
     'Vi vil gerne have bedre lys i entréen. Opgaven er vurderet og klar til en aftale.',
+    'Lamperne er monteret. Opgaven er udført og klar til fakturering.',
+    'Lysstyringen er sat op, og fakturaen er sendt til kunden.',
+    'Opgaven er afsluttet, og betalingen er modtaget.',
   ];
   const data = new Map<string, OperationsLead>();
   const appointments = new Map<string, Appointment>();
@@ -60,7 +66,9 @@ export function createDemoGateway(): OperationsGateway {
       name,
       email: `kunde${i + 1}@example.com`,
       phone: i === 2 ? '' : '+4512345678',
-      postal_code: ['2100', '2820', '2200', '2000', '2500', '2300', '2400'][i],
+      postal_code: ['2100', '2820', '2200', '2000', '2500', '2300', '2400'][
+        i % 7
+      ],
       service: i % 2 ? 'smart-home' : 'belysning',
       description: descriptions[i],
       status:
@@ -70,7 +78,13 @@ export function createDemoGateway(): OperationsGateway {
             ? 'clarifying'
             : i === 5
               ? 'scheduled'
-              : 'qualified',
+              : i === 6
+                ? 'qualified'
+                : i === 7
+                  ? 'completed'
+                  : i === 8
+                    ? 'invoiced'
+                    : 'paid',
       version: 1,
       waiting_on: i === 3 ? 'customer' : i === 4 ? 'staff' : null,
       review_decision: i >= 5 ? 'approved' : 'pending',
@@ -122,9 +136,10 @@ export function createDemoGateway(): OperationsGateway {
   });
   return {
     mail: createDemoCustomerMail([...data.values()]),
-    async list(offset, collection) {
-      const matches = [...data.values()].filter(
-        (lead) => collectionForStatus(lead.status) === collection,
+    async list(offset, collection, track) {
+      const statuses = statusesForCollection(collection, track);
+      const matches = [...data.values()].filter((lead) =>
+        statuses.includes(lead.status),
       );
       return {
         items: structuredClone(matches.slice(offset, offset + 100)),

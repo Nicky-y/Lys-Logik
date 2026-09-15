@@ -124,6 +124,64 @@ const server = createServer((req, res) => {
           reply({ ok: true });
           return;
         }
+        if (url.pathname === '/_test/case-tracks') {
+          await db.exec('reset role');
+          if (req.method === 'POST') {
+            await db.query(
+              "select set_config('request.jwt.claim.sub',$1,false)",
+              [techId],
+            );
+            for (const [status, name] of [
+              ['clarifying', 'Afklaring test'],
+              ['qualified', 'Klar test'],
+              ['scheduled', 'Aftale test'],
+              ['completed', 'Udført test'],
+              ['invoiced', 'Faktureret test'],
+              ['paid', 'Betalt test'],
+              ['rejected', 'Arkiv test'],
+            ]) {
+              await db.query('select public.create_lead_submission($1,$2)', [
+                randomUUID(),
+                JSON.stringify({ ...validLead, name }),
+              ]);
+              if (status === 'qualified' || status === 'scheduled') {
+                await db.query(
+                  "select public.record_lead_review(id,version,$1,'approved','Opgaven er gennemgået og godkendt.') from public.leads where name=$2",
+                  [randomUUID(), name],
+                );
+                await db.query(
+                  "select public.change_lead_status(id,version,$1,'qualified','') from public.leads where name=$2",
+                  [randomUUID(), name],
+                );
+                if (status === 'scheduled') {
+                  await db.query(
+                    "select public.create_lead_appointment(id,version,$1,'Planlagt opgave','Eksempelvej 1','2026-09-20T08:00:00Z','2026-09-20T10:00:00Z') from public.leads where name=$2",
+                    [randomUUID(), name],
+                  );
+                }
+              } else {
+                // Read-only UI fixtures: later statuses are seeded by the test administrator.
+                // This is not evidence that the corresponding staff commands exist yet.
+                await db.query(
+                  'update public.leads set status=$1::public.lead_status where name=$2',
+                  [status, name],
+                );
+              }
+              await db.query(
+                "update public.leads set created_at='2026-01-01T10:00:00Z' where name=$1",
+                [name],
+              );
+            }
+          }
+          reply(
+            (
+              await db.query(
+                'select id,status,version from public.leads order by id',
+              )
+            ).rows,
+          );
+          return;
+        }
         if (url.pathname === '/_test/building-automation') {
           await db.exec('reset role');
           if (req.method === 'POST') {

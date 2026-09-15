@@ -3,19 +3,20 @@ import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import {
   ArrowDown,
   ArrowUpRight,
+  Archive,
   Check,
   ChevronRight,
   Clock3,
   Inbox,
   LoaderCircle,
   LogOut,
+  MessagesSquare,
   MapPin,
   RefreshCw,
   Search,
+  ReceiptText,
 } from 'lucide-react';
 import {
-  archiveStatuses,
-  pipelineStatuses,
   serviceLabels,
   statusLabels,
   type LeadStatus,
@@ -32,7 +33,9 @@ import {
   collectionPath,
   leadPath,
   readWorkspaceRoute,
+  statusesForCollection,
 } from './lead-navigation';
+import { caseTracks } from './case-tracks';
 import './inbox.css';
 import {
   canWorkWithCustomers,
@@ -89,8 +92,9 @@ export function Workspace({
   const isCases = view.section.id === 'sager';
   const isArchive = view.collection === 'archive';
   const list = useInfiniteQuery({
-    queryKey: ['leads', staff.user_id, view.collection],
-    queryFn: ({ pageParam }) => gateway.list(pageParam, view.collection),
+    queryKey: ['leads', staff.user_id, view.collection, view.caseTrack],
+    queryFn: ({ pageParam }) =>
+      gateway.list(pageParam, view.collection, view.caseTrack),
     initialPageParam: 0,
     getNextPageParam: (last, pages) =>
       last.hasMore ? pages.length * 100 : undefined,
@@ -104,11 +108,11 @@ export function Workspace({
     ...refreshPolicy,
   });
   const all = list.data?.pages.flatMap((page) => page.items) ?? [];
-  const statuses = isArchive
-    ? archiveStatuses
-    : pipelineStatuses.filter((status) => status !== 'new');
+  const statuses = statusesForCollection(view.collection, view.caseTrack);
+  const track = caseTracks[view.caseTrack];
   const visible = all.filter(
     (lead) =>
+      statuses.includes(lead.status) &&
       (stage === 'all' || stage === lead.status) &&
       `${lead.name} ${lead.email} ${lead.postal_code} ${lead.description}`
         .toLocaleLowerCase('da')
@@ -224,17 +228,36 @@ export function Workspace({
           <>
             {isCases && (
               <nav className="case-tabs" aria-label="Sagsoversigter">
-                <a
-                  href="#/sager"
-                  aria-current={!isArchive ? 'page' : undefined}
-                >
-                  Igangværende
-                </a>
+                <div className="case-track-switch">
+                  <a
+                    href="#/sager"
+                    aria-current={
+                      !isArchive && view.caseTrack === 'planning'
+                        ? 'page'
+                        : undefined
+                    }
+                  >
+                    <MessagesSquare size={19} aria-hidden="true" />
+                    {caseTracks.planning.label}
+                  </a>
+                  <a
+                    href="#/sager/opfoelgning"
+                    aria-current={
+                      !isArchive && view.caseTrack === 'settlement'
+                        ? 'page'
+                        : undefined
+                    }
+                  >
+                    <ReceiptText size={19} aria-hidden="true" />
+                    {caseTracks.settlement.label}
+                  </a>
+                </div>
                 <a
                   href="#/sager/arkiv"
+                  className="case-archive-link"
                   aria-current={isArchive ? 'page' : undefined}
                 >
-                  Arkiv
+                  <Archive size={17} aria-hidden="true" /> Arkiv
                 </a>
               </nav>
             )}
@@ -245,7 +268,7 @@ export function Workspace({
                   ? 'Nye henvendelser'
                   : isArchive
                     ? 'Arkiverede sager'
-                    : 'Pipeline'
+                    : track.label
               }
             >
               <div className="pipeline-tools">
@@ -255,7 +278,7 @@ export function Workspace({
                       ? 'Afventer første behandling'
                       : isArchive
                         ? 'Arkiverede sager'
-                        : 'Pipeline'}
+                        : track.label}
                   </h2>
                   <span className="muted">
                     {isInbox
@@ -292,6 +315,9 @@ export function Workspace({
                   <strong>Flyt til Sager</strong>, når I er klar til at arbejde
                   videre med opgaven.
                 </p>
+              )}
+              {isCases && !isArchive && (
+                <p className="case-track-description">{track.description}</p>
               )}
               {!isInbox && (
                 <div
@@ -347,9 +373,8 @@ export function Workspace({
                 </div>
               ) : (
                 <div
-                  className={`board ${isArchive ? 'archive-board' : ''}`}
-                  tabIndex={0}
-                  aria-label="Sagskolonner – rul vandret for flere trin"
+                  className={`board case-board ${isArchive ? 'archive-board' : ''}`}
+                  aria-label="Sagskolonner"
                 >
                   {currentColumns.map((status) => (
                     <section
@@ -443,7 +468,7 @@ export function Workspace({
             location.hash =
               view.section.id === 'kalender'
                 ? `#/kalender${view.day ? '/' + view.day : ''}`
-                : collectionPath(view.collection);
+                : collectionPath(view.collection, view.caseTrack);
           }}
         />
       )}

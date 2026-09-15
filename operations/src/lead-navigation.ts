@@ -5,11 +5,17 @@ import {
   type LeadStatus,
 } from '../../supabase/functions/_shared/contracts/operations.ts';
 import { sectionFromHash, type WorkspaceSection } from './shell/navigation.ts';
+import {
+  caseTrackForStatus,
+  caseTracks,
+  type CaseTrack,
+} from './case-tracks.ts';
 
 export type LeadCollection = 'inbox' | 'cases' | 'archive';
 export interface WorkspaceRoute {
   section: WorkspaceSection;
   collection: LeadCollection;
+  caseTrack: CaseTrack;
   lead?: LeadId;
   day?: string;
 }
@@ -22,16 +28,33 @@ export function collectionForStatus(status: LeadStatus): LeadCollection {
       : 'cases';
 }
 
-export function collectionPath(collection: LeadCollection): string {
+export function collectionPath(
+  collection: LeadCollection,
+  track: CaseTrack = 'planning',
+): string {
   return collection === 'inbox'
     ? '#/indbakke'
     : collection === 'archive'
       ? '#/sager/arkiv'
-      : '#/sager';
+      : track === 'settlement'
+        ? '#/sager/opfoelgning'
+        : '#/sager';
 }
 
 export function leadPath(id: LeadId, status: LeadStatus): string {
-  return `${collectionPath(collectionForStatus(status))}/leads/${id}`;
+  return `${collectionPath(collectionForStatus(status), caseTrackForStatus(status))}/leads/${id}`;
+}
+
+/** Apply before pagination so one track cannot hide cases in the other. */
+export function statusesForCollection(
+  collection: LeadCollection,
+  track: CaseTrack = 'planning',
+): readonly LeadStatus[] {
+  return collection === 'inbox'
+    ? ['new']
+    : collection === 'archive'
+      ? archiveStatuses
+      : caseTracks[track].statuses;
 }
 
 /** Older notification and calendar links still resolve; loaded lead state selects its current home. */
@@ -45,6 +68,8 @@ export function readWorkspaceRoute(hash: string): WorkspaceRoute {
   const match = /\/leads\/([^/]+)$/.exec(normalized);
   const lead = match ? LeadIdSchema.safeParse(match[1]).data : undefined;
   const path = normalized.replace(/\/leads\/[^/]+$/, '');
+  const caseTrack: CaseTrack =
+    path === '#/sager/opfoelgning' ? 'settlement' : 'planning';
   const collection: LeadCollection =
     path === '#/indbakke'
       ? 'inbox'
@@ -63,9 +88,14 @@ export function readWorkspaceRoute(hash: string): WorkspaceRoute {
       : undefined;
   return {
     section: sectionFromHash(
-      calendar ? '#/kalender' : collection === 'archive' ? '#/sager' : path,
+      calendar
+        ? '#/kalender'
+        : collection === 'archive' || caseTrack === 'settlement'
+          ? '#/sager'
+          : path,
     ),
     collection,
+    caseTrack,
     lead,
     day,
   };

@@ -5,7 +5,8 @@ import {
 } from './customer-mail';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { z } from 'zod';
-import type { LeadCollection } from './lead-navigation';
+import { statusesForCollection, type LeadCollection } from './lead-navigation';
+import type { CaseTrack } from './case-tracks';
 import {
   OperationsLeadSchema,
   LeadEventSchema,
@@ -18,8 +19,6 @@ import {
   type CommandReceipt,
   AppointmentSchema,
   type Appointment,
-  pipelineStatuses,
-  archiveStatuses,
 } from '../../supabase/functions/_shared/contracts/operations.ts';
 
 export interface OperationsGateway {
@@ -27,6 +26,7 @@ export interface OperationsGateway {
   list(
     offset: number,
     collection: LeadCollection,
+    track?: CaseTrack,
   ): Promise<{ items: OperationsLead[]; hasMore: boolean }>;
   /** Counts every new enquiry under the current staff member's access, independently of loaded pages. */
   inboxCount(): Promise<number>;
@@ -94,13 +94,8 @@ export function createOperationsGateway(
 ): OperationsGateway {
   return {
     mail: createCustomerMailGateway(client),
-    async list(offset, collection) {
-      const statuses =
-        collection === 'inbox'
-          ? ['new']
-          : collection === 'archive'
-            ? archiveStatuses
-            : pipelineStatuses.filter((status) => status !== 'new');
+    async list(offset, collection, track) {
+      const statuses = statusesForCollection(collection, track);
       const { data, error } = await client
         .from('leads')
         .select('*')
