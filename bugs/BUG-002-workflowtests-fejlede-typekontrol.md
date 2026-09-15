@@ -62,3 +62,4 @@ Ved ændringer i fælles kontrakter eller tests skal både runtime-tests og den 
 
 - 2026-09-15: Blev synlig i CI efter rettelsen af [BUG-001](BUG-001-adgangstest-uden-arbejdsrolle.md); reproduceret lokalt.
 - 2026-09-15: Rettet og verificeret i `91abc31`, derefter registreret i fejlhistorikken.
+- 2026-09-15: Genåbnet under de lokale invitationsændringer: ni DB-tests bestod, men `astro check` fandt fem fejl i testhjælperen `reserve`. Standardparameteren `randomUUID()` blev infereret som Nodes UUID-template-type, som ikke accepterede kontraktens brandede `StaffInvitationId` som argument. Hjælperens rå SQL-input er nu eksplicit `string`; resultater valideres fortsat med invitationsschemaet. Efter rettelsen bestod `npm.cmd run build`: 123 filer, ingen fejl/advarsler/hints, syv sider og elleve artefakttests. Genlukket lokalt; denne opfølgning er endnu ikke committet.

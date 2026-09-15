@@ -7,6 +7,12 @@ import {
 } from '../../supabase/functions/_shared/contracts/staff.ts';
 import { StaffAccessError, type StaffAccessGateway } from './staff-access';
 import { randomId } from './random-id';
+import {
+  StaffInvitationCommandSchema,
+  StaffInvitationSchema,
+  StaffInvitationError,
+  type StaffInvitation,
+} from '../../supabase/functions/_shared/contracts/staff-invitation.ts';
 
 /** Isolated demonstration data; never provisions real accounts or sends invitations. */
 export function createDemoStaffAccess(current: Staff): StaffAccessGateway {
@@ -28,7 +34,55 @@ export function createDemoStaffAccess(current: Staff): StaffAccessGateway {
       receipt: ReturnType<typeof StaffAccessReceiptSchema.parse>;
     }
   >();
+  const invitations = new Map<string, StaffInvitation>();
   return {
+    invitations: {
+      async list() {
+        if (
+          !canManageStaff(members.find((m) => m.user_id === current.user_id)!)
+        )
+          throw new StaffInvitationError('owner_required');
+        return structuredClone([...invitations.values()]);
+      },
+      async invite(input) {
+        if (
+          !canManageStaff(members.find((m) => m.user_id === current.user_id)!)
+        )
+          throw new StaffInvitationError('owner_required');
+        const command = StaffInvitationCommandSchema.parse(input);
+        const previous = invitations.get(command.invitationId);
+        if (previous) {
+          if (
+            previous.email !== command.email ||
+            previous.display_name !== command.displayName ||
+            previous.role !== command.role ||
+            previous.is_owner !== command.isOwner
+          )
+            throw new StaffInvitationError('invitation_conflict');
+          return structuredClone(previous);
+        }
+        if (
+          [...invitations.values()].some((item) => item.email === command.email)
+        )
+          throw new StaffInvitationError('invitation_email_exists');
+        const now = new Date().toISOString();
+        const result = StaffInvitationSchema.parse({
+          id: command.invitationId,
+          email: command.email,
+          display_name: command.displayName,
+          role: command.role,
+          is_owner: command.isOwner,
+          state: 'sent',
+          created_by: current.user_id,
+          created_at: now,
+          last_attempt_at: now,
+          sent_at: now,
+          activated_at: null,
+        });
+        invitations.set(result.id, result);
+        return structuredClone(result);
+      },
+    },
     async list() {
       return structuredClone(members);
     },

@@ -431,6 +431,7 @@ export function Workspace({
         ) : view.section.id === 'indstillinger' ? (
           <>
             <StaffSettings
+              demo={demo}
               staff={staff}
               gateway={staffAccess}
               online={online}

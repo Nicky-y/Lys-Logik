@@ -9,9 +9,14 @@ import {
   type StaffAccessReceipt,
 } from '../../supabase/functions/_shared/contracts/staff.ts';
 import { randomId } from './random-id.ts';
+import {
+  createStaffInvitationGateway,
+  type StaffInvitationGateway,
+} from './staff-invitations.ts';
 
 /** Owner-only directory and versioned access changes. Authorization is enforced by RLS/RPC. */
 export interface StaffAccessGateway {
+  invitations: StaffInvitationGateway;
   list(): Promise<Staff[]>;
   update(command: StaffAccessCommand): Promise<StaffAccessReceipt>;
 }
@@ -49,6 +54,7 @@ export function createStaffAccessGateway(
       );
   }
   return {
+    invitations: createStaffInvitationGateway(client),
     async list() {
       const { data, error } = await client
         .from('staff_members')
@@ -73,7 +79,9 @@ export function createStaffAccessGateway(
   };
 }
 /** Keep the exact command for a lost response; changed input gets a fresh command. */
-export function createStaffAccessSender(gateway: StaffAccessGateway) {
+export function createStaffAccessSender(
+  gateway: Pick<StaffAccessGateway, 'update'>,
+) {
   let pending: { payload: string; command: StaffAccessCommand } | undefined;
   return async (input: Omit<StaffAccessCommand, 'commandId'>) => {
     const payload = JSON.stringify(input);

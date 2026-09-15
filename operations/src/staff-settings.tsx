@@ -15,17 +15,20 @@ import {
   type StaffAccessGateway,
 } from './staff-access';
 import './staff-settings.css';
+import { StaffInvitationsSettings } from './staff-invitations-settings';
 
 export function StaffSettings({
   staff,
   gateway,
   online,
   onAccessChanged,
+  demo = false,
 }: {
   staff: Staff;
   gateway: StaffAccessGateway;
   online: boolean;
   onAccessChanged: () => Promise<void>;
+  demo?: boolean;
 }) {
   const directory = useQuery({
     queryKey: ['staff-directory', staff.user_id],
@@ -59,6 +62,12 @@ export function StaffSettings({
             Ingen arbejdsrolle betyder, at medarbejderen ikke har adgang til
             kundesager, kalender eller kundenotifikationer.
           </p>
+          <StaffInvitationsSettings
+            staff={staff}
+            gateway={gateway.invitations}
+            online={online}
+            demo={demo}
+          />
           {directory.isPending && <p role="status">Henter medarbejdere…</p>}
           {directory.isError && (
             <p role="alert" className="error-box">

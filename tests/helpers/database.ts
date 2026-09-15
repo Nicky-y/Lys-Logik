@@ -14,15 +14,22 @@ export async function createTestDatabase() {
     create role authenticated nologin;
     create role service_role nologin bypassrls;
     create schema auth;
-    create table auth.users (id uuid primary key);
+    create table auth.users (
+      id uuid primary key, email text, invited_at timestamptz,
+      email_confirmed_at timestamptz, encrypted_password text,
+      created_at timestamptz not null default now()
+    );
     create function auth.uid() returns uuid language sql stable as
       $$ select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid $$;
     grant usage on schema public, auth to anon, authenticated, service_role;
     grant execute on function auth.uid() to authenticated;
   `);
   const directory = new URL('../../supabase/migrations/', import.meta.url);
-  const migrations = (await readdir(directory)).filter(name => name.endsWith('.sql')).sort();
-  for (const name of migrations) await db.exec(await readFile(new URL(name, directory), 'utf8'));
+  const migrations = (await readdir(directory))
+    .filter((name) => name.endsWith('.sql'))
+    .sort();
+  for (const name of migrations)
+    await db.exec(await readFile(new URL(name, directory), 'utf8'));
   return db;
 }
 

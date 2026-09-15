@@ -2,6 +2,12 @@
 import { createServer } from 'node:http';
 import { randomUUID } from 'node:crypto';
 import { createTestDatabase, validLead, submissionKey } from './database.ts';
+import { inviteStaffHandler } from '../../supabase/functions/_shared/http/invite-staff.ts';
+import {
+  StaffInvitationClaimSchema,
+  StaffInvitationSchema,
+  StaffInvitationError,
+} from '../../supabase/functions/_shared/contracts/staff-invitation.ts';
 const db = await createTestDatabase();
 const staffId = '1054ed20-67f4-4ff8-bd50-b423d7b11baf';
 const techId = 'ec421bef-f031-4416-9f30-21871b4c7d30';
@@ -13,14 +19,20 @@ const users = [
   { id: outsiderId, email: 'outsider@example.com' },
   { id: ownerId, email: 'owner@example.com' },
 ];
+let invitationEmails = 0;
 const token = (id: string) =>
   `${Buffer.from('{"alg":"HS256","typ":"JWT"}').toString('base64url')}.${Buffer.from(JSON.stringify({ sub: id, exp: 4102444800, role: 'authenticated' })).toString('base64url')}.fixture-only`;
 async function reset() {
+  users.splice(4);
+  invitationEmails = 0;
   await db.exec(
     'reset role; truncate public.leads,public.staff_members,auth.users cascade;',
   );
   for (const user of users)
-    await db.query('insert into auth.users(id) values($1)', [user.id]);
+    await db.query('insert into auth.users(id,email) values($1,$2)', [
+      user.id,
+      user.email,
+    ]);
   await db.query(
     "insert into public.staff_members(user_id,display_name,role) values ($1,'Backoffice','backoffice'),($2,'Faglig medarbejder','technical')",
     [staffId, techId],
@@ -96,6 +108,40 @@ const server = createServer((req, res) => {
               )
             ).rows,
           );
+          return;
+        }
+        if (url.pathname === '/_test/staff-invitations') {
+          await db.exec('reset role');
+          reply({
+            invitations: (
+              await db.query(
+                'select id,email,state,auth_user_id,role,is_owner from public.staff_invitations',
+              )
+            ).rows,
+            members: (await db.query('select * from public.staff_members'))
+              .rows,
+            emails: invitationEmails,
+          });
+          return;
+        }
+        if (url.pathname === '/_test/accept-invitation') {
+          // Auth-provider boundary fixture: simulates possession and verification
+          // of the emailed link. PostgreSQL activation and browser onboarding remain real.
+          await db.exec('reset role');
+          const user = users.find(
+            (item) => item.email === url.searchParams.get('email'),
+          );
+          if (!user) {
+            reply({ error: 'fixture_user_missing' }, 404);
+            return;
+          }
+          await db.query(
+            'update auth.users set email_confirmed_at=now() where id=$1',
+            [user.id],
+          );
+          reply({
+            hash: `#access_token=${token(user.id)}&token_type=bearer&expires_in=3600&refresh_token=fixture-refresh&type=invite`,
+          });
           return;
         }
         if (url.pathname === '/_test/staff-access-conflict') {
@@ -319,8 +365,107 @@ const server = createServer((req, res) => {
           user?.id ?? '',
         ]);
         await db.exec(user ? 'set role authenticated' : 'set role anon');
+        if (url.pathname === '/auth/v1/user') {
+          if (!user) {
+            reply({ message: 'unauthenticated' }, 401);
+            return;
+          }
+          if (req.method === 'PUT') {
+            if (
+              typeof body.password !== 'string' ||
+              body.password.length < 12
+            ) {
+              reply({ message: 'weak password' }, 400);
+              return;
+            }
+            await db.exec('reset role');
+            await db.query(
+              "update auth.users set encrypted_password='fixture-password-hash' where id=$1",
+              [user.id],
+            );
+          }
+          reply({
+            ...user,
+            aud: 'authenticated',
+            role: 'authenticated',
+            app_metadata: {},
+            user_metadata: {},
+            created_at: '2026-09-08T10:00:00Z',
+          });
+          return;
+        }
+        if (url.pathname === '/functions/v1/invite-staff') {
+          const handler = inviteStaffHandler(['http://127.0.0.1:5175'], {
+            async reserve(_bearer, command) {
+              try {
+                return StaffInvitationClaimSchema.parse(
+                  (
+                    await db.query<{ result: unknown }>(
+                      'select public.begin_staff_invitation($1,$2,$3,$4,$5) result',
+                      [
+                        command.invitationId,
+                        command.email,
+                        command.displayName,
+                        command.role,
+                        command.isOwner,
+                      ],
+                    )
+                  ).rows[0].result,
+                );
+              } catch (error) {
+                throw new StaffInvitationError((error as Error).message);
+              }
+            },
+            async send(email) {
+              await db.exec('reset role');
+              let invited = users.find((item) => item.email === email);
+              if (!invited) {
+                invited = { id: randomUUID(), email };
+                await db.query(
+                  'insert into auth.users(id,email,invited_at) values($1,$2,now())',
+                  [invited.id, email],
+                );
+                users.push(invited);
+              }
+              invitationEmails++;
+            },
+            async finish(claim, sent) {
+              await db.exec('reset role; set role service_role');
+              return StaffInvitationSchema.parse(
+                (
+                  await db.query<{ result: unknown }>(
+                    'select public.finish_staff_invitation($1,$2,$3) result',
+                    [claim.invitation.id, claim.attemptId, sent],
+                  )
+                ).rows[0].result,
+              );
+            },
+          });
+          const response = await handler(
+            new Request(url, {
+              method: req.method,
+              headers: {
+                authorization: req.headers.authorization ?? '',
+                origin: origin ?? 'http://127.0.0.1:5175',
+              },
+              body: JSON.stringify(body),
+            }),
+          );
+          reply(await response.json(), response.status);
+          return;
+        }
         if (url.pathname.startsWith('/rest/v1/rpc/')) {
           const name = url.pathname.split('/').at(-1);
+          if (name === 'activate_staff_invitation') {
+            reply(
+              (
+                await db.query<{ result: unknown }>(
+                  'select public.activate_staff_invitation() result',
+                )
+              ).rows[0].result,
+            );
+            return;
+          }
           if (name === 'set_staff_access') {
             reply(
               (
@@ -447,6 +592,12 @@ const server = createServer((req, res) => {
             await db.query(
               'select * from public.staff_members where ($1::uuid is null or user_id=$1) order by display_name,user_id',
               [id],
+            )
+          ).rows;
+        } else if (url.pathname === '/rest/v1/staff_invitations') {
+          rows = (
+            await db.query(
+              "select id,email,display_name,role,is_owner,state,created_by,created_at,last_attempt_at,sent_at,activated_at from public.staff_invitations where state<>'activated' order by created_at desc",
             )
           ).rows;
         } else if (url.pathname === '/rest/v1/leads') {

@@ -1,6 +1,61 @@
 .staff-settings {
   margin-bottom: 24px;
 }
+.staff-invitations {
+  margin-top: 24px;
+}
+.staff-create {
+  margin-top: 16px;
+}
+.staff-create fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+}
+.staff-create input {
+  min-height: 48px;
+}
+.staff-create input[type='checkbox'] {
+  min-height: 20px;
+}
+.staff-pending {
+  margin-top: 24px;
+}
+.staff-pending-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--line);
+}
+.staff-pending-item > svg {
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+.staff-pending-item > div {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.staff-pending-item span,
+.staff-pending-item small {
+  display: block;
+  margin-top: 4px;
+}
+.staff-pending-item small {
+  color: var(--muted);
+}
+@media (max-width: 600px) {
+  .staff-pending-item {
+    flex-wrap: wrap;
+  }
+  .staff-pending-item > button {
+    margin-left: 32px;
+  }
+}
 .staff-section-title,
 .staff-own-access {
   display: flex;

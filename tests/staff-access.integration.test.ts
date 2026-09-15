@@ -359,7 +359,7 @@ test('first owner bootstrap is server-only, exact and preserves the work role', 
 test('deployment bootstrap selects only the named existing account and can be repeated safely', async () => {
   await admin();
   await db.exec(
-    'truncate public.leads,public.staff_members,auth.users cascade; alter table auth.users add column email text;',
+    'truncate public.leads,public.staff_members,auth.users cascade;',
   );
   await db.query('insert into auth.users(id,email) values($1,$2),($3,$4)', [
     office,

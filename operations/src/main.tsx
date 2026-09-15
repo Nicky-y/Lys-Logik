@@ -18,6 +18,7 @@ import {
   createStaffAccessGateway,
   type StaffAccessGateway,
 } from './staff-access';
+import { StaffInvitationError } from '../../supabase/functions/_shared/contracts/staff-invitation.ts';
 import { browserAuthSessionStore, endBrowserSession } from './auth-session';
 
 const queryClient = new QueryClient({
@@ -284,7 +285,18 @@ function Application() {
         throw new Error(
           'Medarbejderadgangen kunne ikke kontrolleres. Prøv at logge ind igen.',
         );
-      const member = result.data ? StaffSchema.parse(result.data) : null;
+      let member = result.data ? StaffSchema.parse(result.data) : null;
+      if (!member) {
+        const activation = await client.rpc('activate_staff_invitation');
+        if (request !== profileRequest.current) return;
+        if (activation.error?.message === 'invitation_password_required') {
+          setNeedPassword(true);
+        } else if (activation.error) {
+          throw new StaffInvitationError(activation.error.message);
+        } else if (activation.data) {
+          member = StaffSchema.parse(activation.data);
+        }
+      }
       const previous = staffRef.current;
       if (
         previous &&
@@ -402,7 +414,16 @@ function Application() {
     );
   if (!session) return <SignIn />;
   if (needPassword)
-    return <SignIn initialPassword onDone={() => setNeedPassword(false)} />;
+    return (
+      <SignIn
+        initialPassword
+        onDone={() => {
+          setNeedPassword(false);
+          setLoading(true);
+          void reloadStaff();
+        }}
+      />
+    );
   if (!staff)
     return (
       <main className="loading-screen">

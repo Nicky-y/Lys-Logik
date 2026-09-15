@@ -71,7 +71,6 @@ test('lost access-change responses retain the command, while changed choices get
   const commands: unknown[] = [];
   let fail = true;
   const send = createStaffAccessSender({
-    list: async () => [],
     update: async (command) => {
       commands.push(command);
       if (fail) throw new Error('lost');

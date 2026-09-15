@@ -26,3 +26,10 @@ import_map = "./functions/deno.json"
 verify_jwt = false
 entrypoint = "./functions/customer-attachment/index.ts"
 import_map = "./functions/deno.json"
+
+[functions.invite-staff]
+# begin_staff_invitation verifies the JWT through PostgREST and checks current owner access.
+# Auth administration is server-only, and activation rechecks identity and the inviting owner.
+verify_jwt = false
+entrypoint = "./functions/invite-staff/index.ts"
+import_map = "./functions/deno.json"

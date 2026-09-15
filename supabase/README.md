@@ -2,6 +2,12 @@
 
 Lead-modtagelse er implementeret: formular → servervalidering → atomisk lagring af sag, oprettelseshistorik og ventende notifikationer. P1 tilføjer medarbejderadgang, statuskommandoer, faglig vurdering, afventer-markering og noter gennem [React-arbejdsrummet](../operations/README.md). Websitet er fortsat statisk Astro.
 
+## Medarbejderinvitationer — lokal implementering 15. september 2026
+
+**Opret medarbejder** bruger ny migration `20260915000500_staff_invitations.sql` og Edge-funktionen `invite-staff`. Begge skal udgives før den tilhørende appversion. Ejerkontrol/reservation sker med callerens JWT, Auth-admin/afslutning med servernøglen valgt af `LEAD_SERVER_KEY_NAME`, og aktivering med modtagerens verificerede identitet. Afventende invitationer giver ingen medarbejderadgang.
+
+Se [udrulning, Auth SMTP og grænser for første version](../operations/README.md#opret-medarbejder--forberedt-lokalt-15-september-2026). Dette trin er endnu ikke deployet, og ingen rigtig invitationsmail er sendt som led i implementeringen. De lokale tests bruger rigtige SQL-migrationer og appkode, men simuleret Auth-mail/linkverifikation.
+
 ## Pilotønske fra formularen — 15. september 2026
 
 Formularens valgfrie `pilotRequested` gemmes i den oprindelige indsendelse. Appen læser det afledte `leads.pilot_requested` og viser “Ønsker pilotprojekt”. Det ændrer hverken opgavebeskrivelse, status, faglig vurdering eller aftalevilkår. Ældre indsendelser uden feltet bevares uændret og har `NULL` i den afledte kolonne. Genforsøg sammenlignes fortsat med hele den oprindelige indsendelse.
