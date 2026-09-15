@@ -18,6 +18,7 @@ import {
   createStaffAccessGateway,
   type StaffAccessGateway,
 } from './staff-access';
+import { browserAuthSessionStore, endBrowserSession } from './auth-session';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -31,10 +32,14 @@ const publishable = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 const passwordLink = /(?:type=invite|type=recovery)/.test(
   location.hash + location.search,
 );
+const authSessionStore =
+  !demo && url && publishable ? browserAuthSessionStore(url) : null;
 const client =
   !demo && url && publishable
     ? createClient(url, publishable, {
         auth: {
+          storageKey: authSessionStore!.storageKey,
+          storage: authSessionStore!.storage,
           persistSession: true,
           autoRefreshToken: true,
           detectSessionInUrl: true,
@@ -195,6 +200,10 @@ function Application() {
   const [loading, setLoading] = useState(!demo && !!client);
   const [accessError, setAccessError] = useState('');
   const [needPassword, setNeedPassword] = useState(passwordLink);
+  const endingSession = useRef(false);
+  const [logoutState, setLogoutState] = useState<'idle' | 'pending' | 'failed'>(
+    'idle',
+  );
   const [demoState, setDemoState] = useState<{
     gateway: OperationsGateway;
     staff: Staff;
@@ -216,14 +225,33 @@ function Application() {
   useEffect(() => {
     if (!client) return;
     let current = true;
+    const acceptsSession = () =>
+      current && !endingSession.current && authSessionStore!.isCurrent();
+    const onStorage = (event: StorageEvent) => {
+      if (event.key !== authSessionStore!.logoutKey && event.key !== null)
+        return;
+      // A temporary memory session must also end when a different tab logs out.
+      // Its own storage generation cannot observe the browser's marker change.
+      endingSession.current = true;
+      profileRequest.current++;
+      staffRef.current = null;
+      queryClient.clear();
+      setStaff(null);
+      setSession(null);
+      setLogoutState('pending');
+      client.auth.dispose();
+      // Drop invitation/recovery tokens as well as the old client instance.
+      location.replace(location.pathname);
+    };
+    window.addEventListener('storage', onStorage);
     void client.auth.getSession().then(({ data, error }) => {
-      if (current) {
+      if (acceptsSession()) {
         setSession(data.session);
         if (error || !data.session) setLoading(false);
       }
     });
     const { data } = client.auth.onAuthStateChange((event, next) => {
-      if (current) {
+      if (acceptsSession()) {
         if (event === 'PASSWORD_RECOVERY') setNeedPassword(true);
         setSession(next);
         if (!next) {
@@ -237,11 +265,12 @@ function Application() {
     });
     return () => {
       current = false;
+      window.removeEventListener('storage', onStorage);
       data.subscription.unsubscribe();
     };
   }, []);
   const reloadStaff = useCallback(async () => {
-    if (!client || !session?.user.id) return;
+    if (!client || !session?.user.id || endingSession.current) return;
     const request = ++profileRequest.current;
     setAccessError('');
     try {
@@ -300,12 +329,48 @@ function Application() {
     };
   }, [session?.user.id, reloadStaff]);
   async function signOut() {
-    await pushController?.disable().catch(() => {});
-    await client?.auth.signOut({ scope: 'local' });
+    if (!client || !authSessionStore || logoutState === 'pending') return;
+    endingSession.current = true;
+    setLogoutState('pending');
+    profileRequest.current++;
+    staffRef.current = null;
     queryClient.clear();
-    setSession(null);
     setStaff(null);
+    try {
+      await endBrowserSession(
+        client.auth,
+        authSessionStore,
+        () => pushController?.disable() ?? Promise.resolve(),
+      );
+      setSession(null);
+      location.replace(location.pathname);
+    } catch {
+      // Do not offer a login screen or claim success when browser storage failed.
+      setLogoutState('failed');
+    }
   }
+  if (logoutState !== 'idle')
+    return (
+      <main className="loading-screen">
+        {logoutState === 'pending' ? (
+          <>
+            <LoaderCircle className="spin" />
+            <p>Logger ud…</p>
+          </>
+        ) : (
+          <>
+            <h1>Logout kunne ikke gennemføres</h1>
+            <p role="alert">
+              Browseren kunne ikke rydde din session. Lad ikke denne browser stå
+              til andre, før du er logget ud.
+            </p>
+            <button className="secondary" onClick={() => void signOut()}>
+              Prøv logout igen
+            </button>
+          </>
+        )}
+      </main>
+    );
   if (demo && demoState)
     return (
       <Workspace

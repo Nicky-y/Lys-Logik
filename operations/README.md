@@ -27,6 +27,12 @@ Kontrollér navigation, mobilmenu og tilgængelighed med `npx playwright test --
 
 ## Adgang og workflow
 
+### Lokal logout
+
+`src/auth-session.ts` ejer Supabase-sessionens browserlager. Et gennemført logout rydder projektets auth-nøgler og skifter lagergeneration, så gamle faner og sene tokenfornyelser ikke kan genskabe et login. Fanerne genindlæses med en ny auth-klient; eksisterende sessioner fra før ændringen læses fortsat ved første indlæsning. Andre browserdata røres ikke.
+
+Normal server-logout med `scope: local` og push-deaktivering forsøges, men netværksfejl må ikke forhindre lokal oprydning. Servertilbagekaldelse under offlineforhold kan ikke garanteres. Hvis browseren ikke tillader oprydning, vises en logout-fejl i stedet for en succesfuld login-skærm. Det gælder også midlertidige logins i hukommelsen, hvor ældre sessioner på disk stadig skal ryddes. Se [BUG-006](../bugs/BUG-006-logout-kunne-bevare-session.md) for evidens og afgrænsning.
+
 ### Kundesamtale på den enkelte sag
 
 **Kundesamtale** nederst til højre åbner en chatboks med den eksisterende kundemail. Kunden modtager en mail og svarer på sagens Reply-To; afsendelse, rettigheder, routing og leveringsstatus bruger fortsat de eksisterende servergrænser. Det gælder både Indbakke og Sager. At åbne eller skrive i chatten flytter ikke sagen.

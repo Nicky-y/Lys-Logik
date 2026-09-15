@@ -125,6 +125,10 @@ test('login survives reopening, offline launch reveals no customer data and logo
   if (await page.getByRole('button', { name: 'Åbn menu' }).isVisible())
     await page.getByRole('button', { name: 'Åbn menu' }).click();
   await page.getByRole('button', { name: 'Log ud', exact: true }).click();
+  // Reopening is tested after logout completes, not while its request is pending.
+  await expect(
+    page.getByRole('button', { name: 'Log ind', exact: true }),
+  ).toBeVisible();
   await page.reload();
   await expect(
     page.getByRole('button', { name: 'Log ind', exact: true }),
