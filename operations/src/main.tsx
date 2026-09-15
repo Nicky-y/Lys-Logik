@@ -11,7 +11,8 @@ import {
 } from '../../supabase/functions/_shared/contracts/operations.ts';
 import { createOperationsGateway, type OperationsGateway } from './gateway';
 import { Workspace } from './workspace';
-import { InstallApp, PwaProvider } from './pwa';
+import { PwaProvider } from './pwa';
+import type { PushController } from './push-controller';
 import { browserPushController } from './push';
 import {
   createStaffAccessGateway,
@@ -181,7 +182,6 @@ function SignIn({
             Adgang gives personligt. Har du ikke en konto endnu, skal du
             inviteres af administratoren.
           </p>
-          <InstallApp />
         </div>
       </section>
     </main>
@@ -199,6 +199,7 @@ function Application() {
     gateway: OperationsGateway;
     staff: Staff;
     staffAccess: StaffAccessGateway;
+    push: PushController;
   } | null>(null);
   useEffect(() => {
     if (demo) {
@@ -207,6 +208,7 @@ function Application() {
           gateway: m.createDemoGateway(),
           staff: m.demoStaff,
           staffAccess: m.createDemoStaffAccess(m.demoStaff),
+          push: m.createDemoPushController(),
         }),
       );
     }
@@ -310,6 +312,7 @@ function Application() {
         gateway={demoState.gateway}
         staff={demoState.staff}
         staffAccess={demoState.staffAccess}
+        push={demoState.push}
         onAccessChanged={async () => {
           const current = (await demoState.staffAccess.list()).find(
             (member) => member.user_id === demoState.staff.user_id,

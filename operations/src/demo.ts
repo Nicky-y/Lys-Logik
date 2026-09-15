@@ -16,6 +16,7 @@ import { copenhagenLocal, copenhagenInstant, shiftDay } from './calendar-time';
 import { createDemoStaffAccess } from './staff-access-demo';
 import { createDemoCustomerMail } from './demo-mail';
 export { createDemoStaffAccess };
+export { createDemoPushController } from './demo-push';
 export const demoStaff = StaffSchema.parse({
   user_id: 'ec421bef-f031-4416-9f30-21871b4c7d30',
   display_name: 'Alex · prøvevisning',

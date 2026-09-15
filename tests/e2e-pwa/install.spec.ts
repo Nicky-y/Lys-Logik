@@ -26,6 +26,16 @@ async function login(page: Page) {
   ).toBeVisible();
 }
 
+async function settings(page: Page) {
+  await login(page);
+  await page.evaluate(() => {
+    location.hash = '#/indstillinger';
+  });
+  await expect(
+    page.getByRole('heading', { name: 'App og notifikationer' }),
+  ).toBeVisible();
+}
+
 test('production app is installable and installation guidance is accessible on Android and desktop', async ({
   page,
   context,
@@ -59,6 +69,7 @@ test('production app is installable and installation guidance is accessible on A
   } finally {
     await normal.close();
   }
+  await settings(page);
   await page
     .getByRole('button', { name: 'Installér app', exact: true })
     .click();
@@ -168,6 +179,7 @@ test('install prompt can be dismissed without pretending installation succeeded'
   page,
 }) => {
   await ready(page);
+  await settings(page);
   await page.evaluate(() => {
     const event = new Event('beforeinstallprompt', { cancelable: true });
     Object.assign(event, {
@@ -179,17 +191,105 @@ test('install prompt can be dismissed without pretending installation succeeded'
   await page
     .getByRole('button', { name: 'Installér app', exact: true })
     .click();
-  await page
-    .getByRole('button', { name: 'Installér Lys & Logik', exact: true })
-    .click();
-  await expect(page.getByRole('status')).toContainText(
+  await expect(page.getByRole('dialog').getByRole('status')).toContainText(
     'Installationen blev lukket',
   );
   await expect(
     page.getByRole('button', { name: 'Installér Lys & Logik', exact: true }),
   ).toHaveCount(0);
+  await expect(
+    page.getByText('Appen er installeret', { exact: true }),
+  ).toHaveCount(0);
   await page.evaluate(() => window.dispatchEvent(new Event('appinstalled')));
   await expect(
     page.getByRole('button', { name: 'Installér app', exact: true }),
   ).toHaveCount(0);
+  await expect(
+    page.getByText('Appen er installeret', { exact: true }),
+  ).toBeVisible();
+});
+
+test('installation starts from the settings button only and waits for browser confirmation', async ({
+  page,
+}) => {
+  await ready(page);
+  await settings(page);
+  await page.evaluate(() => {
+    (window as any).installCalls = 0;
+    const event = new Event('beforeinstallprompt', { cancelable: true });
+    Object.assign(event, {
+      prompt: async () => {
+        (window as any).installCalls++;
+      },
+      userChoice: Promise.resolve({ outcome: 'accepted' }),
+    });
+    window.dispatchEvent(event);
+  });
+  expect(await page.evaluate(() => (window as any).installCalls)).toBe(0);
+  await page
+    .getByRole('button', { name: 'Installér app', exact: true })
+    .click();
+  await expect(
+    page.getByText(
+      'Installationen er godkendt. Afventer browserens bekræftelse.',
+    ),
+  ).toBeVisible();
+  await expect(
+    page.getByText('Appen er installeret', { exact: true }),
+  ).toHaveCount(0);
+  await page
+    .getByRole('button', { name: 'Installér app', exact: true })
+    .click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+  expect(await page.evaluate(() => (window as any).installCalls)).toBe(1);
+  await page.evaluate(() => window.dispatchEvent(new Event('appinstalled')));
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await expect(
+    page.getByText('Appen er installeret', { exact: true }),
+  ).toBeVisible();
+});
+
+test('failed installation shows browser guidance and can be attempted again with a fresh prompt', async ({
+  page,
+}) => {
+  await ready(page);
+  await settings(page);
+  await page.evaluate(() => {
+    const event = new Event('beforeinstallprompt', { cancelable: true });
+    Object.assign(event, {
+      prompt: async () => {
+        throw new Error('native prompt unavailable');
+      },
+      userChoice: Promise.resolve({ outcome: 'dismissed' }),
+    });
+    window.dispatchEvent(event);
+  });
+  await page
+    .getByRole('button', { name: 'Installér app', exact: true })
+    .click();
+  await expect(page.getByRole('dialog').getByRole('status')).toContainText(
+    'Installationen kunne ikke åbnes',
+  );
+  await expect(
+    page.getByRole('dialog').getByText('Føj til startskærm', { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText('Appen er installeret', { exact: true }),
+  ).toHaveCount(0);
+  await page.evaluate(() => {
+    const event = new Event('beforeinstallprompt', { cancelable: true });
+    Object.assign(event, {
+      prompt: async () => {
+        window.dispatchEvent(new Event('appinstalled'));
+      },
+      userChoice: Promise.resolve({ outcome: 'accepted' }),
+    });
+    window.dispatchEvent(event);
+  });
+  await page
+    .getByRole('button', { name: 'Installér Lys & Logik', exact: true })
+    .click();
+  await expect(
+    page.getByText('Appen er installeret', { exact: true }),
+  ).toBeVisible();
 });

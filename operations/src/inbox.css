@@ -137,17 +137,6 @@
   margin-top: 10px;
   color: #606c75;
 }
-.settings-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 18px;
-  margin-top: 24px;
-}
-.settings-actions .install-button,
-.settings-actions .push-toggle {
-  display: inline-flex;
-}
 .ws-session-action {
   margin-top: 12px;
 }

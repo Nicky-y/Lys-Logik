@@ -1,0 +1,157 @@
+.device-settings .device-demo-note {
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: #fff5dd;
+  color: #655024;
+  font-size: 0.8rem;
+}
+.device-setting-row {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 16px;
+  row-gap: 12px;
+  padding: 24px 0;
+  border-bottom: 1px solid #e1e6e9;
+}
+.device-setting-row:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+.device-setting-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  color: #5b6268;
+  background: #f2f4f5;
+}
+.device-setting-copy h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #1d2931;
+}
+.device-setting-copy p {
+  margin: 6px 0 0;
+  font-size: 0.82rem;
+  color: #606c75;
+  line-height: 1.65;
+}
+.device-setting-action {
+  justify-self: end;
+}
+.device-settings .install-app-button {
+  min-height: 44px;
+  padding: 10px 16px;
+  border-color: #e4b03e;
+  background: #ffc247;
+  color: #302611;
+  font-size: 0.82rem;
+}
+.device-settings .install-app-button:hover:not(:disabled) {
+  background: #ffd071;
+}
+.device-installed {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: #356748;
+}
+.device-install-status {
+  max-width: 240px;
+  font-size: 0.8rem;
+}
+.notification-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 102px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #606c75;
+  font: inherit;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+.notification-switch-track {
+  display: block;
+  width: 48px;
+  height: 28px;
+  border-radius: 100px;
+  background: #69757d;
+  border: 1px solid #69757d;
+  position: relative;
+  transition: background 160ms ease;
+}
+.notification-switch-track::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  left: 3px;
+  top: 3px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 1px 3px #18222b26;
+  transition: transform 160ms ease;
+}
+.notification-switch[aria-checked='true'] .notification-switch-track {
+  background: #ffc247;
+  border-color: #aa7b19;
+}
+.notification-switch[aria-checked='true'] .notification-switch-track::after {
+  transform: translateX(20px);
+  background: #302611;
+}
+.notification-switch:disabled {
+  cursor: default;
+}
+.notification-switch:disabled .notification-switch-track {
+  opacity: 0.5;
+}
+.notification-switch:focus-visible,
+.device-settings .install-app-button:focus-visible {
+  outline: 3px solid #986911;
+  outline-offset: 5px;
+  border-radius: 8px;
+}
+.device-setting-feedback {
+  grid-column: 2 / -1;
+  font-size: 0.82rem;
+}
+.device-setting-feedback p {
+  margin: 0 0 10px;
+}
+.device-setting-feedback > :last-child {
+  margin-bottom: 0;
+}
+@media (max-width: 600px) {
+  .device-settings {
+    padding: 20px;
+  }
+  .device-setting-row {
+    grid-template-columns: 36px minmax(0, 1fr);
+    column-gap: 12px;
+  }
+  .device-setting-icon {
+    width: 36px;
+    height: 40px;
+  }
+  .device-setting-action {
+    grid-column: 2;
+    justify-self: start;
+  }
+  .device-setting-feedback {
+    grid-column: 1 / -1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .notification-switch-track,
+  .notification-switch-track::after {
+    transition: none;
+  }
+}

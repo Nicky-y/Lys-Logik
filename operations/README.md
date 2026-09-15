@@ -100,7 +100,9 @@ React Query holder hentede kundedata i hukommelsen, som ryddes ved logout. Supab
 
 ## Installation på Android og hosting
 
-PWA'en har manifest med stabil appidentitet, standalone-visning, logo_v12 uden tekst i 192/512 px og et maskable-ikon med lys baggrund og plads til Androids beskæring. Ikonernes versionsnavne sikrer nye cacheadresser; appidentiteten er uændret. **Installér app** vises ved login og i arbejdsrummet; demoen tilbyder ikke installation. Knappen bruger browserens installationsdialog, når den er tilgængelig, og viser ellers vejledning til Chrome på Android: menu → Føj til startskærm → Installér. Knappen skjules i standalone-visning.
+PWA'en har manifest med stabil appidentitet, standalone-visning og ikoner i 192/512 px samt et maskable-ikon. **Indstillinger → App og notifikationer** samler enhedens betjening. **Installér app** har et downloadikon og åbner browserens installation direkte, når den er tilgængelig. Ellers vises vejledning til Chrome på Android: menu → Føj til startskærm → Installér. Først efter `appinstalled` eller ved åbning i standalone-visning erstattes knappen med **Appen er installeret**. Accept af browserens dialog er alene en afventende tilstand; afvisning og fejl giver vejledning uden at foregive installation.
+
+Notifikationer styres af en til/fra-kontakt i samme panel. Tilstanden bekræftes gennem den eksisterende browserabonnement-/RPC-controller; ukendt status låser kontakten og tilbyder genforsøg. En igangværende ændring låser også kontakten. Ved fokus, genforbindelse og tilbagevenden fra browserens indstillinger genlæses status uden at anmode om tilladelse. En ejer uden arbejdsrolle kan installere appen, men kan ikke tilmelde kundenotifikationer. I demoen er kontakten en tydeligt markeret prøvevisning i hukommelsen; den hverken anmoder om tilladelser, tilmelder push eller registrerer en service worker.
 
 Service workeren registreres kun i produktionsbuildet og på en sikker origin. Navigation og alle database-/loginkald bruger netværket. Åbning uden net viser en særskilt offlinebesked uden kundedata. Allerede åbne sager har fortsat netværksindikator og blokerede gem-handlinger offline. Der er ingen offlinekø. Web Push leveres nu af det separate baggrundsjob beskrevet nedenfor. Opdatering bruger hverken `skipWaiting` eller automatisk reload, så en åben indtastning ikke afbrydes; luk appens vinduer/faner og åbn den igen for at aktivere en ventende service worker.
 
@@ -144,7 +146,7 @@ P2 mangler kundemail frem og tilbage, billedskabelon/vedhæftninger og fysisk af
 
 ## Mobilnotifikationer — 10. september 2026
 
-Efter login vælges **Notifikationer → Slå notifikationer til** på hver enhed. Browserens tilladelse gives kun ved eget tryk. Slå fra afmelder den aktuelle enhed; logout afmelder også lokalt, selv hvis backend ikke kan kontaktes. Ved en gammel service worker beder appen om at lukke alle appvinduer/faner og åbne igen, før tilmelding kan gennemføres. Ingen kundeoplysninger vises på låseskærmen: notifikationen siger kun, at en ny henvendelse er kommet. Tryk åbner `#/leads/<id>`; login og medarbejderadgang gælder stadig.
+Efter login vælges **Indstillinger → Notifikationer**, og kontakten slås til på hver enhed. Browserens tilladelse gives kun ved eget tryk. Slå fra afmelder den aktuelle enhed; logout afmelder også lokalt, selv hvis backend ikke kan kontaktes. Ved en gammel service worker beder appen om at lukke alle appvinduer/faner og åbne igen, før tilmelding kan gennemføres. Ingen kundeoplysninger vises på låseskærmen. Tryk åbner `#/leads/<id>`, som finder sagen i Indbakke eller Sager; login og medarbejderadgang gælder stadig.
 
 Migration `20260910063714_web_push.sql` er lagt på Supabase. Private tilmeldinger ejes af den aktive medarbejder, maksimalt 10 aktive enheder. Endpoints er begrænset til kendte Web Push-udbydere; ukendte værter, custom ports og redirects afvises. Ingen ny tilmelding modtager historiske henvendelser.
 

@@ -26,8 +26,7 @@ import type { OperationsGateway } from './gateway';
 import type { PushController } from './push-controller';
 import { LeadDialog } from './lead-detail';
 import { CalendarView } from './calendar';
-import { InstallApp } from './pwa';
-import { PushSettings } from './push';
+import { DeviceSettings } from './device-settings';
 import { AppShell } from './shell/app-shell';
 import {
   collectionPath,
@@ -412,22 +411,12 @@ export function Workspace({
               online={online}
               onAccessChanged={onAccessChanged}
             />
-            <section className="settings-panel">
-              <h2>App og notifikationer</h2>
-              <p>Administrér installation og notifikationer på denne enhed.</p>
-              <div className="settings-actions">
-                <InstallApp />
-                {push && canWork ? (
-                  <PushSettings controller={push} />
-                ) : (
-                  <p className="muted">
-                    {canWork
-                      ? 'Notifikationer er tilgængelige, når du er logget ind i appen.'
-                      : 'Kundenotifikationer kræver en arbejdsrolle.'}
-                  </p>
-                )}
-              </div>
-            </section>
+            <DeviceSettings
+              key={staff.user_id}
+              push={push}
+              canWork={canWork}
+              demo={demo}
+            />
           </>
         ) : (
           <section className="ws-page-surface">

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Bell, X } from 'lucide-react';
+import { Bell } from 'lucide-react';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import {
   createPushController,
@@ -88,98 +88,153 @@ export function browserPushController(
   });
 }
 
-export function PushSettings({ controller }: { controller: PushController }) {
-  const dialog = useRef<HTMLDialogElement>(null);
+export function PushSettings({
+  controller,
+  unavailableReason,
+}: {
+  controller?: PushController;
+  unavailableReason: string;
+}) {
   const [active, setActive] = useState<boolean | null>(null);
-  const [busy, setBusy] = useState(false);
+  const [busy, setBusy] = useState(true);
   const [error, setError] = useState('');
+  const changing = useRef(false);
+  const generation = useRef(0);
   useEffect(() => {
-    let mounted = true;
-    void controller
-      .active()
-      .then((value) => {
-        if (mounted) setActive(value);
-      })
-      .catch(() => { if (mounted) setError('Status kunne ikke hentes. Kontrollér forbindelsen og prøv igen.'); });
+    setActive(null);
+    setError('');
+    changing.current = false;
+    const refresh = async () => {
+      if (changing.current || document.visibilityState === 'hidden') return;
+      const request = ++generation.current;
+      setBusy(true);
+      try {
+        const value = controller?.supported ? await controller.active() : null;
+        if (request === generation.current) {
+          setActive(value);
+          setError('');
+        }
+      } catch {
+        if (request === generation.current) {
+          setActive(null);
+          setError(
+            'Status kunne ikke hentes. Kontrollér forbindelsen og prøv igen.',
+          );
+        }
+      } finally {
+        if (request === generation.current) setBusy(false);
+      }
+    };
+    void refresh();
+    // Recheck after returning from Android/browser settings, without asking permission.
+    window.addEventListener('focus', refresh);
+    window.addEventListener('online', refresh);
+    document.addEventListener('visibilitychange', refresh);
     return () => {
-      mounted = false;
+      generation.current++;
+      window.removeEventListener('focus', refresh);
+      window.removeEventListener('online', refresh);
+      document.removeEventListener('visibilitychange', refresh);
     };
   }, [controller]);
   async function change() {
+    if (!controller?.supported || busy || changing.current) return;
+    changing.current = true;
+    const request = ++generation.current;
     setBusy(true);
     setError('');
     try {
-      if (active === null) { setActive(await controller.active()); return; }
-      if (active) await controller.disable();
-      else await controller.enable();
-      setActive(await controller.active());
+      if (active !== null) {
+        if (active) await controller.disable();
+        else await controller.enable();
+      }
+      const value = await controller.active();
+      if (request === generation.current) setActive(value);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Prøv igen.');
-      setActive(await controller.active().catch(() => null));
+      const value = await controller.active().catch(() => null);
+      if (request === generation.current) {
+        setError(err instanceof Error ? err.message : 'Prøv igen.');
+        setActive(value);
+      }
     } finally {
-      setBusy(false);
+      if (request === generation.current) {
+        setBusy(false);
+        changing.current = false;
+      }
     }
   }
+  const unavailable = !controller
+    ? unavailableReason
+    : !controller.supported
+      ? 'Åbn appen i Chrome på Android for at bruge mobilnotifikationer.'
+      : '';
+  const status =
+    unavailable ||
+    (active === null
+      ? 'Status for notifikationer er ikke bekræftet endnu.'
+      : active
+        ? 'Notifikationer er slået til på denne enhed.'
+        : 'Notifikationer er slået fra på denne enhed.');
   return (
-    <>
-      <button
-        type="button"
-        className="install-app-button"
-        onClick={() => dialog.current?.showModal()}
-      >
-        <Bell size={16} /> Notifikationer
-      </button>
-      <dialog
-        ref={dialog}
-        className="install-dialog"
-        aria-labelledby="push-title"
-      >
+    <div className="device-setting-row">
+      <span className="device-setting-icon">
+        <Bell size={22} aria-hidden="true" />
+      </span>
+      <div className="device-setting-copy">
+        <h3 id="push-title">Notifikationer</h3>
+        <p>
+          Få besked om nye henvendelser og svar fra kunder. Tryk på
+          notifikationen for at åbne sagen.
+        </p>
+        <p id="push-status" role="status">
+          {status}
+        </p>
+      </div>
+      <div className="device-setting-action">
         <button
           type="button"
-          className="icon-button install-close"
-          aria-label="Luk notifikationer"
-          onClick={() => dialog.current?.close()}
+          role="switch"
+          className="notification-switch"
+          aria-labelledby="push-title"
+          aria-describedby="push-status"
+          aria-checked={active === true}
+          aria-busy={busy}
+          disabled={busy || active === null || !!unavailable}
+          onClick={() => void change()}
         >
-          <X size={20} />
-        </button>
-        <p className="eyebrow">NYE HENVENDELSER</p>
-        <h2 id="push-title">Besked på denne enhed.</h2>
-        <p>
-          Få en notifikation, når der kommer en ny henvendelse. Tryk på den for
-          at åbne sagen. Kundens oplysninger vises først i appen.
-        </p>
-        <p role="status">
-          {active === null ? 'Status for notifikationer er ikke bekræftet endnu.' : active
-            ? 'Notifikationer er slået til på denne enhed.'
-            : 'Notifikationer er slået fra på denne enhed.'}
-        </p>
-        {controller.supported ? (
-          <button
-            className="primary"
-            disabled={busy}
-            onClick={() => void change()}
-          >
+          <span className="notification-switch-track" aria-hidden="true" />
+          <span aria-hidden="true">
             {busy
-              ? 'Gemmer…'
-              : active === null ? 'Kontrollér status'
-              : active
-                ? 'Slå notifikationer fra'
-                : 'Slå notifikationer til'}
-          </button>
-        ) : (
-          <p>Åbn appen i Chrome på Android for at bruge mobilnotifikationer.</p>
-        )}
-        {error && (
-          <p role="alert" className="error-box">
-            {error}
-          </p>
-        )}
-        <p className="install-footnote">
-          Gælder nye henvendelser efter tilmelding. Levering sker normalt ved
-          næste minutkontrol og afhænger af telefonens forbindelse. Log ud for
-          at afmelde denne enhed.
-        </p>
-      </dialog>
-    </>
+              ? 'Vent…'
+              : unavailable
+                ? '—'
+                : active === null
+                  ? 'Ukendt'
+                  : active
+                    ? 'Til'
+                    : 'Fra'}
+          </span>
+        </button>
+      </div>
+      {(error || (active === null && !unavailable && !busy)) && (
+        <div className="device-setting-feedback">
+          {error && (
+            <p role="alert" className="error-box">
+              {error}
+            </p>
+          )}
+          {active === null && !unavailable && (
+            <button
+              type="button"
+              className="secondary"
+              disabled={busy}
+              onClick={() => void change()}
+            >
+              Kontrollér status
+            </button>
+          )}
+        </div>
+      )}
+    </div>
   );
 }

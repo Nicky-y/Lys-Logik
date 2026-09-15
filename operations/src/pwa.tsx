@@ -6,7 +6,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { Download, X } from 'lucide-react';
+import { Check, Download, X } from 'lucide-react';
 
 interface InstallPrompt extends Event {
   prompt(): Promise<void>;
@@ -62,26 +62,39 @@ export function PwaProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export function InstallApp() {
+export function InstallApp({ demo = false }: { demo?: boolean }) {
   const { installed, prompt, clearPrompt } = useContext(PwaContext);
   const dialog = useRef<HTMLDialogElement>(null);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
-  if (installed || import.meta.env.VITE_OPERATIONS_MODE === 'demo') return null;
+  const [accepted, setAccepted] = useState(false);
+  if (installed && !demo)
+    return (
+      <span className="device-installed" role="status">
+        <Check size={18} aria-hidden="true" />
+        Appen er installeret
+      </span>
+    );
   async function install() {
-    if (!prompt) return;
+    if (!prompt || busy || demo) return;
     setBusy(true);
     setMessage('');
+    setAccepted(false);
     try {
       await prompt.prompt();
       const choice = await prompt.userChoice;
-      if (choice.outcome === 'accepted') dialog.current?.close();
-      else
+      if (choice.outcome === 'accepted') {
+        setAccepted(true);
+        dialog.current?.close();
+      } else {
         setMessage(
           'Installationen blev lukket. Du kan stadig bruge appen her og installere senere via browserens menu.',
         );
+        dialog.current?.showModal();
+      }
     } catch {
       setMessage('Installationen kunne ikke åbnes. Prøv via browserens menu.');
+      dialog.current?.showModal();
     } finally {
       clearPrompt();
       setBusy(false);
@@ -92,10 +105,20 @@ export function InstallApp() {
       <button
         type="button"
         className="install-app-button"
-        onClick={() => dialog.current?.showModal()}
+        disabled={busy}
+        onClick={() => {
+          if (prompt && !demo) void install();
+          else dialog.current?.showModal();
+        }}
       >
-        <Download size={16} /> Installér app
+        <Download size={18} aria-hidden="true" />{' '}
+        {busy ? 'Åbner installation…' : 'Installér app'}
       </button>
+      {accepted && (
+        <p className="device-install-status" role="status">
+          Installationen er godkendt. Afventer browserens bekræftelse.
+        </p>
+      )}
       <dialog
         ref={dialog}
         className="install-dialog"
@@ -116,7 +139,14 @@ export function InstallApp() {
           Få Lys & Logik som app med eget ikon på din hjemmeskærm. Brug din
           samme medarbejderkonto.
         </p>
-        {!window.isSecureContext ? (
+        {demo ? (
+          <p>
+            Dette er en lokal prøvevisning. For at installere appen skal du åbne{' '}
+            <a href="https://app.lysoglogik.dk/">app.lysoglogik.dk</a> i Chrome
+            på telefonen og vælge <strong>Indstillinger → Installér app</strong>
+            .
+          </p>
+        ) : !window.isSecureContext ? (
           <p className="error-box">
             Åbn appens HTTPS-adresse på telefonen for at installere. Den lokale
             netværksadresse understøtter ikke installation.
@@ -148,7 +178,7 @@ export function InstallApp() {
         {message && <p role="status">{message}</p>}
         <p className="install-footnote">
           Sager og aftaler kræver internet. Efter login kan du slå
-          mobilnotifikationer til under Notifikationer.
+          mobilnotifikationer til under Indstillinger.
         </p>
       </dialog>
     </>
