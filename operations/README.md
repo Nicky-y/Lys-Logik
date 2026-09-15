@@ -27,6 +27,18 @@ Kontrollér navigation, mobilmenu og tilgængelighed med `npx playwright test --
 
 ## Adgang og workflow
 
+### Kundesamtale på den enkelte sag
+
+**Kundesamtale** nederst til højre åbner en chatboks med den eksisterende kundemail. Kunden modtager en mail og svarer på sagens Reply-To; afsendelse, rettigheder, routing og leveringsstatus bruger fortsat de eksisterende servergrænser. Det gælder både Indbakke og Sager. At åbne eller skrive i chatten flytter ikke sagen.
+
+**Billeder** ved *Kundens opgave* åbner direkte billedoversigten i chatten. Den viser kundens tilladte JPG-, PNG- og WebP-filer fra de hentede beskeder, inklusive en advarsel ved afvigende afsender. Samtalen viser også øvrige vedhæftninger med de eksisterende type- og størrelsesgrænser. Billeder nær det synlige område hentes automatisk gennem `customer-attachment`; stor visning og download genbruger den hentede fil. Knappen til ældre beskeder gør billeder længere tilbage i historikken tilgængelige uden at hente hele arkivet på én gang.
+
+Chatten henter først beskeder, når den åbnes, og opdaterer hvert 15. sekund, mens den er åben og online. Minimering bevarer kladde og idempotensnøgle ved usikker afsendelse, men stopper polling og frigiver billedvisningernes blob-URL'er. Kladder gemmes kun i hukommelsen, mens sagen er åben; lukning af sagen, genindlæsning og logout kasserer dem. En anden sag får sin egen samtale og kladde. Besked- og billeddata skrives ikke til en ny browser- eller PWA-cache.
+
+Prøvevisningen har fiktive beskeder og et eksempelbillede. Afsendelse her ændrer kun data i hukommelsen og sender ingen rigtig mail. UI-ændringen kræver ingen ny migration eller mailkonfiguration; de eksisterende adgangs- og mailmigrationer skal være installeret i et live-miljø.
+
+Kontroller: `node --test tests/conversation-model.test.ts tests/mail.test.ts tests/mail-attachment.test.ts tests/mail.integration.test.ts`, `npm run test:e2e:app -- chat.spec.ts mail.spec.ts` og `npm run test:e2e:pwa -- mail-preview.spec.ts`. Browsertestene bruger syntetiske data og et lokalt API med de faktiske migrationsfiler. Mailtransport og billedsvar simuleres; de beviser ikke en ny ekstern maillevering.
+
 ### Ejerrettigheder og arbejdsrolle
 
 Adgangen har to uafhængige felter: `is_owner` giver medarbejderadministration; `role` giver arbejdsfunktioner. Arbejdsrollen vælges fra den fælles kontrakt i `supabase/functions/_shared/contracts/staff.ts`: **Backoffice** (`backoffice`), **Faglig** (`technical`) eller **Ingen arbejdsrolle** (`null`). Ejerrettigheder tilføjer aldrig en arbejdsrolle. Databasen afviser andre rolleværdier; nye roller kræver en bevidst kontrakt-, rettigheds- og migrationsændring.

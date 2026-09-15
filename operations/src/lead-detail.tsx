@@ -4,6 +4,7 @@ import {
   ArrowLeft,
   ArrowRight,
   Check,
+  Images,
   MessageSquare,
   Phone,
   ShieldCheck,
@@ -26,7 +27,7 @@ import {
   type OperationsGateway,
   type CommandInput,
 } from './gateway';
-import { LeadConversation } from './conversation';
+import { CaseChat, type ChatView } from './case-chat';
 import { randomId } from './random-id';
 import { AppointmentPanel, AppointmentHistory } from './calendar';
 const dateTime = (value: string) =>
@@ -145,6 +146,7 @@ function LeadContent({
   const [assessment, setAssessment] = useState('');
   const [waiting, setWaiting] = useState(lead.waiting_on ?? 'staff');
   const [notice, setNotice] = useState('');
+  const [chatView, setChatView] = useState<ChatView | null>(null);
   const mutation = useMutation({
     mutationFn: (input: CommandInput) => sender(input),
     onSuccess: async (receipt, command) => {
@@ -235,7 +237,21 @@ function LeadContent({
         )}
       </div>
       <section className="detail-section">
-        <h3>Kundens opgave</h3>
+        <div className="section-heading">
+          <h3>Kundens opgave</h3>
+          {gateway.mail && (
+            <button
+              type="button"
+              className="text-button customer-photos-shortcut"
+              aria-label="Se kundens billeder"
+              aria-haspopup="dialog"
+              aria-controls="customer-chat"
+              onClick={() => setChatView('photos')}
+            >
+              <Images size={19} aria-hidden="true" /> Billeder
+            </button>
+          )}
+        </div>
         {lead.pilot_requested === true && (
           <p>
             <span className="pilot-request">Ønsker pilotprojekt</span>{' '}
@@ -245,14 +261,6 @@ function LeadContent({
         <p className="preserve">{lead.description}</p>
         <small className="muted">Modtaget {dateTime(lead.created_at)}</small>
       </section>
-      {gateway.mail && (
-        <LeadConversation
-          key={lead.id}
-          lead={lead}
-          gateway={gateway.mail}
-          online={online}
-        />
-      )}
       {stale && (
         <div role="alert" className="warning-box">
           <strong>Der er nyt på sagen.</strong>
@@ -547,6 +555,16 @@ function LeadContent({
           <p className="muted">Viser de seneste 500 hændelser.</p>
         )}
       </section>
+      {gateway.mail && (
+        <CaseChat
+          key={lead.id}
+          lead={lead}
+          gateway={gateway.mail}
+          online={online}
+          view={chatView}
+          onViewChange={setChatView}
+        />
+      )}
     </div>
   );
 }

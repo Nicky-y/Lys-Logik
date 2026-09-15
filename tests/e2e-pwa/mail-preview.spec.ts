@@ -78,6 +78,7 @@ test('private photo preview works under production CSP, zooms, downloads without
     });
   });
   await openCase(page);
+  await page.getByRole('button', { name: 'Åbn kundesamtale' }).click();
   const preview = page.getByRole('button', {
     name: 'Vis billede: installation.png',
   });
@@ -110,10 +111,14 @@ test('private photo preview works under production CSP, zooms, downloads without
     .click();
   expect((await download).suggestedFilename()).toBe('installation.png');
   expect(requests).toBe(1);
-  await page.getByRole('button', { name: 'Luk sag', exact: true }).click();
+  await page.getByRole('button', { name: 'Minimer kundesamtale' }).click();
   await expect
     .poll(() => page.evaluate(() => (window as any).revokedImageUrls))
     .toContain(url);
+  await expect(
+    page.getByRole('dialog', { name: 'Anna Jensen', exact: true }),
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'Luk sag', exact: true }).click();
 });
 
 test('a failed private preview can be retried without losing the case', async ({
@@ -130,6 +135,7 @@ test('a failed private preview can be retried without losing the case', async ({
       });
   });
   await openCase(page);
+  await page.getByRole('button', { name: 'Se kundens billeder' }).click();
   await page.locator('.attachment-card').scrollIntoViewIfNeeded();
   await expect(page.getByRole('alert')).toContainText(
     'Billedet kunne ikke hentes',

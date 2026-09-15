@@ -17,6 +17,7 @@ test('staff can compose a photo request and see its queued delivery state on the
       has: page.getByRole('heading', { name: 'Anna Jensen', exact: true }),
     })
     .click();
+  await page.getByRole('button', { name: 'Åbn kundesamtale' }).click();
   await expect(
     page.getByRole('heading', { name: 'Samtale med kunden' }),
   ).toBeVisible();
@@ -32,6 +33,7 @@ test('staff can compose a photo request and see its queued delivery state on the
   ).toBeVisible();
   await expect(page.getByLabel('Besked til kunden')).toHaveValue('');
   await page.reload();
+  await page.getByRole('button', { name: 'Åbn kundesamtale' }).click();
   await expect(
     page.getByText('Afventer afsendelse', { exact: true }),
   ).toBeVisible();
@@ -52,6 +54,7 @@ test('a failed send preserves the draft and a retry reuses the same message id',
       has: page.getByRole('heading', { name: 'Anna Jensen', exact: true }),
     })
     .click();
+  await page.getByRole('button', { name: 'Åbn kundesamtale' }).click();
   await page
     .getByLabel('Besked til kunden')
     .fill('Tak for billederne. Vi vender tilbage i morgen.');
@@ -70,6 +73,11 @@ test('a failed send preserves the draft and a retry reuses the same message id',
   });
   await page.getByRole('button', { name: 'Send e-mail', exact: true }).click();
   await expect(page.getByRole('alert')).toContainText('Teksten er bevaret');
+  await expect(page.getByLabel('Besked til kunden')).toHaveValue(
+    'Tak for billederne. Vi vender tilbage i morgen.',
+  );
+  await page.getByRole('button', { name: 'Minimer kundesamtale' }).click();
+  await page.getByRole('button', { name: 'Åbn kundesamtale' }).click();
   await expect(page.getByLabel('Besked til kunden')).toHaveValue(
     'Tak for billederne. Vi vender tilbage i morgen.',
   );

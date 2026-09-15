@@ -26,11 +26,9 @@ async function navigateCases(page: Page) {
     .click();
 }
 const customer = (page: Page) =>
-  page
-    .locator('.lead-card')
-    .filter({
-      has: page.getByRole('heading', { name: 'Anna Jensen', exact: true }),
-    });
+  page.locator('.lead-card').filter({
+    has: page.getByRole('heading', { name: 'Anna Jensen', exact: true }),
+  });
 
 test('first-contact handoff is explicit, persists, preserves history and removes the inbox indicator', async ({
   page,
@@ -155,6 +153,11 @@ test('another employee can move a case first without creating a second handoff',
 }) => {
   await login(page);
   await customer(page).click();
+  // The stale-edit scenario starts only after this employee has read version 1.
+  // A link click alone can race with the initial case fetch.
+  await expect(
+    page.getByRole('button', { name: 'Flyt til Sager', exact: true }),
+  ).toBeEnabled();
   await request.post('http://127.0.0.1:54327/_test/qualify');
   await page
     .getByRole('button', { name: 'Flyt til Sager', exact: true })
