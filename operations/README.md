@@ -15,6 +15,14 @@ Kør fra `website/`, eller dobbeltklik den tilsvarende startfil:
 
 Prøvevisningen nulstilles ved genindlæsning. Den viser en fiktiv faglig medarbejder. Udviklingsserveren er sat til `0.0.0.0`, så telefoner på samme netværk kan åbne computerens lokale IP og port. Brug HTTPS-adressen ovenfor til installation på telefonen; den lokale HTTP-netværksadresse kan kun bruges til browserafprøvning.
 
+### Nyt menudesign til lokal gennemgang
+
+Start `npm.cmd run app:demo`, og åbn [menuforhåndsvisningen](http://127.0.0.1:5174/ui.html#/sager). Den har tomme sider, venstremenu og mobilmenu. Den røde prik i indbakken og profilen er visuelle eksempler; visningen indlæser ingen kundedata og foretager ingen API-kald.
+
+`src/shell/app-shell.tsx` er selve præsentationsrammen, som senere kan modtage indhold gennem `children`. `src/shell/preview.tsx` vælger foreløbige sider gennem URL-hashen. Den separate udviklingsindgang `ui.html` indgår ikke i produktionsbuildet. Den eksisterende app starter fortsat i `index.html`.
+
+Kontrollér navigation, mobilmenu og tilgængelighed med `npx playwright test --config playwright.shell.config.ts`. Testene starter en isoleret lokal server på port 5178.
+
 `operations/.env.local` indeholder kun `VITE_SUPABASE_URL` og `VITE_SUPABASE_PUBLISHABLE_KEY`; se `.env.local.example`. Administrations-, server- og Turnstile-secrets må aldrig sættes som `VITE_*`. Buildkonfigurationen accepterer kun Supabases offentlige publishable-key-format. Miljøfilerne er ignoreret af Git.
 
 ## Adgang og workflow
