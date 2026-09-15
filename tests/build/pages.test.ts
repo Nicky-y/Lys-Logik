@@ -6,6 +6,19 @@ import { test } from 'node:test';
 const dist = new URL('../../dist/', import.meta.url);
 const html = readFileSync(new URL('index.html', dist), 'utf8');
 
+test('contact section reuses responsive hero artwork with deployment-safe paths', () => {
+  const base = process.env.GITHUB_ACTIONS === 'true' ? '/Lys-Logik/' : '/';
+  const section = html.match(/<section id="kontakt"[\s\S]*?<\/section>/)?.[0];
+  assert.ok(section);
+  assert.ok(section.includes('class="contact-background" aria-hidden="true"'));
+  assert.ok(section.includes(`src="${base}images/hero.webp"`));
+  assert.ok(section.includes(`srcset="${base}images/hero-960.webp 960w, ${base}images/hero.webp 1536w"`));
+  assert.ok(section.includes('loading="lazy"'));
+  for (const path of ['images/hero.webp', 'images/hero-960.webp']) {
+    assert.ok(existsSync(new URL(path, dist)));
+  }
+});
+
 test('building automation has a complete service route and uses the supported enquiry contract', () => {
   const base = process.env.GITHUB_ACTIONS === 'true' ? '/Lys-Logik/' : '/';
   const automation = readFileSync(

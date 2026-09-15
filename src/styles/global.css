@@ -1,6 +1,7 @@
 :root {
   --ink: #192329;
   --dark: #141d23;
+  --footer-background: #0b1115;
   --yellow: #ffc247;
   --muted: #62696c;
   --line: #dfe2e1;
@@ -722,9 +723,52 @@ details[open] .faq-plus {
   padding: 0 35px 25px 0;
 }
 .contact-section {
-  background: var(--soft);
+  --contact-muted: #e0e6e8;
+  position: relative;
+  isolation: isolate;
+  background: var(--dark);
+}
+.contact-background,
+.contact-section::before {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.contact-background {
+  overflow: hidden;
+}
+.contact-background img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 60% center;
+}
+.contact-section::before {
+  content: '';
+  z-index: 1;
+  background: linear-gradient(
+    90deg,
+    rgb(12 21 26 / 90%) 0%,
+    rgb(12 21 26 / 78%) 46%,
+    rgb(12 21 26 / 55%) 100%
+  );
+}
+.contact-section::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0;
+  height: clamp(180px, 24vw, 320px);
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--footer-background) 95%
+  );
 }
 .contact-grid {
+  position: relative;
+  z-index: 2;
   display: grid;
   grid-template-columns: 1fr 1.15fr;
   gap: 105px;
@@ -732,16 +776,21 @@ details[open] .faq-plus {
 }
 .contact-intro {
   padding-top: 27px;
+  color: var(--paper);
+}
+.contact-intro .eyebrow,
+.contact-detail svg {
+  color: var(--yellow);
 }
 .contact-intro .light-dot {
-  background: #b77b04;
+  background: var(--yellow);
 }
 .contact-intro h2 {
   font-size: 3.125rem;
   margin-top: 18px;
 }
 .contact-intro > p:not(.eyebrow) {
-  color: var(--muted);
+  color: var(--contact-muted);
   font-size: 0.9375rem;
   margin-top: 24px;
   max-width: 355px;
@@ -758,13 +807,19 @@ details[open] .faq-plus {
 }
 .contact-detail small {
   display: block;
-  color: var(--muted);
+  color: var(--contact-muted);
   font-size: 0.75rem;
   margin-top: 5px;
 }
+.contact-detail a:hover,
+.contact-detail a:focus-visible {
+  color: var(--yellow);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
 .establishment-note {
   padding: 20px 0 0 18px;
-  border-left: 2px solid #c88e20;
+  border-left: 2px solid var(--yellow);
   margin-top: 41px;
   max-width: 360px;
 }
@@ -773,7 +828,7 @@ details[open] .faq-plus {
 }
 .establishment-note p {
   font-size: 0.75rem;
-  color: var(--muted);
+  color: var(--contact-muted);
   margin-top: 7px;
 }
 .form-card {
@@ -783,6 +838,9 @@ details[open] .faq-plus {
   box-shadow: 0 10px 40px #14232b04;
   border-radius: 6px;
   min-width: 0;
+}
+.contact-section .form-card {
+  box-shadow: 0 24px 64px rgb(0 0 0 / 28%);
 }
 .form-heading {
   display: flex;
@@ -1416,6 +1474,13 @@ dialog p:not(.eyebrow) {
   .contact-grid {
     grid-template-columns: 1fr;
     gap: 32px;
+  }
+  .contact-section::before {
+    background: linear-gradient(
+      180deg,
+      rgb(12 21 26 / 86%),
+      rgb(12 21 26 / 76%)
+    );
   }
   .contact-intro {
     padding-top: 0;

@@ -17,6 +17,7 @@ const {
   endpoint: import.meta.env.PUBLIC_LEAD_ENDPOINT,
   siteKey: import.meta.env.PUBLIC_TURNSTILE_SITE_KEY,
 });
+const assetBase = import.meta.env.BASE_URL.replace(/\/?$/, '/');
 
 ---
 
@@ -185,6 +186,18 @@ const {
     </section>
 
     <section id="kontakt" class="section contact-section">
+      <picture class="contact-background" aria-hidden="true">
+        <img
+          src={`${assetBase}images/hero.webp`}
+          srcset={`${assetBase}images/hero-960.webp 960w, ${assetBase}images/hero.webp 1536w`}
+          sizes="100vw"
+          width="1536"
+          height="1024"
+          alt=""
+          loading="lazy"
+          decoding="async"
+        />
+      </picture>
       <div class="container contact-grid">
         <div class="contact-intro">
           <p class="eyebrow">
