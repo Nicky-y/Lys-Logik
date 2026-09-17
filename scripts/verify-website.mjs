@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { formEntryLinks } from '../src/lib/form-entry.ts';
 
 const config = JSON.parse(
   readFileSync(
@@ -19,6 +20,20 @@ assert.ok(
 );
 assert.ok(html.includes('Vi har modtaget din henvendelse.'));
 assert.ok(!html.includes('Demoversion'));
+assert.ok(html.includes('id="formular"'));
+for (const link of formEntryLinks('/')) {
+  for (const suffix of ['', '/', '?via=other&email=synthetic-test']) {
+    const redirect = await request(new URL(link.path + suffix, config.origin), {
+      redirect: 'manual',
+    });
+    assert.equal(redirect.status, 302, link.path + suffix);
+    assert.equal(
+      new URL(redirect.headers.get('location'), config.origin).href,
+      new URL(link.destination, config.origin).href,
+      link.path + suffix,
+    );
+  }
+}
 const assets = [
   ...html.matchAll(/(?:src|href)="([^"\s]*\/_astro\/[^"\s]+)"/g),
 ].map((match) => match[1]);
@@ -60,6 +75,7 @@ console.log(
     origin: config.origin,
     liveForm: true,
     deployedAssetsMatch: true,
+    printedFormLinks: 'passed',
     allowedOrigin: 'passed',
     rejectedOrigin: 'passed',
     note: 'No enquiry is submitted by this check.',

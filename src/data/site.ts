@@ -9,6 +9,11 @@ export const site = {
   legalName: 'Lys & Logik I/S',
   cvr: '45 82 71 27',
   area: 'Storkøbenhavn',
+  address: {
+    street: 'Tybjergparken 5',
+    postalCode: '2660',
+    city: 'Brøndby Strand',
+  },
   vision:
     'Vi bygger Lys & Logik med godt elhåndværk som fundament og teknologi som en del af driften. Vi udvikler egne softwareværktøjer og nye arbejdsgange, der skal forbedre planlægning, logistik og dokumentation. Målet er at kunne vokse uden at miste overblik, kvalitet eller nærhed til kunden.',
   email: 'kontakt@lysoglogik.dk',

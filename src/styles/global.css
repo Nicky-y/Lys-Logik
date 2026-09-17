@@ -762,6 +762,7 @@ details[open] .faq-plus {
   margin-top: 7px;
 }
 .form-card {
+  scroll-margin-top: 24px;
   padding: 36px 35px 26px;
   background: #fff;
   border: 1px solid #e2e5e0;

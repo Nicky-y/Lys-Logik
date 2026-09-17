@@ -38,7 +38,10 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
         <p class="footer-vision">{site.vision}</p>
         <div class="footer-company-details">
           <p class="company-name">{site.legalName}</p>
-          <p>{site.area}</p>
+          <address class="company-address">
+            {site.address.street}<br />
+            {site.address.postalCode} {site.address.city}
+          </address>
           <p class="company-cvr">CVR {site.cvr}</p>
         </div>
       </div>
@@ -159,6 +162,10 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
 
   .company-cvr {
     margin-top: 12px;
+  }
+
+  .company-address {
+    font-style: normal;
   }
 
   h2 {

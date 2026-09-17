@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
+import { readFileSync } from 'node:fs';
 import { resolve, extname, sep } from 'node:path';
 import {
   CONSENT_KEY,
@@ -10,6 +11,8 @@ import {
 const origin = 'https://lysoglogik.dk';
 const optOut = `ga-disable-${MEASUREMENT_ID}`;
 const dist = resolve('dist');
+const printedRedirects = readFileSync(resolve(dist, '_redirects'), 'utf8')
+  .trim().split('\n').map((line) => line.split(/\s+/));
 let googleRequests: string[];
 
 test.beforeEach(async ({ context }) => {
@@ -24,10 +27,17 @@ test.beforeEach(async ({ context }) => {
       });
     }
     if (url.origin !== origin) return route.abort();
+    const printedRedirect = printedRedirects.find(([path]) => path === url.pathname);
     const pathname = decodeURIComponent(url.pathname);
+    // A fulfilled HTTP redirect bypasses Playwright's interception on the next
+    // request. Serve the real static meta-refresh fallback so every navigation
+    // stays mocked. verify-website.mjs separately checks Cloudflare HTTP 302s.
+    const assetPath = printedRedirect
+      ? `${pathname.replace(/\/$/, '')}/index.html`
+      : pathname.endsWith('/') ? pathname + 'index.html' : pathname;
     const file = resolve(
       dist,
-      `.${pathname.endsWith('/') ? pathname + 'index.html' : pathname}`,
+      `.${assetPath}`,
     );
     if (!file.startsWith(dist + sep)) return route.abort();
     const types: Record<string, string> = {
@@ -67,6 +77,59 @@ async function grant(page: Page) {
 async function settings(page: Page) {
   await page.locator('[data-statistics-settings]').click();
 }
+
+for (const source of ['visitkort', 'qr']) {
+  test(`printed ${source} link lands on the form and attributes only after consent`, async ({ page }) => {
+    await page.goto(`${origin}/${source}/formular?email=private&utm_source=private`);
+    await expect(page).toHaveURL(`${origin}/?via=${source}#formular`);
+    const heading = page.getByRole('heading', { name: 'Fortæl om din opgave', exact: true });
+    await expect(heading).toBeInViewport({ ratio: 1 });
+    const headingBox = (await heading.boundingBox())!;
+    expect(headingBox.y).toBeGreaterThanOrEqual(0);
+    expect(headingBox.y).toBeLessThan(240);
+    expect(googleRequests).toHaveLength(0);
+    expect((await queue(page)).filter((e) => e[0] === 'config' || e[0] === 'event')).toEqual([]);
+
+    // Rejection must not stop an enquiry, and must not start analytics.
+    await page.locator('[data-consent-reject]').click();
+    await page.getByLabel('Dit navn', { exact: true }).fill('Teknisk test');
+    expect(googleRequests).toHaveLength(0);
+    await settings(page);
+    await grant(page);
+    await expect.poll(() => googleRequests.length).toBe(1);
+    const events = await queue(page);
+    const config = events.find((e) => e[0] === 'config')?.[2];
+    expect(config).toMatchObject({
+      page_location: `${origin}/`,
+      page_referrer: '',
+      campaign_source: source,
+      campaign_medium: 'qr',
+      campaign_name: 'kontaktformular',
+    });
+    const measurement = events.filter((e) => e[0] === 'config' || e[0] === 'event');
+    expect(JSON.stringify(measurement)).not.toMatch(/private|Teknisk test|via=|#formular/);
+    expect(events.filter((e) => e[0] === 'event')).toHaveLength(1);
+    await expect(page.getByLabel('Dit navn', { exact: true })).toHaveValue('Teknisk test');
+  });
+}
+
+test('printed link with stored consent keeps its source on reload without storing the source separately', async ({ page }) => {
+  await page.goto(`${origin}/visitkort/formular/`);
+  await grant(page);
+  await page.reload();
+  await expect(page.locator('#statistics-banner')).toBeHidden();
+  const config = (await queue(page)).find((e) => e[0] === 'config')?.[2];
+  expect(config).toMatchObject({ campaign_source: 'visitkort', page_location: `${origin}/` });
+  expect(await page.evaluate(() => Object.keys(localStorage))).toEqual([CONSENT_KEY]);
+});
+
+test('unrecognized landing source never becomes a custom analytics value', async ({ page }) => {
+  await page.goto(`${origin}/?via=private%40example.test&utm_source=private#formular`);
+  await grant(page);
+  const config = (await queue(page)).find((e) => e[0] === 'config')?.[2];
+  expect(config).not.toHaveProperty('campaign_source');
+  expect(JSON.stringify(config)).not.toContain('private');
+});
 
 test('nothing loads before consent or after rejection; only a sanitized page view after accept', async ({
   page,

@@ -19,6 +19,12 @@ Oversigten er startet 15. september 2026 med to dokumenterede fejl fra den senes
 | [BUG-009](BUG-009-auth-test-matchede-vaertsnavn-som-logout.md) | Auth-test matchede værtsnavn som logout-endpoint | Testfixture | Løst og verificeret | 2026-09-15 | `5a4c373` |
 | [BUG-010](BUG-010-intermitterende-timeout-i-logout-browsertest.md) | Intermitterende timeout ved genåbning i logout-test | E2E / testmiljø | Åben – ikke gentaget | 2026-09-15 | Ingen ændring |
 | [BUG-011](BUG-011-smtp-secret-fejlagtig-readback-kontrol.md) | SMTP-kontrol krævede plaintext-secret ved readback | Deployværktøj | Løst; separat readback bestået | 2026-09-15 | Lokal kontrol |
+| [BUG-012](BUG-012-deaktivering-i-demo-omgik-versionstype.md) | Demoens deaktivering tildelte uvalideret version | App-demo / build | Løst og verificeret; udgivet | 2026-09-15 | `3340906` |
+| [BUG-013](BUG-013-offentlig-hjemmeside-har-noindex.md) | Offentlig hjemmeside sender noindex | Hjemmeside / metadata | Åben | 2026-09-16 | Ikke rettet |
+| [BUG-014](BUG-014-privatlivstekst-mangler-oplysninger-om-henvendelser.md) | Privatlivsteksten mangler oplysninger om henvendelser | Hjemmeside / privatliv | Åben | 2026-09-16 | Ikke rettet |
+| [BUG-015](BUG-015-virksomhedsoplysninger-mangler-fysisk-adresse.md) | Virksomhedsoplysninger mangler fysisk adresse | Hjemmeside / virksomhedsoplysninger | Løst og verificeret offentligt | 2026-09-16 | Se commitreference i registreringen |
+| [BUG-016](BUG-016-lokal-preview-viste-foraeldet-badge-css.md) | Lokal prøvevisning viste gammel badge-styling | Lokal preview / Astro | Under undersøgelse; symptom løst ved genstart | 2026-09-17 | Ingen permanent rettelse |
+| [BUG-017](BUG-017-redirect-test-hentede-live-html.md) | Mocked redirect-test hentede live HTML | Browser-tests | Løst og verificeret | 2026-09-17 | Se commitreference i registreringen |
 
 Oversigten er ikke en fuldstændig sikkerhedsgennemgang. BUG-007 og BUG-008 er registreret fra den indleverede rapport og behandles som separate rettelser.
 

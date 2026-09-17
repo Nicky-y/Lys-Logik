@@ -1,0 +1,13 @@
+---
+import { formEntryLinks } from '../../lib/form-entry';
+
+export function getStaticPaths() {
+  return formEntryLinks(import.meta.env.BASE_URL).map((link) => ({
+    params: { entry: link.source },
+    props: { destination: link.destination },
+  }));
+}
+
+// Development/portable static-host fallback. Cloudflare uses the HTTP redirects.
+return Astro.redirect(Astro.props.destination, 302);
+---

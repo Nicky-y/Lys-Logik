@@ -7,6 +7,7 @@ import {
   pageLocation,
   type StatisticsChoice,
 } from './analytics-consent';
+import { formEntryCampaign } from './form-entry';
 
 type AnalyticsWindow = Window & {
   dataLayer?: unknown[];
@@ -97,6 +98,7 @@ export function initAnalytics() {
       cookie_update: false,
       page_location: pageLocation(location.href, banner!.dataset.base!),
       page_referrer: '',
+      ...formEntryCampaign(location.href, banner!.dataset.base!),
     });
     win.gtag!('event', 'page_view', {
       send_to: MEASUREMENT_ID,

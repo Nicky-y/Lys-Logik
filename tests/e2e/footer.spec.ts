@@ -102,13 +102,12 @@ test('footer provides real business details and working contact destinations', a
   ).toHaveCount(2);
   await expect(footer).toContainText('Lys & Logik I/S');
   await expect(footer).toContainText('CVR 45 82 71 27');
-  await expect(footer).toContainText('Storkøbenhavn');
+  await expect(footer.locator('address')).toContainText('Tybjergparken 5');
+  await expect(footer.locator('address')).toContainText('2660 Brøndby Strand');
   await expect(footer).toContainText(
     'Vi bygger Lys & Logik med godt elhåndværk som fundament',
   );
-  await expect(footer).not.toContainText(
-    /Niclas Bundgaard|Tybjergparken|2660|Brøndby Strand/,
-  );
+  await expect(footer).not.toContainText(/c\/o|Niclas Bundgaard/);
   await expect(footer).not.toContainText(/placeholder|Under etablering/i);
   await expect(
     footer.getByRole('link', { name: '+45 71 41 84 81', exact: true }),

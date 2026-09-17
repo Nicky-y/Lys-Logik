@@ -34,6 +34,56 @@ explain the decision and expose buttons. No additional analytics framework is us
 The explicit page view includes only a known public route, no query string,
 fragment or referrer. There are no explicit form, phone or email tracking events.
 
+## Printed form links
+
+- Permanent print URL: `https://lysoglogik.dk/visitkort/formular`.
+- General QR URL: `https://lysoglogik.dk/qr/formular`.
+- Both forms, with or without a trailing slash, use HTTP 302 redirects on
+  Cloudflare. `public/_redirects` defines the rules; artifact checks keep them
+  aligned with the portable destinations in `form-entry.ts`.
+  Astro also builds meta-refresh fallback pages for portable static hosting.
+- Destinations are `/?via=visitkort#formular` and `/?via=qr#formular`.
+  The anchor targets the form card itself, including on mobile. Request query
+  parameters cannot choose a destination or override the source.
+- On a consented landing page, the Google config receives `campaign_source`
+  (`visitkort` or `qr`), `campaign_medium` (`qr`) and `campaign_name`
+  (`kontaktformular`). Only these constants are accepted. Unknown, repeated or
+  off-route `via` values produce no campaign data. Arbitrary UTM data and form
+  values are not forwarded. Page location still excludes all query/hash data.
+- No extra browser storage, scan counter, tracking endpoint, per-card identity
+  or lead/database attribution is added. A source is read from the current
+  landing URL when analytics starts. Navigating away before consenting loses
+  this landing source; declining consent never blocks the form.
+- GA4 Traffic acquisition can be broken down by Session source/medium and
+  Session campaign. The custom `qr` medium need not fit a default channel group;
+  use those source/medium dimensions. Counts are consented visits via the link,
+  not proof of physical scans or distinct people. Forwarded links count too.
+- Change the destination in `form-entry.ts` if the form moves, while retaining
+  both printed paths. Publish and run `scripts/verify-website.mjs` before print.
+
+References:
+- https://support.google.com/analytics/answer/11259997?hl=en
+- https://developers.cloudflare.com/workers/static-assets/redirects/
+
+### QR release verified, 2026-09-17
+
+- Six focused unit tests and twelve production artifact checks passed; Astro
+  checked 132 files with no errors or warnings.
+- Eight QR/campaign browser cases passed on desktop/mobile after correcting the
+  mock-redirect isolation issue documented in BUG-017. The sixteen existing
+  consent cases passed in the preceding run.
+- Deployed website Worker version `1e51fe32-07ca-4fd6-971b-90cd10f41b1c`.
+  `scripts/verify-website.mjs` passed on `https://lysoglogik.dk`, including exact
+  302 destinations, slash variants, query stripping and deployed asset matching.
+- Real public pages were opened with a mobile viewport for both entry links.
+  The form heading appeared without manually scrolling. No Google tag loaded
+  before consent. After consent, the real Google library produced `page_view`
+  requests with the correct `cs`, `cm`, `cn` and sanitized `dl` fields.
+- Those collection requests were intercepted and aborted, so test visits were
+  not inserted into GA4. The reporting dashboard itself was not verified.
+- No enquiries were submitted, no QR artwork changed, and no Git commit/push
+  was performed. The previously approved footer address shipped in this build.
+
 ## Google configuration and release check
 
 Disable **Enhanced Measurement** for this exact stream in GA4. Server-configured

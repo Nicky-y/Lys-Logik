@@ -7,7 +7,7 @@
 | Område | App-demo / TypeScript / build |
 | Berørt version og miljø | Lokalt arbejde oven på `7cec589` |
 | Påvirkning | Appens typekontrol og produktionsbuild blev blokeret |
-| Rettelse | Endnu ikke committet |
+| Rettelse | `3340906` |
 | Udgivelse | Appversion `44212126-67f2-4baa-af22-ef7f71ac724c`, verificeret 2026-09-16 |
 
 ## Symptom
@@ -42,3 +42,4 @@ Bevar schema-validering ved ændring af brandede værdier, og kør både runtime
 
 - 2026-09-15: Fundet ved app-build under implementeringen; rettet og build verificeret før udgivelse.
 - 2026-09-16: Rettelsen indgik i den verificerede [produktionsudgivelse](../docs/staff-deactivation-release.md). Kildeændringerne er endnu ikke committet.
+- 2026-09-17: Kildeændringer og regressionstests versioneret i `3340906`.

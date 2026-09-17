@@ -6,6 +6,24 @@ import { test } from 'node:test';
 const dist = new URL('../../dist/', import.meta.url);
 const html = readFileSync(new URL('index.html', dist), 'utf8');
 
+test('printed form links ship HTTP redirects and portable fallback pages', () => {
+  const base = process.env.GITHUB_ACTIONS === 'true' ? '/Lys-Logik/' : '/';
+  const redirects = readFileSync(new URL('_redirects', dist), 'utf8').trim().split('\n');
+  assert.equal(redirects.length, 4);
+  for (const source of ['qr', 'visitkort']) {
+    const destination = `${base}?via=${source}#formular`;
+    for (const slash of ['', '/']) {
+      // Cloudflare serves at root; the legacy Pages host uses the HTML fallback.
+      assert.ok(redirects.includes(`/${source}/formular${slash} /?via=${source}#formular 302`));
+    }
+    const fallback = readFileSync(new URL(`${source}/formular/index.html`, dist), 'utf8');
+    assert.match(fallback, /http-equiv="refresh"/);
+    assert.ok(fallback.includes(destination));
+    assert.ok(!fallback.includes('googletagmanager.com'));
+  }
+  assert.match(html, /id="formular" class="form-card"/);
+});
+
 test('contact section reuses responsive hero artwork with deployment-safe paths', () => {
   const base = process.env.GITHUB_ACTIONS === 'true' ? '/Lys-Logik/' : '/';
   const section = html.match(/<section id="kontakt"[\s\S]*?<\/section>/)?.[0];
