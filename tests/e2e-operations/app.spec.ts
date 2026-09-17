@@ -223,7 +223,7 @@ test('a login without staff membership shows no customer data', async ({
 }) => {
   await login(page, 'outsider@example.com');
   await expect(
-    page.getByRole('heading', { name: 'Din konto afventer adgang' }),
+    page.getByRole('heading', { name: 'Din konto har ikke adgang' }),
   ).toBeVisible();
   await expect(page.getByText('Anna Jensen')).toHaveCount(0);
 });

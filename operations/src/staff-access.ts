@@ -4,9 +4,11 @@ import {
   StaffSchema,
   StaffAccessCommandSchema,
   StaffAccessReceiptSchema,
+  StaffDeactivationCommandSchema,
   type Staff,
   type StaffAccessCommand,
   type StaffAccessReceipt,
+  type StaffDeactivationCommand,
 } from '../../supabase/functions/_shared/contracts/staff.ts';
 import { randomId } from './random-id.ts';
 import {
@@ -19,9 +21,13 @@ export interface StaffAccessGateway {
   invitations: StaffInvitationGateway;
   list(): Promise<Staff[]>;
   update(command: StaffAccessCommand): Promise<StaffAccessReceipt>;
+  /** An active owner may remove another member's access/push enrollment; never their own. Preserves historical records. */
+  deactivate(command: StaffDeactivationCommand): Promise<StaffAccessReceipt>;
 }
 const errors: Record<string, string> = {
   owner_required: 'Kun en aktiv ejer kan ændre medarbejdernes rettigheder.',
+  self_deactivation_forbidden:
+    'Du kan ikke deaktivere din egen konto. En anden ejer skal gøre det.',
   staff_version_conflict:
     'Rettighederne er ændret af en anden. Hent den seneste version og gennemgå den, før du gemmer igen.',
   last_owner_required:
@@ -32,6 +38,8 @@ const errors: Record<string, string> = {
   command_conflict:
     'Handlingen er allerede brugt med et andet indhold. Hent oversigten igen.',
   no_change: 'Rettighederne er uændrede.',
+  staff_already_inactive:
+    'Medarbejderen er allerede deaktiveret. Hent oversigten igen.',
 };
 export class StaffAccessError extends Error {
   readonly code: string;
@@ -76,6 +84,38 @@ export function createStaffAccessGateway(
       check(error);
       return StaffAccessReceiptSchema.parse(data);
     },
+    async deactivate(input) {
+      const command = StaffDeactivationCommandSchema.parse(input);
+      const { data, error } = await client.rpc('deactivate_staff_member', {
+        p_command_id: command.commandId,
+        p_user_id: command.userId,
+        p_expected_version: command.expectedVersion,
+      });
+      check(error);
+      return StaffAccessReceiptSchema.parse(data);
+    },
+  };
+}
+
+/** A retry retains the confirmed target/version; a new observed version needs a new confirmation and command. */
+export function createStaffDeactivationSender(
+  gateway: Pick<StaffAccessGateway, 'deactivate'>,
+) {
+  let pending: StaffDeactivationCommand | undefined;
+  return async (input: Omit<StaffDeactivationCommand, 'commandId'>) => {
+    const validated = StaffDeactivationCommandSchema.parse({
+      ...input,
+      commandId: randomId(),
+    });
+    if (
+      !pending ||
+      pending.userId !== validated.userId ||
+      pending.expectedVersion !== validated.expectedVersion
+    )
+      pending = validated;
+    const receipt = await gateway.deactivate(pending);
+    pending = undefined;
+    return receipt;
   };
 }
 /** Keep the exact command for a lost response; changed input gets a fresh command. */

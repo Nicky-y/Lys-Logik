@@ -456,6 +456,13 @@ const server = createServer((req, res) => {
         }
         if (url.pathname.startsWith('/rest/v1/rpc/')) {
           const name = url.pathname.split('/').at(-1);
+          if (name === 'deactivate_staff_member') {
+            reply((await db.query<{ receipt: unknown }>(
+              'select public.deactivate_staff_member($1,$2,$3) receipt',
+              [body.p_command_id, body.p_user_id, body.p_expected_version],
+            )).rows[0].receipt);
+            return;
+          }
           if (name === 'activate_staff_invitation') {
             reply(
               (

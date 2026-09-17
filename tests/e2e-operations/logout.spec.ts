@@ -38,7 +38,7 @@ test('logout also clears a login that is awaiting staff access', async ({
     .fill('fixture-password');
   await page.getByRole('button', { name: 'Log ind', exact: true }).click();
   await expect(
-    page.getByRole('heading', { name: 'Din konto afventer adgang' }),
+    page.getByRole('heading', { name: 'Din konto har ikke adgang' }),
   ).toBeVisible();
   await page.getByRole('button', { name: 'Log ud', exact: true }).click();
   await loggedOut(page);

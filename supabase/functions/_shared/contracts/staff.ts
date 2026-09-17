@@ -36,6 +36,13 @@ export const StaffAccessCommandSchema = z.strictObject({
   isOwner: z.boolean(),
 });
 export type StaffAccessCommand = z.infer<typeof StaffAccessCommandSchema>;
+/** Ends access for the observed membership. No client-supplied role, owner or reactivation flag is accepted. */
+export const StaffDeactivationCommandSchema = z.strictObject({
+  commandId: StaffAccessCommandIdSchema,
+  userId: StaffIdSchema,
+  expectedVersion: StaffVersionSchema,
+});
+export type StaffDeactivationCommand = z.infer<typeof StaffDeactivationCommandSchema>;
 export const StaffAccessReceiptSchema = z.object({
   userId: StaffIdSchema,
   version: StaffVersionSchema,

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ShieldCheck, Users, LoaderCircle } from 'lucide-react';
 import {
@@ -16,6 +16,7 @@ import {
 } from './staff-access';
 import './staff-settings.css';
 import { StaffInvitationsSettings } from './staff-invitations-settings';
+import { StaffDeactivation } from './staff-deactivation';
 
 export function StaffSettings({
   staff,
@@ -30,6 +31,11 @@ export function StaffSettings({
   onAccessChanged: () => Promise<void>;
   demo?: boolean;
 }) {
+  const [deactivatedName, setDeactivatedName] = useState('');
+  const deactivationNotice = useRef<HTMLParagraphElement>(null);
+  useEffect(() => {
+    if (deactivatedName) deactivationNotice.current?.focus();
+  }, [deactivatedName]);
   const directory = useQuery({
     queryKey: ['staff-directory', staff.user_id],
     queryFn: () => gateway.list(),
@@ -69,6 +75,16 @@ export function StaffSettings({
             demo={demo}
           />
           {directory.isPending && <p role="status">Henter medarbejdere…</p>}
+          {deactivatedName && (
+            <p
+              role="status"
+              tabIndex={-1}
+              ref={deactivationNotice}
+              className="staff-saved"
+            >
+              {deactivatedName} er deaktiveret. Historikken er bevaret.
+            </p>
+          )}
           {directory.isError && (
             <p role="alert" className="error-box">
               Medarbejderne kunne ikke hentes.{' '}
@@ -81,23 +97,56 @@ export function StaffSettings({
             </p>
           )}
           <div className="staff-directory">
-            {directory.data?.map((member) => (
-              <StaffEditor
-                key={member.user_id}
-                member={member}
-                gateway={gateway}
-                online={online}
-                onSaved={async () => {
-                  await onAccessChanged();
-                  await directory.refetch();
-                }}
-                onRefresh={async () => {
-                  await directory.refetch();
-                  await onAccessChanged();
-                }}
-              />
-            ))}
+            {directory.data
+              ?.filter((member) => member.active)
+              .map((member) => (
+                <StaffEditor
+                  key={member.user_id}
+                  member={member}
+                  isSelf={member.user_id === staff.user_id}
+                  gateway={gateway}
+                  online={online}
+                  onDeactivated={async () => {
+                    setDeactivatedName(member.display_name);
+                    await onAccessChanged();
+                    await directory.refetch();
+                  }}
+                  onSaved={async () => {
+                    await onAccessChanged();
+                    await directory.refetch();
+                  }}
+                  onRefresh={async () => {
+                    await directory.refetch();
+                    await onAccessChanged();
+                  }}
+                />
+              ))}
           </div>
+          {!!directory.data?.some((member) => !member.active) && (
+            <details className="staff-inactive">
+              <summary>
+                Deaktiverede medarbejdere (
+                {directory.data.filter((member) => !member.active).length})
+              </summary>
+              <div className="staff-directory">
+                {directory.data
+                  .filter((member) => !member.active)
+                  .map((member) => (
+                    <article
+                      className="staff-member"
+                      key={member.user_id}
+                      aria-label={member.display_name}
+                    >
+                      <h3>{member.display_name}</h3>
+                      <p className="muted">
+                        Deaktiveret · Tidligere: {staffAccessLabel(member)}
+                      </p>
+                      <p>Adgangen er lukket. Historikken er bevaret.</p>
+                    </article>
+                  ))}
+              </div>
+            </details>
+          )}
         </>
       ) : (
         <p className="muted">
@@ -111,16 +160,20 @@ export function StaffSettings({
 
 function StaffEditor({
   member,
+  isSelf,
   gateway,
   online,
   onSaved,
   onRefresh,
+  onDeactivated,
 }: {
   member: Staff;
+  isSelf: boolean;
   gateway: StaffAccessGateway;
   online: boolean;
   onSaved: () => Promise<void>;
   onRefresh: () => Promise<void>;
+  onDeactivated: () => Promise<void>;
 }) {
   const [editing, setEditing] = useState(false);
   const [observed, setObserved] = useState(member);
@@ -186,9 +239,20 @@ function StaffEditor({
           </p>
         </div>
         {!editing && (
-          <button className="secondary" onClick={start} disabled={!online}>
-            Redigér rettigheder
-          </button>
+          <div className="staff-member-actions">
+            <button className="secondary" onClick={start} disabled={!online}>
+              Redigér rettigheder
+            </button>
+            {!isSelf && (
+              <StaffDeactivation
+                member={member}
+                gateway={gateway}
+                online={online}
+                onDeactivated={onDeactivated}
+                onRefresh={onRefresh}
+              />
+            )}
+          </div>
         )}
       </div>
       {saved && (

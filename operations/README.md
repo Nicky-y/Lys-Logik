@@ -77,6 +77,18 @@ Samme invitation og indhold genbruges ved tabt svar. Et allerede bekræftet send
 
 Første version har ikke annullering, ændring af afventende rettigheder eller genudsendelse af et bekræftet, men udløbet invitationslink i appen. Disse situationer kræver betroet administration i Supabase; invitationer og forsøgsrækker må ikke blot slettes for at omgå grænserne. Login via vilkårlig e-mail, selvvalgte beføjelser og SMS indgår ikke.
 
+### Deaktivér medarbejder
+
+En aktiv ejer kan under **Indstillinger → Medarbejdere og rettigheder** vælge **Deaktivér medarbejder** for en anden medarbejder. Knappen vises aldrig på egen konto. Bekræftelsen viser navn og nuværende adgang. Medarbejderen flyttes til **Deaktiverede medarbejdere**, mens identitet, tidligere rolle, sager, beskeder og historik bevares. Funktionen sletter ikke en Auth-konto og genaktiverer ikke tidligere medarbejdere.
+
+`deactivate_staff_member` kontrollerer den aktuelle ejer, den viste adgangsversion og et stabilt kommando-id. Selv-deaktivering afvises med `self_deactivation_forbidden`, også ved direkte API-kald og med flere aktive ejere. En anden aktiv ejer skal udføre handlingen. Deaktivering, versionsændring, før/efter-historik, push-afmelding og kvittering gemmes i samme transaktion. Den sidste aktive ejer er fortsat beskyttet; en afventende invitation tæller ikke som en ekstra ejer. En konflikt kræver, at ejeren henter og gennemgår de seneste rettigheder før en ny bekræftelse. Både oprettelse og deaktivering kræver aktiv ejeradgang; arbejdsrollen alene giver ingen af disse beføjelser.
+
+Nye API-kald afvises efter deaktivering, også med en allerede udstedt login-session. Appens eksisterende profilkontrol rydder kundedata fra hukommelsen ved næste kontrol (tilbagevenden til appen eller inden for 30 sekunder i forgrunden). Auth-login kan fortsat lykkes, men giver skærmen **Din konto har ikke adgang**. Allerede viste oplysninger og notifikationer, der er overdraget til push-leverandøren, kan ikke trækkes tilbage.
+
+**Udrulning:** Anvend `20260915000600_staff_deactivation.sql` efter de eksisterende adgangs-/invitationsmigrationer, og udgiv derefter appen. Der kræves ingen ny Edge-funktion eller ændring af Auth/SMTP. **Udgivet 16. september 2026:** Migrationen er anvendt, og appversion `44212126-67f2-4baa-af22-ef7f71ac724c` modtager 100 % trafik på `app.lysoglogik.dk`. Offentlig kode og databasegrænse er verificeret. Ingen produktionsmedarbejdere blev deaktiveret under udgivelsen. Se [udgivelsesrapport](../docs/staff-deactivation-release.md).
+
+Kontroller: `tests/staff-deactivation.test.ts`, `tests/staff-deactivation.integration.test.ts` og `tests/e2e-operations/staff-deactivation.spec.ts`. Databaseintegrationerne kører de rigtige migrationer. Browsertestene bruger fiktive medarbejdere og tester blandt andet en allerede indlogget medarbejder, tabt netværkssvar, sidste ejer og konflikt under bekræftelse på desktop og emuleret Android. Demoen på port 5174 kan afprøves uden at ændre rigtig adgang.
+
 ### Indbakke og manuel overførsel
 
 Appen åbner i **Indbakke** (`#/indbakke`), som kun viser status `new`. Læsning, noter, e-mails og billeder flytter ikke henvendelsen. **Flyt til Sager** bruger den eksisterende `change_lead_status`-kommando til `clarifying`: samme sag, original henvendelse og samtale bevares, og medarbejder, tidspunkt og overgangen registreres atomisk i historikken. Genforsøg genbruger kommando-id'et, og en gammel version kræver gennemgang før en ny handling.

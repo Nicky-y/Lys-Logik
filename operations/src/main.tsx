@@ -395,6 +395,7 @@ function Application() {
             (member) => member.user_id === demoState.staff.user_id,
           )!;
           if (
+            current.active !== demoState.staff.active ||
             current.role !== demoState.staff.role ||
             current.is_owner !== demoState.staff.is_owner
           )
@@ -428,10 +429,10 @@ function Application() {
     return (
       <main className="loading-screen">
         <ShieldCheck size={32} />
-        <h1>Din konto afventer adgang</h1>
+        <h1>Din konto har ikke adgang</h1>
         <p>
           {accessError ||
-            'Du er logget ind, men er endnu ikke tilføjet som aktiv medarbejder.'}
+            'Du er logget ind, men har ikke aktiv medarbejderadgang. Kontakt en ejer, hvis du mener, det er en fejl.'}
         </p>
         <button className="secondary" onClick={() => void signOut()}>
           Log ud

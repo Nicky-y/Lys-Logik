@@ -2,11 +2,12 @@ import {
   StaffSchema,
   StaffAccessCommandSchema,
   StaffAccessReceiptSchema,
+  StaffDeactivationCommandSchema,
   canManageStaff,
   type Staff,
 } from '../../supabase/functions/_shared/contracts/staff.ts';
-import { StaffAccessError, type StaffAccessGateway } from './staff-access';
-import { randomId } from './random-id';
+import { StaffAccessError, type StaffAccessGateway } from './staff-access.ts';
+import { randomId } from './random-id.ts';
 import {
   StaffInvitationCommandSchema,
   StaffInvitationSchema,
@@ -119,6 +120,47 @@ export function createDemoStaffAccess(current: Staff): StaffAccessGateway {
         access_version: member.access_version + 1,
       });
       Object.assign(member, updated);
+      const receipt = StaffAccessReceiptSchema.parse({
+        userId: member.user_id,
+        version: member.access_version,
+        eventId: randomId(),
+      });
+      receipts.set(command.commandId, { payload, receipt });
+      return receipt;
+    },
+    async deactivate(input) {
+      const command = StaffDeactivationCommandSchema.parse(input);
+      const actor = members.find((m) => m.user_id === current.user_id)!;
+      if (!canManageStaff(actor)) throw new StaffAccessError('owner_required');
+      if (command.userId === actor.user_id)
+        throw new StaffAccessError('self_deactivation_forbidden');
+      const payload = JSON.stringify({ action: 'deactivate', ...command });
+      const previous = receipts.get(command.commandId);
+      if (previous) {
+        if (previous.payload !== payload)
+          throw new StaffAccessError('command_conflict');
+        return previous.receipt;
+      }
+      const member = members.find((m) => m.user_id === command.userId);
+      if (!member) throw new StaffAccessError('staff_not_found');
+      if (member.access_version !== command.expectedVersion)
+        throw new StaffAccessError('staff_version_conflict');
+      if (!member.active) throw new StaffAccessError('staff_already_inactive');
+      if (
+        member.is_owner &&
+        !members.some(
+          (m) => m.user_id !== member.user_id && m.active && m.is_owner,
+        )
+      )
+        throw new StaffAccessError('last_owner_required');
+      Object.assign(
+        member,
+        StaffSchema.parse({
+          ...member,
+          active: false,
+          access_version: member.access_version + 1,
+        }),
+      );
       const receipt = StaffAccessReceiptSchema.parse({
         userId: member.user_id,
         version: member.access_version,
