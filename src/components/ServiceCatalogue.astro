@@ -31,9 +31,20 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
             aria-labelledby={`service-${service.id}`}
           >
             <a
-              class="catalogue-image-link"
+              class:list={[
+                'catalogue-image-link',
+                {
+                  'catalogue-image-speciality':
+                    service.id === 'bygningsautomatik',
+                },
+              ]}
               href={`${assetBase}services/${service.page}/`}
               aria-label={`Læs om ${service.label}`}
+              aria-describedby={
+                service.id === 'bygningsautomatik'
+                  ? 'automation-speciality-label'
+                  : undefined
+              }
             >
               <img
                 class="catalogue-image"
@@ -44,6 +55,14 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
                 loading="lazy"
                 decoding="async"
               />
+              {service.id === 'bygningsautomatik' && (
+                <span
+                  id="automation-speciality-label"
+                  class="catalogue-speciality"
+                >
+                  Vores specialisering
+                </span>
+              )}
               <span class="catalogue-tag" aria-hidden="true">
                 {service.tag}
               </span>
@@ -79,6 +98,37 @@ const assetBase = import.meta.env.BASE_URL.endsWith('/')
 </section>
 
 <style>
+  .catalogue-image-speciality::after {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    height: 100px;
+    background: linear-gradient(
+      to bottom,
+      rgb(17 32 26 / 78%),
+      rgb(17 32 26 / 54%) 48%,
+      transparent
+    );
+    pointer-events: none;
+  }
+  .catalogue-speciality {
+    position: absolute;
+    z-index: 1;
+    top: 16px;
+    right: 16px;
+    max-width: calc(100% - 32px);
+    padding: 7px 12px;
+    border: 1px solid currentColor;
+    border-radius: 4px;
+    color: #70ffb7;
+    background: transparent;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+    line-height: 1.4;
+    pointer-events: none;
+  }
+
   .catalogue-image-arrow {
     position: absolute;
     right: 16px;

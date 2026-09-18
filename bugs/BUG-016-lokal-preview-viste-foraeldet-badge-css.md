@@ -39,3 +39,4 @@ Ved uoverensstemmelse mellem kode/test og synlig prøvevisning: kontrollér styl
 ## Historik
 
 - 2026-09-17: Observeret under justering af specialiseringsbadge. Lokal prøvevisning genoprettet; permanent årsag uafklaret.
+- 2026-09-18: Gentaget på port 4341 efter `7be5b32`. Den nye tekst blev vist under billedet uden den nye positionering og kant. En separat Astro-prøvevisning på port 4342 med egen Vite-cache viste korrekt transparent badge med lysegrøn kant øverst til højre. Visuelt kontrolleret i browseren; de to fokuserede desktop-/mobiltests bestod mod den friske server. Dette er en verificeret omgåelse; årsagen er fortsat ikke isoleret.

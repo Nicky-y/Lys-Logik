@@ -11,6 +11,30 @@ const serviceRoutes: Record<string, string> = {
   hvidevarer: 'hvidevarer',
 };
 
+test('speciality outline labels only building automation without blocking its image link', async ({ page }) => {
+  await page.goto('/#ydelser');
+  const badge = page.locator('.catalogue-speciality');
+  await expect(badge).toHaveCount(1);
+  await expect(badge).toHaveText('Vores specialisering');
+  const card = page.getByRole('article', { name: 'Bygningsautomatik', exact: true });
+  const link = card.locator('.catalogue-image-link');
+  await expect(link).toHaveAccessibleDescription('Vores specialisering');
+  await expect(card.locator('.catalogue-tag')).toHaveText('Automatik');
+  const appearance = await badge.evaluate((el) => {
+    const style = getComputedStyle(el);
+    return { background: style.backgroundColor, border: style.borderTopColor, text: style.color };
+  });
+  expect(appearance.background).toBe('rgba(0, 0, 0, 0)');
+  expect(appearance.border).toBe(appearance.text);
+  const badgeBox = (await badge.boundingBox())!;
+  const imageBox = (await link.boundingBox())!;
+  expect(badgeBox.x).toBeGreaterThanOrEqual(imageBox.x);
+  expect(badgeBox.x + badgeBox.width).toBeLessThanOrEqual(imageBox.x + imageBox.width);
+  expect(badgeBox.y - imageBox.y).toBeCloseTo(16, 0);
+  await link.click({ position: { x: badgeBox.x - imageBox.x + 10, y: badgeBox.y - imageBox.y + 10 } });
+  await expect(page).toHaveURL(/\/services\/bygningsautomatik\/$/);
+});
+
 test('building automation leads the six-card catalogue and opens its service page', async ({
   page,
 }, testInfo) => {
