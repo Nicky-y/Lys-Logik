@@ -871,29 +871,6 @@ details[open] .faq-plus {
   width: 24px;
   height: 24px;
 }
-.pilot-choice {
-  padding: 16px;
-  margin-bottom: 24px;
-  border: 1px solid #ead398;
-  border-radius: 4px;
-  background: #fff8e7;
-}
-.pilot-choice label strong {
-  display: block;
-  color: var(--ink);
-  font-weight: 650;
-  line-height: 1.5;
-}
-.pilot-choice label span {
-  display: block;
-  margin-top: 5px;
-  color: #5e5541;
-  font-size: 0.75rem;
-  line-height: 1.65;
-}
-.pilot-choice input:before {
-  content: none;
-}
 .form-submit {
   width: 100%;
   margin-top: 23px;

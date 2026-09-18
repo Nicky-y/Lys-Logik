@@ -37,39 +37,40 @@ import { site } from '../data/site';
       </div>
     </div>
 
-    <aside class="pilot-offer" aria-labelledby="pilot-offer-title">
-      <div class="pilot-offer-heading">
-        <h3 id="pilot-offer-title">Pilottilbuddet</h3>
-        <span>{site.pilotPlaces} udvalgte projekter</span>
-      </div>
-      <p class="pilot-limit">Op til</p>
-      <p class="pilot-hours">
-        <strong>{site.pilotHours}</strong>{' '}
-        <span>timers arbejde{' '}<b>0 kr. i arbejdsløn</b></span>
-      </p>
-      <dl class="pilot-terms">
-        <div><dt>Du betaler</dt><dd>Materialer og evt. lejeudstyr.</dd></div>
-        <div>
-          <dt>Vi aftaler først</dt><dd>Opgave, omfang og alle udgifter.</dd>
+    <div class="pilot-offer-column">
+      <aside class="pilot-offer" aria-labelledby="pilot-offer-title">
+        <div class="pilot-offer-heading">
+          <h3 id="pilot-offer-title">Pilottilbuddet</h3>
+          <span>{site.pilotPlaces} udvalgte projekter</span>
         </div>
-        <div>
-          <dt>Hvis opgaven tager længere tid</dt><dd>
-            Arbejde ud over de {site.pilotHours} timer kræver en særskilt aftale.
-          </dd>
-        </div>
-      </dl>
+        <p class="pilot-limit">Op til</p>
+        <p class="pilot-hours">
+          <strong>{site.pilotHours}</strong>{' '}
+          <span>timers arbejde{' '}<b>0 kr. i arbejdsløn</b></span>
+        </p>
+        <dl class="pilot-terms">
+          <div><dt>Du betaler</dt><dd>Materialer og evt. lejeudstyr.</dd></div>
+          <div>
+            <dt>Vi aftaler først</dt><dd>Opgave, omfang og alle udgifter.</dd>
+          </div>
+          <div>
+            <dt>Hvis opgaven tager længere tid</dt><dd>
+              Arbejde ud over de {site.pilotHours} timer kræver en særskilt aftale.
+            </dd>
+          </div>
+        </dl>
+      </aside>
       <a
         class="button pilot-action"
-        href="#kontakt"
-        data-pilot
+        href="#formular"
         aria-describedby="pilot-enquiry-hint"
       >
-        Foreslå et pilotprojekt <Icon name="arrow" />
+        Beskriv din opgave <Icon name="arrow" />
       </a>
       <p class="pilot-enquiry-hint" id="pilot-enquiry-hint">
-        Pilotønsket markeres i formularen.<br />Henvendelsen er uforpligtende.
+        Henvendelsen er uforpligtende.
       </p>
-    </aside>
+    </div>
   </div>
 </section>
 
@@ -167,7 +168,7 @@ import { site } from '../data/site';
     margin-top: 5px;
   }
   .pilot-terms {
-    margin: 28px 0;
+    margin: 28px 0 0;
     padding-top: 24px;
     border-top: 1px solid #19232933;
     display: grid;
@@ -184,23 +185,14 @@ import { site } from '../data/site';
     line-height: 1.6;
   }
   .pilot-action {
-    width: 100%;
-    justify-content: space-between;
+    margin-top: 24px;
     gap: 16px;
-    background: var(--ink);
-    color: var(--paper);
-  }
-  .pilot-action:hover {
-    background: #28363f;
-  }
-  .pilot-action:focus-visible {
-    outline-color: var(--ink);
   }
   .pilot-enquiry-hint {
     font-size: 0.8125rem;
     line-height: 1.65;
-    color: #3e3b31;
-    margin-top: 16px;
+    color: var(--muted);
+    margin-top: 12px;
   }
   @media (max-width: 860px) {
     .pilot-grid {
@@ -208,7 +200,7 @@ import { site } from '../data/site';
       gap: 36px;
     }
     .pilot-copy,
-    .pilot-offer {
+    .pilot-offer-column {
       width: 100%;
       max-width: 620px;
       margin-inline: auto;

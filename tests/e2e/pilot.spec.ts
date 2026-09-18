@@ -25,6 +25,14 @@ test('pilot offer presents readable terms and a contrasting action in every inte
   await expect(pilot).toContainText('referencecase');
   await expect(pilot.locator('a.button')).toHaveCount(1);
   const action = pilot.locator('a.button');
+  await expect(action).toHaveAccessibleName('Beskriv din opgave');
+  const offerBox = (await pilot.locator('.pilot-offer').boundingBox())!;
+  const actionBox = (await action.boundingBox())!;
+  expect(actionBox.y - (offerBox.y + offerBox.height)).toBeGreaterThanOrEqual(20);
+  await expect(pilot.locator('.pilot-offer a.button')).toHaveCount(0);
+  expect(await action.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe(
+    await page.locator('.hero-actions .button').evaluate((el) => getComputedStyle(el).backgroundColor),
+  );
   for (const state of ['default', 'hover', 'focus']) {
     if (state === 'hover') await action.hover();
     if (state === 'focus') {
@@ -48,35 +56,28 @@ test('pilot action reaches the ordinary form without changing an existing draft'
   page,
 }) => {
   await page.goto('/#kontakt');
-  const choice = page.getByRole('checkbox', {
-    name: /Jeg vil gerne komme i betragtning/,
-  });
-  await expect(choice).not.toBeChecked();
-  await expect(choice).not.toHaveAttribute('required');
+  await expect(page.locator('[name="pilotRequested"]')).toHaveCount(0);
   await expect(page.locator('#enquiry-form input').first()).toHaveAttribute(
     'id',
-    'pilotRequested',
+    'name',
   );
   await page.getByLabel('Dit navn').fill('Anna Jensen');
   await page
     .getByLabel('Fortæl lidt om din idé')
     .fill('Vi vil gerne have hjælp til vores lamper.');
   await page.locator('#pilot').scrollIntoViewIfNeeded();
-  const action = page.getByRole('link', { name: 'Foreslå et pilotprojekt' });
+  const action = page.locator('#pilot').getByRole('link', { name: 'Beskriv din opgave' });
   await expect(action).toHaveAccessibleDescription(
-    'Pilotønsket markeres i formularen. Henvendelsen er uforpligtende.',
+    'Henvendelsen er uforpligtende.',
   );
   await action.focus();
   await page.keyboard.press('Enter');
-  await expect(page).toHaveURL(/#kontakt$/);
+  await expect(page).toHaveURL(/#formular$/);
   await expect(page.getByLabel('Dit navn')).toHaveValue('Anna Jensen');
   await expect(page.getByLabel('Fortæl lidt om din idé')).toHaveValue(
     'Vi vil gerne have hjælp til vores lamper.',
   );
-  await expect(choice).toBeChecked();
-  await choice.focus();
-  await page.keyboard.press('Space');
-  await expect(choice).not.toBeChecked();
+  await expect(page.locator('#enquiry-form input[type="checkbox"]')).toHaveCount(1);
 });
 
 test('pilot terms and action fit narrow screens and enlarged text', async ({

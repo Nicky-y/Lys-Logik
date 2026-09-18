@@ -192,7 +192,8 @@ test('pilot offer and payment terms consistently specify four hours', () => {
   assert.match(text, /3 udvalgte projekter/);
   assert.match(text, /Materialer og evt\. lejeudstyr/);
   assert.match(text, /efter aftale med dig.*referencecase/);
-  assert.match(text, /Pilotønsket markeres i formularen/);
+  assert.match(text, /Beskriv din opgave/);
+  assert.doesNotMatch(text, /Pilotønsket markeres i formularen/);
   assert.doesNotMatch(text, /Skriv “pilotprojekt”/);
   assert.ok(html.includes('op til 4 timers arbejde uden beregning'));
   assert.ok(
@@ -204,10 +205,7 @@ test('pilot offer and payment terms consistently specify four hours', () => {
 test('production ships the live form with the production endpoint and real widget', () => {
   const form = html.match(/<form\b[^>]*id="enquiry-form"[\s\S]*?<\/form>/)?.[0];
   assert.ok(form);
-  const pilotChoice = form.match(/<input\b[^>]*id="pilotRequested"[^>]*>/)?.[0];
-  assert.ok(pilotChoice);
-  assert.doesNotMatch(pilotChoice, /\b(?:checked|required)\b/);
-  assert.match(pilotChoice, /type="checkbox"/);
+  assert.doesNotMatch(form, /pilotRequested|pilot-choice/);
   assert.ok(form.includes('Send en uforpligtende henvendelse'));
   assert.ok(form.includes('pris og omfang aftales'));
   assert.match(

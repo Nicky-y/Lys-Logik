@@ -60,6 +60,9 @@ test('hero separates ordinary enquiries from the bounded pilot offer', async ({ 
   await page.goto('/');
   await page.locator('[data-consent-reject]').click();
   const hero = page.locator('.hero');
+  await expect(hero.locator('.hero-description')).toHaveText(
+    /^Bygningsautomatik, smart-home og belysning\./,
+  );
   const primary = hero.getByRole('link', { name: 'Beskriv din opgave', exact: true });
   await expect(primary).toHaveAttribute('href', '#kontakt');
   await expect(hero.getByRole('link', { name: 'Se vores serviceydelser' })).toHaveAttribute('href', '#ydelser');

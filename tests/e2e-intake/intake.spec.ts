@@ -57,19 +57,19 @@ test('sends form through the real local endpoint and stores one enquiry with its
   ).toEqual({ local: 0, session: 0 });
 });
 
-test('optional pilot checkbox stores interest separately and resets for the next enquiry', async ({
+test('ordinary form does not infer pilot interest from the offer link or a later enquiry', async ({
   page,
   request,
 }) => {
-  const choice = page.locator('#pilotRequested');
-  await expect(choice).not.toBeChecked();
+  await expect(page.locator('[name="pilotRequested"]')).toHaveCount(0);
   await fillEnquiry(page);
   const description = await page.locator('#description').inputValue();
-  await choice.check();
+  await page.locator('#pilot .pilot-action').click();
+  await expect(page).toHaveURL(/#formular$/);
   await page.getByRole('button', { name: 'Send din henvendelse' }).click();
   await expect(page.locator('#form-success')).toBeVisible();
   await page.getByRole('button', { name: 'Ny henvendelse' }).click();
-  await expect(choice).not.toBeChecked();
+  await expect(page.locator('[name="pilotRequested"]')).toHaveCount(0);
   await fillEnquiry(page);
   await page.getByRole('button', { name: 'Send din henvendelse' }).click();
   await expect(page.locator('#form-success')).toBeVisible();
@@ -78,14 +78,14 @@ test('optional pilot checkbox stores interest separately and resets for the next
   ).json();
   expect(rows).toHaveLength(2);
   expect(
-    rows.map((row: { pilot_requested: boolean }) => row.pilot_requested),
-  ).toEqual([true, false]);
+    rows.map((row: { pilot_requested: boolean | null }) => row.pilot_requested),
+  ).toEqual([null, null]);
   for (const row of rows) {
     expect(row.description).toBe(description);
     expect(row.original_submission).toMatchObject({
       description,
-      pilotRequested: row.pilot_requested,
     });
+    expect(row.original_submission).not.toHaveProperty('pilotRequested');
   }
 });
 
@@ -131,7 +131,6 @@ test('lost response preserves fields and retry confirms the same database enquir
   request,
 }) => {
   let first = true;
-  await page.locator('#pilotRequested').check();
   const keys: string[] = [];
   await page.route('http://127.0.0.1:54325/create-lead', async (route) => {
     if (route.request().method() !== 'POST') {
@@ -152,7 +151,9 @@ test('lost response preserves fields and retry confirms the same database enquir
   );
   await expect(page.getByLabel('Din e-mail')).toHaveValue('anna@example.com');
   await expect(page.locator('#form-success')).toBeHidden();
-  await expect(page.locator('#pilotRequested')).toBeChecked();
+  await expect(page.getByLabel('Fortæl lidt om din idé')).toHaveValue(
+    'Vi vil gerne have bedre lys over vores spisebord.',
+  );
   await page.getByRole('button', { name: 'Send din henvendelse' }).click();
   await expect(page.locator('#form-success')).toBeVisible();
   expect(keys).toHaveLength(2);

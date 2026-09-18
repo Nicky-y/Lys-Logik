@@ -25,6 +25,7 @@ Oversigten er startet 15. september 2026 med to dokumenterede fejl fra den senes
 | [BUG-015](BUG-015-virksomhedsoplysninger-mangler-fysisk-adresse.md) | Virksomhedsoplysninger mangler fysisk adresse | Hjemmeside / virksomhedsoplysninger | Løst og verificeret offentligt | 2026-09-16 | Se commitreference i registreringen |
 | [BUG-016](BUG-016-lokal-preview-viste-foraeldet-badge-css.md) | Lokal prøvevisning viste gammel badge-styling | Lokal preview / Astro | Under undersøgelse; symptom løst ved genstart | 2026-09-17 | Ingen permanent rettelse |
 | [BUG-017](BUG-017-redirect-test-hentede-live-html.md) | Mocked redirect-test hentede live HTML | Browser-tests | Løst og verificeret | 2026-09-17 | Se commitreference i registreringen |
+| [BUG-018](BUG-018-intake-tests-haenger-efter-afsluttede-scenarier.md) | Intake-tests afslutter ikke efter gennemførte scenarier | Browser-tests / Windows | Under undersøgelse | 2026-09-18 | Ikke rettet |
 
 Oversigten er ikke en fuldstændig sikkerhedsgennemgang. BUG-007 og BUG-008 er registreret fra den indleverede rapport og behandles som separate rettelser.
 
